@@ -32,5 +32,8 @@
 		"axios": "^1.7.9",
 		"html5-qrcode": "^2.3.8",
 		"svelte-sonner": "^0.3.28"
-	}
+	},
+	"engines": {
+    "node": "20.x"
+  }
 }
