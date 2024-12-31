@@ -13,12 +13,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        // flowbite-svelte
-        primary: {
+			// flowbite-svelte
+				primary: {
 					DEFAULT: '#22b186',
 					text: 'white',
-					background: '#eee',
-        },
+				},
+				light: {
+					text: '#333',
+					background: 'white',
+				},
+				dark: {
+					text: 'white',
+					background: '#333',
+				},
 				check: {
 					DEFAULT: 'white',
 				},
@@ -27,6 +34,9 @@ export default {
 				},
 				skip: {
 					DEFAULT: '#acf',
+				},
+				config: {
+					DEFAULT: 'blue-600',
 				},
       }
     },

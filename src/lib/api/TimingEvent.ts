@@ -1,19 +1,19 @@
-import { Dayjs } from 'dayjs';
-import type { TimingPoint } from './TimingPoint';
+//import { Dayjs } from 'dayjs';
+import { TimingPoint } from '$lib/api/TimingPoint';
 
 type TimingEventParams = {
 	eventCode: string;
-	eventDate: Dayjs;
+	eventDate: string;	//Dayjs;
 	eventTitle: string;
-	eventUpdatedAt: Dayjs;
+	eventUpdatedAt: string;	//Dayjs;
 	points: TimingPoint[];
 }
 
 export class TimingEvent {
 	public eventCode: string;
-	public eventDate: Dayjs;
+	public eventDate: string;	//Dayjs;
 	public eventTitle: string;
-	public eventUpdatedAt: Dayjs;
+	public eventUpdatedAt: string;	//Dayjs;
 	public points: TimingPoint[];
 
 	constructor({eventCode, eventDate, eventTitle, eventUpdatedAt, points }: TimingEventParams) {

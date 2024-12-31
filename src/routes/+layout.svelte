@@ -1,23 +1,25 @@
 <script lang="ts">
 	import '../app.css';
 	
-	import { dayjs } from 'svelte-time';
+	import { dayjs } from '$lib/type/Dayjs';
 	import Icon from "@iconify/svelte";
 	import { Button } from 'flowbite-svelte';
-	import { selectedRegisterMode } from '../stores';
+	import { selectedEvent, selectedPoint, selectedRegisterMode } from '$lib/stores';
 	import { RegisterMethod, RegisterMethodState } from '$lib/type/RegisterMethod';
 	import { ScanInput } from '$lib/type/ScanInput';
 	import { ScanInputValidator } from '$lib/ScanInputValidator';
 	import type { ValidationResultState } from '$lib/type/ValidationResult';
 	import { QRTToast } from '$lib/QRTToast';
-	import DrawerMenu from '../components/DrawerMenu.svelte';
-  import ConfigLoginDialog from '../components/ConfigLoginDialog.svelte';
+	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
+  import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
 		
 	import { Toaster } from 'svelte-sonner';
-    import ConfigDialog from '../components/ConfigDialog.svelte';
-    import EventLoadDialog from '../components/EventLoadDialog.svelte';
+	import { page } from '$app/stores';
 
 	let { children } = $props();
+
+console.log('page');
+console.log($page.url.href);
 
 	// PWAのためのservice-worker登録
 	if ('serviceWorker' in navigator) {
@@ -134,8 +136,7 @@
 <Toaster richColors closeButton />
 <DrawerMenu bind:hidden={drawerHidden}></DrawerMenu>
 <ConfigLoginDialog />
-<ConfigDialog />
-<EventLoadDialog />
+<!-- <ConfigDialog /> -->
 
 
 <!-- 共通ヘッダ部分 -->
@@ -146,8 +147,8 @@
 	</Button>
 
 	<div class="grow">
-		<div id="point_name" class="text-primary-text text-xl whitespace-nowrap" style="text-align:left;">地点名</div>
-		<div id="event_name" class="text-primary-text text-xs whitespace-nowrap" style="text-align:left;">大会名</div>
+		<div id="point_name" class="text-primary-text text-xl whitespace-nowrap" style="text-align:left;">{ $selectedPoint?.pointTitle }</div>
+		<div id="event_name" class="text-primary-text text-xs whitespace-nowrap" style="text-align:left;">{ $selectedEvent?.eventTitle }</div>
 	</div>
 
 <!-- 	
@@ -157,6 +158,5 @@
 	 -->
 </header>
 
-
-<!-- メインコンテンツ -->
-{@render children()}
+	<!-- メインコンテンツ -->
+	{@render children()}

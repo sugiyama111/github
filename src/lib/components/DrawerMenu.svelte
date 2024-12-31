@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-	import { showsConfigLoginDialog } from '../stores';
+	import { showsConfigLoginDialog } from '$lib/stores';
 	import Icon from '@iconify/svelte';
 	import { Drawer, CloseButton, Sidebar, SidebarWrapper, SidebarGroup, SidebarItem, SidebarBrand, Button, Modal } from 'flowbite-svelte';
 	import { sineIn } from 'svelte/easing';
@@ -26,8 +26,8 @@
 
 <Drawer class="" transitionType="fly" {transitionParams} bind:hidden={hidden} id="sidebar2">
   <div class="flex items-center">
-    <h5 id="drawer-navigation-label-3" class="font-semibold text-3xl text-primary-text">QR-Timing3</h5>
-    <CloseButton on:click={() => hidden=true} class="mb-4 text-primary-text" />
+    <h5 id="drawer-navigation-label-3" class="font-semibold text-3xl dark:text-dark-text">QR-Timing3</h5>
+    <CloseButton on:click={() => hidden=true} class="mb-4 dark:text-dark-text" />
   </div>
   <Sidebar>
     <SidebarWrapper divClass="overflow-y-auto py-4 px-3 rounded">

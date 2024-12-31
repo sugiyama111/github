@@ -31,10 +31,6 @@ export class RegisterModeState {
 			this.mode = mode;
 	}
 
-	getMode(): RegisterMode {
-			return this.mode;
-	}
-
 	isCheck(): boolean {
 			return this.mode.code === RegisterMode.CHECK.code;
 	}
@@ -45,6 +41,10 @@ export class RegisterModeState {
 
 	isSkip(): boolean {
 			return this.mode.code === RegisterMode.SKIP.code;
+	}
+
+	getCode(): string {
+		return this.mode.code
 	}
 
 	setMode(newMode: RegisterMode): void {
