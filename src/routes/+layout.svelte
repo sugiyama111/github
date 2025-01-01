@@ -9,7 +9,7 @@
 	import { ScanInput } from '$lib/type/ScanInput';
 	import { ScanInputValidator } from '$lib/ScanInputValidator';
 	import type { ValidationResultState } from '$lib/type/ValidationResult';
-	import { QRTToast } from '$lib/QRTToast';
+	import { toast } from '$lib/QRTToast';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
   import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
 		
@@ -91,7 +91,7 @@ console.log($page.url.href);
 
 			// ユーザーにレスポンス(エラー)を返して終わり
 			const result = valResState.getResult();
-			new QRTToast().error(result.message);
+			toast.error(result.message);
 			
 			return;
 		}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { QRTToast } from '$lib/QRTToast';
+  import { toast } from '$lib/QRTToast';
 	import { inputPassword, showsConfigLoginDialog } from '$lib/stores';
 	import { Button, Input, Modal } from "flowbite-svelte";
 	import { goto } from '$app/navigation';
@@ -18,7 +18,7 @@
 			console.log(`ShowsConfigLoginDialog:${$showsConfigLoginDialog}`);
 		} else {
 			password = '';
-			new QRTToast().error('パスワードが違います');
+			toast.error('パスワードが違います');
 		}
 	}
 

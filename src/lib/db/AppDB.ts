@@ -5,12 +5,15 @@ import RecordEntity from './RecordEntity';
 import type { TimingPoint } from '$lib/api/TimingPoint';
 import type { TimingEvent } from '$lib/api/TimingEvent';
 import { dayjs } from '$lib/type/Dayjs';
+import TestEntity from './TestEntity';
 
 export default class AppDB extends Dexie {
 	
 	public members!: EntityTable<MemberEntity, 'member_code'>;
 	public logs!: EntityTable<LogEntity, 'log_id'>;
 	public records!: EntityTable<RecordEntity, 'seq'>;
+	public tests!: EntityTable<TestEntity, 'id'>;
+
 
 	constructor() {
 		super('qrt');
@@ -32,9 +35,13 @@ export default class AppDB extends Dexie {
       logs: '&log_id, event_code, point_id, point_code, point_name, log_start_time, record_count, sent_count',
 			// 初期化したいため、seqはオートインクリメントでない
       records: '&seq, [log_id+sent], member_code, member_name, race_num, time, method, mode', 
+			tests: '&id',
     });
 		
 		this.members.mapToClass(MemberEntity);
+		this.logs.mapToClass(LogEntity);
+		this.records.mapToClass(RecordEntity);
+		this.tests.mapToClass(TestEntity);
 
   }
 

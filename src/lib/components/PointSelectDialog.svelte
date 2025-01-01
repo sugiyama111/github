@@ -4,7 +4,7 @@
 	import { showsPointSelectDialog } from '$lib/stores';
 	import type { TimingPoint } from '$lib/api/TimingPoint';
 	import { db } from '$lib/db/db';
-    import { QRTToast } from '$lib/QRTToast';
+	import { toast } from '$lib/QRTToast';
 
 	//$: selectedId = $selectedPoint?.pointId;
 	let selectedId = $selectedPoint?.pointId;
@@ -16,7 +16,7 @@
 	const asyncSelectPoint = async (point:TimingPoint) => {
 		// 万一、イベントが選択されていない場合は何もしない
 		if (!$selectedEvent) {
-			new QRTToast().error('イベントが選択されていません');
+			toast.error('イベントが選択されていません');
 			return;
 		}
 		

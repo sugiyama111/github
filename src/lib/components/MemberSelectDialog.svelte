@@ -2,17 +2,25 @@
   import { Modal, Radio } from 'flowbite-svelte';
 	import { showsMemberSelectDialog } from '$lib/stores';
 	import type MemberEntity from '$lib/db/MemberEntity';
+	import { selectedRegisterMode } from '$lib/stores'
 
-	const { memberCollection, onMemberSelected } = $props();
+	const { message, memberCollection, onMemberSelected } = $props();
 	let selectedMemberCode:string = $state('');
 
 	const selectMember = (member:MemberEntity) => {
-		//$selectedPoint = member;
 		onMemberSelected(member);
 	}
 </script>
 
-<Modal title="対象を選択してください" size="xs" bind:open={$showsMemberSelectDialog}>
+<Modal title={ $selectedRegisterMode.getText() } size="xs" 
+	classHeader={`bg-${$selectedRegisterMode.getCode()}`}
+	class={`bg-${$selectedRegisterMode.getCode()} text-gray-800 font-bold`}
+	bind:open={$showsMemberSelectDialog}>
+	
+	<section class="notice">
+		{ message }
+	</section>
+
 	<ul class="w-100 divide-y divide-gray-200 dark:divide-gray-600">
 {#each memberCollection as member}
 	<li>

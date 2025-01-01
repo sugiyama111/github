@@ -1,8 +1,5 @@
 
-import { Entity } from 'dexie';
-import type AppDB from '$lib/db/AppDB';
-
-export default class LogEntity extends Entity<AppDB> {
+export default class LogEntity {
   log_id!: number;
 	event_code!: string;
 	point_id!  : string;

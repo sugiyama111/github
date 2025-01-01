@@ -1,15 +1,14 @@
-import { toast } from 'svelte-sonner';
+import { toast as svelteToast } from 'svelte-sonner';
 
-export const QRTToastType = {
+const QRTToastType = {
 	SUCCESS: 'success',
 	ERROR: 'error',
 	WARNING: 'warning',
 	INFO: 'info',
 } as const;
-export type QRTToastType = (typeof QRTToastType)[keyof typeof QRTToastType];
+type QRTToastType = (typeof QRTToastType)[keyof typeof QRTToastType];
 
-
-export class QRTToast {
+class QRTToast {
 	
 	success = (message:string) => {
 		this.showToast(message, QRTToastType.SUCCESS);
@@ -31,22 +30,22 @@ export class QRTToast {
 
 		switch (type) {
 			case QRTToastType.SUCCESS:
-				toast.success(message, {
+				svelteToast.success(message, {
 					duration: 5000,
 				});
 				break;
 			case QRTToastType.ERROR:
-				toast.error(message, {
+				svelteToast.error(message, {
 					duration: 7000,
 				});
 				break;
 			case QRTToastType.WARNING:
-				toast.warning(message, {
+				svelteToast.warning(message, {
 					duration: 5000,
 				});
 				break;
 			case QRTToastType.INFO:
-				toast.info(message, {
+				svelteToast.info(message, {
 					duration: 4000,
 				});
 				break;
@@ -55,3 +54,5 @@ export class QRTToast {
 	}
 
 }
+
+export const toast = new QRTToast();

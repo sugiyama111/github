@@ -6,20 +6,26 @@
 	import Keypad from "$lib/components/Keypad.svelte";
 	import { db } from "$lib/db/db";
 	import MemberEntity from "$lib/db/MemberEntity";
-	import { QRTToast } from "$lib/QRTToast";
+	import { toast } from "$lib/QRTToast";
 	import { config, selectedLogId, selectedRegisterMode, showsMemberSelectDialog, showsRegisterConfirmDialog } from "$lib/stores";
+	import { lastRegistered, lastRegisteredTime } from '$lib/stores';
 	import MemberSelectDialog from '$lib/components/MemberSelectDialog.svelte';
 	import RegisterConfirmDialog from '$lib/components/RegisterConfirmDialog.svelte';
 	import { dayjs, type Dayjs } from '$lib/type/Dayjs';
-	
-    import { RegisterMethod } from "$lib/type/RegisterMethod";
+
+	import { RegisterMethod } from "$lib/type/RegisterMethod";
+	import RecordEntity from "$lib/db/RecordEntity";
 
 	let mode:RegisterModeState = $state(new RegisterModeState(RegisterMode.CHECK));
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
 	let memberForConfirm:MemberEntity | null = $state(null);
 	let measuringTime:Dayjs | null = null;
+	let registerMethod:RegisterMethod | null = null;
+	let specifiedMember:MemberEntity | null = null;
 
+	console.log('lastRegisteredTime');
+	console.log($lastRegisteredTime);
 
 	function vib() {
 		console.log('vib');
@@ -33,20 +39,23 @@
 		
 		measuringTime = dayjs();
 
-		await asyncFilterProcess(memberList, measuringTime, RegisterMethod.KEYPAD);
+		registerMethod = RegisterMethod.KEYPAD;
+		await asyncFilterProcess(memberList);
 	}
 	
 	// 登録プロセス1：メンバー絞り込み
-	const asyncFilterProcess = async (memberCollection:MemberEntity[], measuringTime:Dayjs, method:RegisterMethod) => {
+	const asyncFilterProcess = async (memberCollection:MemberEntity[]) => {
 console.log('asyncFilterProcess');
 console.log(measuringTime);
 
 		// 複数存在する場合は選択ダイアログを表示
 		if (memberCollection.length == 0) {
-			new QRTToast().warning('名簿にみつかりません');
+			toast.warning('名簿にみつかりません');
 		} else if (memberCollection.length == 1) {
 			// 特定できた場合(→プロセス2へ)
-			await asyncConfirmProcess(memberCollection[0], measuringTime, method);
+			specifiedMember = memberCollection[0];
+			console.log(specifiedMember);
+			await asyncConfirmProcess();
 		} else {
 			// 複数存在する場合
 			memberCollectionForSelect = memberCollection;
@@ -55,25 +64,38 @@ console.log(measuringTime);
 	}
 
 	// 登録プロセス2：登録是非確認
-	const asyncConfirmProcess = async (member:MemberEntity, measuringTime:Dayjs, method:RegisterMethod) => {
+	const asyncConfirmProcess = async () => {
 		console.log('asyncConfirmProcess');
 		console.log(measuringTime);
 
 		if ($selectedRegisterMode.isCheck()) {
 			// 確認不要の場合
-			await asyncRegisterProcess(member, measuringTime, method);
+			await asyncRegisterProcess();
 		} else {
 			// 確認必要の場合
-			memberForConfirm = member;
+			memberForConfirm = specifiedMember;
 			$showsRegisterConfirmDialog = true;
 		}
 	}
 
 	// 登録プロセス3：登録
-	const asyncRegisterProcess = async (member:MemberEntity, measuringTime:Dayjs, method:RegisterMethod) => {
+	const asyncRegisterProcess = async () => {
 		// 万一、記録対象のログが選ばれていない場合
 		if ($selectedLogId === null) {
-			new QRTToast().error('ログが選択されていません');
+			toast.error('ログが選択されていません');
+			return;
+		}
+
+		if (specifiedMember === null) {
+			toast.error('対象メンバーが特定されていません');
+			return;
+		}
+		if (measuringTime === null) {
+			toast.error('計測時刻が異常です');
+			return;
+		}
+		if (registerMethod === null) {
+			toast.error('計測方法が選択されていません');
 			return;
 		}
 
@@ -85,23 +107,28 @@ console.log(measuringTime);
 		const regRecordObj = {
 			seq: nextSeq,
 			log_id: $selectedLogId,
-			member_code: member.member_code,
-			member_name: member.name,
-			race_num: member.bib_number,
+			member_code: specifiedMember.member_code,
+			member_name: specifiedMember.name,
+			race_num: specifiedMember.bib_number,
 			time: measuringTime.format('YYYY/MM/DD HH:mm:ss.SSS'),
-			method: method.code,
+			method: registerMethod.code,
 			mode:$selectedRegisterMode.getCode(),
 			sent: false,
 		};
 
     // 登録
 		try {
-			await db.records.add(regRecordObj);
+			const record = new RecordEntity(regRecordObj);
+			await db.records.add(record);
+
+			// 最終登録storeを更新
+			$lastRegistered[$selectedRegisterMode.getCode() as keyof typeof $lastRegistered] = record;
+			
 
 			// 音を鳴らす
 
 			// Toast
-			new QRTToast().success('登録しました');
+			toast.success('登録しました');
 
 			// モーダルを条件によっては閉じる
 
@@ -116,8 +143,8 @@ console.log(measuringTime);
 
 <main class={`bg-${$selectedRegisterMode.getCode()} min-h-screen`}>
 
-<MemberSelectDialog memberCollection={memberCollectionForSelect} onMemberSelected={asyncConfirmProcess} />
-<RegisterConfirmDialog member={memberForConfirm} onRegisterConfirmed={asyncRegisterProcess} />
+<MemberSelectDialog message="複数見つかりました。対象を選んでください。" memberCollection={memberCollectionForSelect} onMemberSelected={(member:MemberEntity)=>{specifiedMember = member; asyncConfirmProcess();}} />
+<RegisterConfirmDialog message="登録してよいですか？" member={memberForConfirm} onRegisterConfirmed={asyncRegisterProcess} />
 
 <!-- モード切替タブ -->
 <Tabs tabStyle="full" contentClass="m-0 p-0" class="bg-gray-500 flex justify-between w-full">
@@ -131,18 +158,22 @@ console.log(measuringTime);
 		</div>
 		<section class="pt-4 bg-check">
 			
-			<article id="last-data" class="p-2 ml-auto mr-auto mb-4 bg-slate-300 shadow-md 
+			<article class="last-data p-2 ml-auto mr-auto mb-4 bg-slate-300 shadow-md 
 				text-black text-left rounded-md w-3/4 max-w-96">
-				<div class="flex"><Icon icon="material-symbols:check-circle-outline" />チェック</div>
-				<div>No. 101</div>
-				<div>田中 太郎</div>
-				<div><span class="text-sm">2024/</span>7/25 14:47<span class="text-sm">:42</span></div>
+				<div class="mode-chip"><Icon icon="material-symbols:check-circle-outline" />チェック</div>
+				<div>No. { $lastRegistered['check']?.race_num}</div>
+				<div>{ $lastRegistered['check']?.member_name }</div>
+				<div>
+					{#if $lastRegisteredTime['check']}
+					<span class="text-sm">{ $lastRegisteredTime['check'].format('YYYY') }/</span>{ $lastRegisteredTime['check'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['check'].format('ss') }</span>
+					{/if}
+				</div>
 			</article>
 
 		</section>
 	</TabItem>
 {/if}
-	
+
 {#if $config.availableRegisterModes.findIndex(m => m.code == RegisterMode.RETIRE.code) !== -1}
   <TabItem open={mode.isRetire()} class="flex-1"
 		onclick={()=>$selectedRegisterMode=new RegisterModeState(RegisterMode.RETIRE)}>
@@ -153,12 +184,16 @@ console.log(measuringTime);
 
 		<section class="pt-4 bg-retire">
 			
-			<article id="last-data" class="p-2 ml-auto mr-auto mb-4 bg-slate-300 shadow-md 
+			<article class="last-data p-2 ml-auto mr-auto mb-4 bg-slate-300 shadow-md 
 				text-black text-left rounded-md w-3/4 max-w-96">
-				<div class="flex"><Icon icon="material-symbols:close" />リタイア</div>
-				<div>No. 101</div>
-				<div>田中 太郎</div>
-				<div><span class="text-sm">2024/</span>7/25 14:47<span class="text-sm">:42</span></div>
+				<div class="mode-chip"><Icon icon="material-symbols:close" />リタイア</div>
+				<div>No. { $lastRegistered['retire']?.race_num}</div>
+				<div>{ $lastRegistered['retire']?.member_name }</div>
+				<div>
+					{#if $lastRegisteredTime['retire']}
+					<span class="text-sm">{ $lastRegisteredTime['retire'].format('YYYY') }/</span>{ $lastRegisteredTime['retire'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['retire'].format('ss') }</span>
+					{/if}
+				</div>
 			</article>
 
 		</section>
@@ -175,12 +210,16 @@ console.log(measuringTime);
 
 		<section class="pt-4 bg-skip">
 			
-			<article id="last-data" class="p-2 ml-auto mr-auto mb-4 bg-slate-300 shadow-md 
+			<article class="last-data p-2 ml-auto mr-auto mb-4 bg-slate-300 shadow-md 
 				text-black text-left rounded-md w-3/4 max-w-96">
-				<div class="flex"><Icon icon="material-symbols:step-over" />スキップ</div>
-				<div>No. 101</div>
-				<div>田中 太郎</div>
-				<div><span class="text-sm">2024/</span>7/25 14:47<span class="text-sm">:42</span></div>
+				<div class="mode-chip"><Icon icon="material-symbols:step-over" />スキップ</div>
+				<div>No. { $lastRegistered['skip']?.race_num}</div>
+				<div>{ $lastRegistered['skip']?.member_name }</div>
+				<div>
+					{#if $lastRegisteredTime['skip']}
+					<span class="text-sm">{ $lastRegisteredTime['skip'].format('YYYY') }/</span>{ $lastRegisteredTime['skip'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['skip'].format('ss') }</span>
+					{/if}
+				</div>
 			</article>
 
 		</section>
@@ -240,11 +279,23 @@ console.log(measuringTime);
 </main>
 
 <style lang="postcss">
+	.mode-chip {
+		@apply flex bg-light-background;
+		@apply rounded-xl;
+		@apply pl-2 pr-3 pt-1 pb-1;
+		width: fit-content;
+		line-height: 1.1rem;
+		box-shadow: 1px 1px gray;
+	}
 	.btn-circle {
 		border-radius: 50%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		@apply text-primary-text;
+	}
+
+	article.last-data div {
+		height: 1.6em;
 	}
 </style>

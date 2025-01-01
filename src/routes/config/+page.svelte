@@ -8,7 +8,7 @@
 	import { dayjs } from '$lib/type/Dayjs';
 	import EventLoadDialog from "$lib/components/EventLoadDialog.svelte";
 	import PointSelectDialog from "$lib/components/PointSelectDialog.svelte";
-	import { QRTToast } from "$lib/QRTToast";
+	import { toast } from "$lib/QRTToast";
 	import MemberLoadDialog from "$lib/components/MemberLoadDialog.svelte";
 	import axios from "axios";
 	import { Member } from "$lib/api/Member";
@@ -53,13 +53,13 @@
 		db.members.clear();
 		$config.memberCount = null;
 
-		new QRTToast().success('イベントを初期化しました');
+		toast.success('イベントを初期化しました');
 	}
 	// 名簿のクリア
 	const asyncClearMembers = async () => {
 		db.members.clear();
 		$config.memberCount = null;
-		new QRTToast().success('名簿を初期化しました');
+		toast.success('名簿を初期化しました');
 	}
 
 	// 名簿の取り込み
@@ -105,12 +105,12 @@ console.log(memberList)
 			db.members.bulkAdd(dbMemberList);
 
 			$config.memberCount = memberList.length;
-      new QRTToast().success(`${$config.memberCount}件の名簿を取得しました`);
+      toast.success(`${$config.memberCount}件の名簿を取得しました`);
 
 //       // 表示上のmembers件数を更新
 //       this.applyCountMemberAsync();
 		} catch (e) {
-			new QRTToast().error(`取得できませんでした`);
+			toast.error(`取得できませんでした`);
 		}
 
 		$showsMemberLoadDialog = false;

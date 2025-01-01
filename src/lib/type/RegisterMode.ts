@@ -46,6 +46,10 @@ export class RegisterModeState {
 	getCode(): string {
 		return this.mode.code
 	}
+	getText(): string {
+		return this.mode.text
+	}
+	
 
 	setMode(newMode: RegisterMode): void {
 			this.mode = newMode;

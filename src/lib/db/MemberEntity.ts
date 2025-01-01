@@ -1,8 +1,6 @@
 
-import { Entity } from 'dexie';
-import type AppDB from '$lib/db/AppDB';
 
-export default class MemberEntity extends Entity<AppDB> {
+export default class MemberEntity {
   member_code!: string;
   bib_number!: string;
 	name!: string;
