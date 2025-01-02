@@ -7,7 +7,7 @@
 	import { db } from "$lib/db/db";
 	import MemberEntity from "$lib/db/MemberEntity";
 	import { toast } from "$lib/QRTToast";
-	import { config, selectedLogId, selectedRegisterMode, showsMemberSelectDialog, showsRegisterConfirmDialog } from "$lib/stores";
+	import { config, selectedEvent, selectedPoint, selectedLogId, selectedRegisterMode, showsMemberSelectDialog, showsRegisterConfirmDialog } from "$lib/stores";
 	import { lastRegistered, lastRegisteredTime } from '$lib/stores';
 	import MemberSelectDialog from '$lib/components/MemberSelectDialog.svelte';
 	import RegisterConfirmDialog from '$lib/components/RegisterConfirmDialog.svelte';
@@ -15,6 +15,7 @@
 
 	import { RegisterMethod } from "$lib/type/RegisterMethod";
 	import RecordEntity from "$lib/db/RecordEntity";
+    import { Sound } from "$lib/Sound";
 
 	let mode:RegisterModeState = $state(new RegisterModeState(RegisterMode.CHECK));
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
@@ -50,7 +51,9 @@ console.log(measuringTime);
 
 		// 複数存在する場合は選択ダイアログを表示
 		if (memberCollection.length == 0) {
-			toast.warning('名簿にみつかりません');
+			// 音とトースト
+			toast.error('名簿にみつかりません');
+			Sound.Play(Sound.NOT_FOUND);
 		} else if (memberCollection.length == 1) {
 			// 特定できた場合(→プロセス2へ)
 			specifiedMember = memberCollection[0];
@@ -126,6 +129,10 @@ console.log(measuringTime);
 			
 
 			// 音を鳴らす
+			Sound.Play(Sound.READ_OK);
+
+			// 振動
+
 
 			// Toast
 			toast.success('登録しました');
@@ -141,11 +148,22 @@ console.log(measuringTime);
 	}
 </script>
 
-<main class={`bg-${$selectedRegisterMode.getCode()} min-h-screen`}>
-
 <MemberSelectDialog message="複数見つかりました。対象を選んでください。" memberCollection={memberCollectionForSelect} onMemberSelected={(member:MemberEntity)=>{specifiedMember = member; asyncConfirmProcess();}} />
 <RegisterConfirmDialog message="登録してよいですか？" member={memberForConfirm} onRegisterConfirmed={asyncRegisterProcess} />
+	
+<main class={`bg-${$selectedRegisterMode.getCode()}`} >
 
+{#if !$selectedEvent}
+	<section class="flex justify-center p-6 text-lg">
+		<Icon icon="mdi:alert-circle-outline" font-size="30" />
+		<div>イベントを読み込んでください</div>
+	</section>
+{:else if !$selectedPoint}
+	<section class="flex justify-center p-6 text-lg">
+		<Icon icon="mdi:alert-circle-outline" font-size="30" />
+		<div>地点を選択してください</div>
+	</section>
+{:else}
 <!-- モード切替タブ -->
 <Tabs tabStyle="full" contentClass="m-0 p-0" class="bg-gray-500 flex justify-between w-full">
 
@@ -228,21 +246,21 @@ console.log(measuringTime);
 </Tabs>
 
 <section class="control-panel p-2 ml-auto mr-auto mb-10 bg-yellow-100 shadow-md 
-	text-black text-left rounded-md w-3/4 min-h-48 max-w-96">
+	text-black text-left rounded-md w-3/4 max-w-96">
 
 {#if inputPanel == 'info'}
 	<article id="information" class="">
-	
-		<div>最終送信：<span class="text-sm">2024/</span>7/25 14:49<span class="text-sm">:01</span></div>
-		<div id="info-detail">
-			端末内　件数　回数
-		</div>
+		スキャナはありません<br>
+		Scanner Manager アプリが起動していません。<br>
+		端末起動直後の場合は起動するまでお待ちください。<br>
+		それ以外は、アプリを起動してください。		
 	</article>
 {:else if inputPanel == 'keypad'}
 	<Keypad onClose={()=>inputPanel = 'info'} onRegister={asyncRegisterByNumber} />
 {:else if inputPanel == 'camera' }
 	<Camera />
 {/if}
+
 
 </section>
 
@@ -276,6 +294,8 @@ console.log(measuringTime);
 	</Button>
 
 </section>
+
+{/if}
 </main>
 
 <style lang="postcss">

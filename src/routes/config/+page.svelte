@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
   import { Button, Checkbox, Modal, Range, Toggle } from 'flowbite-svelte';
-	import { inputPassword, selectedEvent, selectedPoint, config, 
+	import { inputPassword, selectedEvent, selectedPoint, lastRegistered, config, 
 		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog } from "../../lib/stores";
 	import { RegisterMode } from "$lib/type/RegisterMode";
 	import { onMount, onDestroy } from "svelte";
@@ -48,6 +48,7 @@
 	const clearConfig = () => {
 		$selectedEvent = null;
 		$selectedPoint = null;
+		$lastRegistered = {check:null, retire:null, skip:null};
 		
 		// 名簿のクリア
 		db.members.clear();
@@ -151,7 +152,6 @@ console.log(memberList)
 {:else}
 
 <EventLoadDialog />
-<PointSelectDialog />
 <MemberLoadDialog />
 
 <Modal size="xs" bind:open={showsConfigClearConfirm}>

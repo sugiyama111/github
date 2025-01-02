@@ -30,11 +30,11 @@ type Registered = {
 	[K in 'check' | 'retire' | 'skip']: RecordEntity | null;
 };
 export const lastRegistered = persisted('lastRegistered', <Registered>{check:null, retire:null, skip:null});
-export const lastRegisteredCheckTime = derived(lastRegistered, $lastRegistered => $lastRegistered['check']?.time != null ? dayjs($lastRegistered['check']?.time) : null);
 
 type RegisteredTime = {
 	[K in 'check' | 'retire' | 'skip']: Dayjs | null;
 }
+
 export const lastRegisteredTime = derived<typeof lastRegistered, RegisteredTime>(lastRegistered, 
 	($lastRegistered) => ({
 		check: $lastRegistered?.check?.time != null ? dayjs($lastRegistered.check?.time) : null,

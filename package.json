@@ -14,6 +14,7 @@
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.9.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@types/howler": "^2.2.12",
 		"autoprefixer": "^10.4.20",
 		"flowbite": "^2.5.2",
 		"flowbite-svelte": "^0.47.4",
@@ -31,6 +32,7 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"axios": "^1.7.9",
 		"dexie": "^4.0.10",
+		"howler": "^2.2.4",
 		"html5-qrcode": "^2.3.8",
 		"svelte-persisted-store": "^0.12.0",
 		"svelte-sonner": "^0.3.28"

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-	import { showsConfigLoginDialog } from '$lib/stores';
+	import { showsConfigLoginDialog, showsPointSelectDialog } from '$lib/stores';
 	import Icon from '@iconify/svelte';
 	import { Drawer, CloseButton, Sidebar, SidebarWrapper, SidebarGroup, SidebarItem, SidebarBrand, Button, Modal } from 'flowbite-svelte';
 	import { sineIn } from 'svelte/easing';
@@ -45,8 +45,17 @@
 						<Icon icon="material-symbols:data-table" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
 				</SidebarItem>
+
+				<hr style="margin-top:20px; margin-bottom:20px;" />
 				
-				<SidebarItem label="設定" {spanClass}
+				<SidebarItem label="地点選択" {spanClass}
+					on:click={()=>{$showsPointSelectDialog = true; hidden=true;}}>
+					<svelte:fragment slot="icon">
+						<Icon icon="material-symbols:location-on" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+					</svelte:fragment>
+				</SidebarItem>
+				
+				<SidebarItem label="管理者設定" {spanClass}
 					on:click={()=>{$showsConfigLoginDialog = true; hidden=true;}}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:settings" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />

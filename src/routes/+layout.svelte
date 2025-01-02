@@ -15,6 +15,7 @@
 		
 	import { Toaster } from 'svelte-sonner';
 	import { page } from '$app/stores';
+    import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
 
 	let { children } = $props();
 
@@ -135,12 +136,13 @@ console.log($page.url.href);
 <!-- 通常は非表示の全体で共通のコンポーネント -->
 <Toaster richColors closeButton />
 <DrawerMenu bind:hidden={drawerHidden}></DrawerMenu>
+<PointSelectDialog />
 <ConfigLoginDialog />
 <!-- <ConfigDialog /> -->
 
 
 <!-- 共通ヘッダ部分 -->
-<header class="flex header bg-primary">
+<header class="flex header bg-primary h-12">
 
 	<Button on:click={()=>drawerHidden = false} class="p-2">
 		<Icon icon="material-symbols:menu-rounded" class="w-8 h-6" />
