@@ -9,7 +9,6 @@
 	// let selectedMemberCode:string = $state('');
 
 	const confirmRegistering = (member:MemberEntity) => {
-		//$selectedPoint = member;
 		onRegisterConfirmed(member);
 	}
 </script>

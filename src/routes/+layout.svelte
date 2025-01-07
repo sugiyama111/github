@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	
+
 	import { dayjs } from '$lib/type/Dayjs';
 	import Icon from "@iconify/svelte";
 	import { Button } from 'flowbite-svelte';
@@ -11,11 +11,11 @@
 	import type { ValidationResultState } from '$lib/type/ValidationResult';
 	import { toast } from '$lib/QRTToast';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
-  import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
-		
+	import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
+
 	import { Toaster } from 'svelte-sonner';
 	import { page } from '$app/stores';
-    import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
+	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
 
 	let { children } = $props();
 
@@ -138,11 +138,11 @@ console.log($page.url.href);
 <DrawerMenu bind:hidden={drawerHidden}></DrawerMenu>
 <PointSelectDialog />
 <ConfigLoginDialog />
-<!-- <ConfigDialog /> -->
 
 
+<div class="h-screen flex flex-col ">
 <!-- 共通ヘッダ部分 -->
-<header class="flex header bg-primary h-12">
+<header class="flex bg-primary h-12">
 
 	<Button on:click={()=>drawerHidden = false} class="p-2">
 		<Icon icon="material-symbols:menu-rounded" class="w-8 h-6" />
@@ -162,3 +162,5 @@ console.log($page.url.href);
 
 	<!-- メインコンテンツ -->
 	{@render children()}
+
+</div>

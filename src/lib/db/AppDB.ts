@@ -1,4 +1,4 @@
-import Dexie, { type EntityTable } from 'dexie';
+import Dexie, { type EntityTable, type IndexableType } from 'dexie';
 import MemberEntity from './MemberEntity';
 import LogEntity from './LogEntity';
 import RecordEntity from './RecordEntity';
@@ -11,7 +11,9 @@ export default class AppDB extends Dexie {
 	
 	public members!: EntityTable<MemberEntity, 'member_code'>;
 	public logs!: EntityTable<LogEntity, 'log_id'>;
-	public records!: EntityTable<RecordEntity, 'seq'>;
+	//public records!: EntityTable<RecordEntity, 'seq'>;
+	public records!: Dexie.Table<RecordEntity, number>; // 第二引数はプライマリキーの型
+
 	public tests!: EntityTable<TestEntity, 'id'>;
 
 
@@ -53,6 +55,14 @@ export default class AppDB extends Dexie {
       .equals(number)
 	}
 
+	async asyncFetchByMembercode(code:string) {
+		
+    return this.members
+      .where('member_code')
+      .equals(code);
+
+	}
+
 	async asyncSwitchNextLog(event:TimingEvent, point:TimingPoint):Promise<number> {
 		const newLogId = await this.asyncFetchNewLogId()
 
@@ -84,4 +94,13 @@ export default class AppDB extends Dexie {
 		return nextReq;
 	}
 
+	async asyncFetchUnsentCount(logId:number): Promise<number> {
+		console.log('fetch unsent count on logid: ' + logId);
+		const key:[number, boolean] = [logId, false];
+    return this.records
+      .where('[log_id+sent]')
+      //.equals(key as IndexableType)
+			.equals(key)
+			.count();
+	}
 }

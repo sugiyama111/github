@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Icon from "@iconify/svelte";
+	import { selectedRegisterMode } from '$lib/stores';
 
 	const props = $props();
 	const { onClose, onRegister } = props;
@@ -29,6 +30,15 @@
 </script>
 
 <style lang="postcss">
+	.mode-chip {
+		@apply flex;
+		@apply rounded-xl;
+		@apply pl-2 pr-3 pt-1 pb-1;
+		width: fit-content;
+		line-height: 1.1rem;
+		box-shadow: 1px 1px gray;
+	}
+
 	.keypad {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
@@ -53,6 +63,14 @@
 <div style="float:right; cursor:pointer; margin-right:-6px; margin-top:-6px;">
 	<Icon icon="mdi:close" class="size-6" onclick={onClose} />
 </div>
+
+{#if $selectedRegisterMode.isCheck()}
+<div class="mode-chip bg-check"><Icon icon="material-symbols:check-circle-outline" />チェック</div>
+{:else if $selectedRegisterMode.isRetire()}
+<div class="mode-chip bg-retire"><Icon icon="material-symbols:close" />リタイア</div>
+{:else if $selectedRegisterMode.isSkip()}
+<div class="mode-chip bg-skip"><Icon icon="material-symbols:step-over" />スキップ</div>
+{/if}
 
 <div class="p-5">
 	<section class="p-3 h-16 text-4xl text-center align-middle bg-white">

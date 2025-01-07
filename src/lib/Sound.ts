@@ -2,7 +2,7 @@ import { Howl } from 'howler';
 
 // 音声の種類を定義
 const soundTypes = {
-  READ_OK: '/sound/ok5.mp3',
+  READ_OK: '/sound/ok1.mp3',
   NOT_FOUND: '/sound/ng49.mp3',
   // 他の音を追加する場合はここに追加
 } as const;
@@ -18,7 +18,8 @@ class SoundManager {
   constructor() {
     // 音声ファイルを一度だけプリロードし、インスタンスを作成
     this.soundList = {} as Record<SoundKey, Howl>;
-    Object.entries(soundTypes).forEach(([key, src]) => {
+
+		Object.entries(soundTypes).forEach(([key, src]) => {
       this.soundList[key as SoundKey] = new Howl({
         src: [src],
         preload: true,

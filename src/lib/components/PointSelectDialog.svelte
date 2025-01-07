@@ -24,6 +24,9 @@
 		$selectedPoint = point;
 
 		// ログを切り替える
+		// 旧ログを更新
+		
+
 		const newLogId = await db.asyncSwitchNextLog($selectedEvent, point);
 		$selectedLogId = newLogId;
 	}
@@ -31,21 +34,7 @@
 </script>
 
 <style lang="postcss">
-	.title {
-		@apply w-24;
-		@apply text-gray-500;
-	}
-	.body {
-		@apply flex;
-		@apply grow;
-		@apply text-blue-600;
-	}
-	.row {
-		@apply pb-4;
-		@apply flex items-center;
-		@apply h-10 leading-normal;
-		border-bottom: 1px solid gray;
-	}
+
 </style>
 
 <Modal title="地点の選択" size="xs" bind:open={$showsPointSelectDialog}>

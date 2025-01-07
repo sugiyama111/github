@@ -24,6 +24,7 @@ export const selectedEvent = persisted('selectedEvent', <TimingEvent | null>(nul
 export const selectedPoint = persisted('selectedPoint', <TimingPoint | null>(null));
 export const inputPassword = persisted('inputPassword', <string | null>null);
 export const selectedLogId = persisted('selectedLogId', <number | null>null);
+export const unsentCount = persisted('unsentCount', <number>0);
 
 // check/retire/skip いずれかをキーとし、それぞれの最終登録RecordEntity(nullable)を扱う型
 type Registered = {

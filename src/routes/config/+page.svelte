@@ -7,7 +7,6 @@
 	import { onMount, onDestroy } from "svelte";
 	import { dayjs } from '$lib/type/Dayjs';
 	import EventLoadDialog from "$lib/components/EventLoadDialog.svelte";
-	import PointSelectDialog from "$lib/components/PointSelectDialog.svelte";
 	import { toast } from "$lib/QRTToast";
 	import MemberLoadDialog from "$lib/components/MemberLoadDialog.svelte";
 	import axios from "axios";
@@ -150,6 +149,7 @@ console.log(memberList)
 {#if !loggedIn}
 	not logged in.
 {:else}
+
 
 <EventLoadDialog />
 <MemberLoadDialog />
