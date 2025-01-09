@@ -1,5 +1,6 @@
 import { ScanInput } from '$lib/type/ScanInput';
 import { ValidationResult, ValidationResultState } from '$lib/type/ValidationResult';
+import type { TimingEvent } from './api/TimingEvent';
 
 /**
  * スキャン入力情報が登録可能か確認するためのバリデーター。
@@ -13,14 +14,14 @@ export class ScanInputValidator {
 	}
 
 	/** バリデーションを行う */
-	public async asyncValidate(): Promise<ValidationResultState> {
+	public async asyncValidate(specifiedEvent:TimingEvent): Promise<ValidationResultState> {
 		
-    // 何らかのエラー
-    if (typeof(this.input.val) !== "string") {
-			return new ValidationResultState(ValidationResult.INVALID_FORMAT);
-    }
+    // // 何らかのエラー
+    // if (typeof(this.input.val) !== "string") {
+		// 	return new ValidationResultState(ValidationResult.INVALID_FORMAT);
+    // }
 
-    const valSet = this.input.val.split(',');
+    const valSet:string[] = this.input.val.split(',');
 
     // カンマが2つでない
     if (valSet.length !== 3) {
@@ -29,7 +30,7 @@ export class ScanInputValidator {
     }
 
     // 大会IDが異なる
-    if (valSet[0] != this.input.eventId) {
+    if (specifiedEvent.eventId != this.input.eventId) {
 			return new ValidationResultState(ValidationResult.EVENT_ID_NOT_MATCH);
     }
 

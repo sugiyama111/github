@@ -65,6 +65,7 @@
 		if (isScanSuccessProcessing) return;
 		isScanSuccessProcessing = true;
 
+		// @TODO ここに選択中のイベントと合致するかの判定
 		const memberCode = parseQrText(decodedText);
 		console.log(memberCode);
 

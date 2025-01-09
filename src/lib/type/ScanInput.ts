@@ -10,7 +10,7 @@ export class ScanInput {
 	time: string;
 	method: RegisterMethodState;
 	mode: RegisterModeState;
-	eventId: string;
+	eventId: number;
 
 	/**
 	 * 
@@ -20,7 +20,7 @@ export class ScanInput {
 	 * @param mode スキャンモード
 	 * @param eventId イベントID
 	 */
-	constructor(val:string, time:string, method:RegisterMethodState, mode:RegisterModeState, eventId:string) {
+	constructor(val:string, time:string, method:RegisterMethodState, mode:RegisterModeState, eventId:number) {
 		this.val = val;
 		this.time = time;
 		this.method = method;

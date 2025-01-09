@@ -1,23 +1,26 @@
 <script lang="ts">
 	import Icon from "@iconify/svelte";
-	import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
 	import { Tabs, TabItem, Button } from 'flowbite-svelte';
 	import Camera from "$lib/components/Camera_html5.svelte";
 	import Keypad from "$lib/components/Keypad.svelte";
 	import { db } from "$lib/db/db";
 	import MemberEntity from "$lib/db/MemberEntity";
+	import RecordEntity from "$lib/db/RecordEntity";
 	import { toast } from "$lib/QRTToast";
-	import { config, selectedEvent, selectedPoint, selectedLogId, selectedRegisterMode, showsMemberSelectDialog, showsRegisterConfirmDialog } from "$lib/stores";
-	import { lastRegistered, lastRegisteredTime } from '$lib/stores';
+	import { config, selectedEvent, selectedPoint, selectedLogId, selectedRegisterMode, 
+		showsMemberSelectDialog, showsRegisterConfirmDialog,
+		lastRegistered, lastRegisteredTime, unsentCount } from "$lib/stores";
 	import MemberSelectDialog from '$lib/components/MemberSelectDialog.svelte';
 	import RegisterConfirmDialog from '$lib/components/RegisterConfirmDialog.svelte';
 	import { dayjs, type Dayjs } from '$lib/type/Dayjs';
-
-	import { RegisterMethod } from "$lib/type/RegisterMethod";
-	import RecordEntity from "$lib/db/RecordEntity";
+	import { RegisterMethod, RegisterMethodState } from "$lib/type/RegisterMethod";
+	import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
 	import { Sound } from "$lib/Sound";
 	import { Vibrate } from "$lib/Vibrate";
-	import { unsentCount } from "$lib/stores";
+  import { ScanInput } from "$lib/type/ScanInput";
+	import { ScanInputValidator } from "$lib/ScanInputValidator";
+	import type { ValidationResultState } from "$lib/type/ValidationResult";
+	import { TimingEvent } from "$lib/api/TimingEvent";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -27,19 +30,7 @@
 
 	// 特定済みメンバー（各ダイアログで共有のためここに保持）
 	let specifiedMember:MemberEntity | null = null;
-	
 
-
-	console.log('lastRegisteredTime');
-	console.log($lastRegisteredTime);
-
-	function vib() {
-		console.log('vib');
-		
-		Vibrate.Play(Vibrate.READ_OK);
-
-		console.log('vib finished');
-	}
 
 	// 番号での登録
 	const asyncRegisterByNumber = async (inputNumber:string, method:RegisterMethod) => {
@@ -63,8 +54,6 @@
 	
 	// 登録プロセス1：メンバー存在確認＆絞り込み
 	const asyncFilterProcess = async (memberCollection:MemberEntity[]) => {
-console.log('asyncFilterProcess');
-console.log(measuringTime);
 
 		// 複数存在する場合は選択ダイアログを表示
 		if (memberCollection.length == 0) {
@@ -85,9 +74,6 @@ console.log(measuringTime);
 
 	// 登録プロセス2：登録是非確認
 	const asyncConfirmProcess = async () => {
-		console.log('asyncConfirmProcess');
-		console.log(measuringTime);
-
 		if ($selectedRegisterMode.isCheck()) {
 			// 確認不要の場合
 			await asyncRegisterProcess();
@@ -146,20 +132,15 @@ console.log(measuringTime);
 			
 			
 
-
-			// 音を鳴らす
-			Sound.Play(Sound.READ_OK);
-
-			// 振動
-			Vibrate.Play(Vibrate.READ_OK);
-
-			// Toast
-			toast.success('登録しました');
+			Sound.Play(Sound.READ_OK);			// 音を鳴らす
+			Vibrate.Play(Vibrate.READ_OK);	// 振動
+			toast.success('登録しました');		// Toast
 
 			// storeを更新：未送信件数
 			$unsentCount = await db.asyncFetchUnsentCount($selectedLogId);
 
 			// モーダルを条件によっては閉じる
+
 
 		} catch (e) {
 			console.error('登録エラー db.records.add');
@@ -169,7 +150,145 @@ console.log(measuringTime);
 
 	}
 
+
+
+
+	let scannerStackStr:string = '';
+
+	// onMount(()=>{
+	// 	// スキャナのイベント割り当て
+	// 	document.body.addEventListener('keypress', (e)=>{
+	// 	  this.stackKey(e);
+	// 	});
+	// });
+
+
+	// スキャナーからの入力を受け付けるために、入力キーをスタックする。
+	// body:onloadにて割り当て
+	function stackKey(e:any) {
+		//if ($selectedEvent == null) return;
+
+		const key = e.key;
+// console.log('code - which');
+// console.log(e.keyCode)
+// console.log(e.which);
+// console.log(e.key);
+		
+		// セミコロンが来たら出力
+		if (key == ';') {
+			console.log(`stackKey done@+layout.svelte val is [${scannerStackStr}]`)
+
+			const scanInput:ScanInput = new ScanInput(
+				scannerStackStr, 
+				dayjs().format('YYYY/MM/DD HH:mm:ss.SSS'),
+				new RegisterMethodState(RegisterMethod.SCANNER),		// スキャナ限定
+				$selectedRegisterMode,
+				1,//$selectedEvent.eventId,		// @TODO テストコード戻す
+			);
+
+			// 読取り後処理
+			afterScan(scanInput);
+
+			scannerStackStr = ''; // クリア
+			return;
+		} else {
+			// 特殊記号の場合は無視
+			if (key === "Unidentified") {
+				console.log(`[${key}] is not valid character for QR.`)
+				return;
+			}
+
+			// キーをスタックする
+			scannerStackStr += key;
+			//console.log(`Stacked: ${key}`);
+		}
+	}
+
+
+	async function afterScan(_scanInput:ScanInput) {
+		//if (!$selectedEvent) return;
+
+		const validator = new ScanInputValidator(_scanInput);
+
+		// @TODO テストコード戻す
+//		const valResState:ValidationResultState = await validator.asyncValidate($selectedEvent);
+		const valResState:ValidationResultState = await validator.asyncValidate(new TimingEvent({eventId:1, eventCode:'24test', eventTitle:'テスト', eventDate:'2025-1-5 18:28:20', eventUpdatedAt:'2025-1-5 18:28:20', points:[]}));
+
+		// 異常時の処理
+		if (!valResState.isSuccess()) {
+			console.log(`invalid state ${valResState}`);
+
+			// ユーザーにレスポンス(エラー)を返して終わり
+			const result = valResState.getResult();
+
+			Sound.Play(Sound.INVALID);
+			toast.error(result.message);
+			
+			return;
+		}
+
+		// memberCodeをQRデータから取り出し
+		const memberCode = _scanInput.val.split(',')[1];
+
+		asyncRegisterByMemberCode(memberCode, RegisterMethod.SCANNER);
+
+	}
+
+
+
+///////////Socketテストここから
+let switcherWebSocket:WebSocket | null = null;
+let isSwitcherSocketClosed = true;
+
+const initSwitcherSocket = () => {
+	console.log('initSwitchSocket()')
+	switcherWebSocket = new WebSocket('ws://127.0.0.1:12345/')
+
+	switcherWebSocket.onmessage = function(event) {
+		console.log(`ON MESSAGE: ${event.data}`)
+	}
+	switcherWebSocket.onclose = function() {
+		isSwitcherSocketClosed = true
+		console.log(`socket closed`)
+	}
+	switcherWebSocket.onopen = function() {
+		isSwitcherSocketClosed = false
+		console.log(`socket opened(isSwitchSocketClosed: ${isSwitcherSocketClosed})`)
+	}
+}
+
+const sendMessageToSwitcherServer = (json_msg:object) => {
+	console.log('sendMessageToSwitcherServer')
+	console.log(`isSwitcherSocketClosed: ${isSwitcherSocketClosed}`)
+	if (isSwitcherSocketClosed || !switcherWebSocket) {
+		initSwitcherSocket()
+	} else {
+		console.log(`SendMessage: ${JSON.stringify(json_msg)}`);
+		switcherWebSocket.send(JSON.stringify(json_msg))
+	}
+}
+const turnScannerOn = () => {
+	const json = {
+		"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
+		"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
+		"extra_value": "ENABLE_PLUGIN"
+	}
+	sendMessageToSwitcherServer(json)
+}
+const turnScannerOff = () => {
+	const json = {
+		"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
+		"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
+		"extra_value": "DISABLE_PLUGIN"
+	}
+	sendMessageToSwitcherServer(json)
+}
+
+/////////////Socketテストここまで
 </script>
+
+<!-- <svelte:body bind:this={bodyElement} on:keydown={(e)=>{stackKey(e);}}/> -->
+	<svelte:body on:keydown={(e)=>{stackKey(e);}}/>
 
 <MemberSelectDialog message="複数見つかりました。対象を選んでください。" memberCollection={memberCollectionForSelect} onMemberSelected={(member:MemberEntity)=>{specifiedMember = member; asyncConfirmProcess();}} />
 <RegisterConfirmDialog message="登録してよいですか？" member={memberForConfirm} onRegisterConfirmed={asyncRegisterProcess} />
@@ -178,20 +297,26 @@ console.log(measuringTime);
 <!-- body全体 -->
 <section class={`bg-${$selectedRegisterMode.getCode()} flex-1 overflow-y-hidden`}>
 
-{#if $selectedEvent}
+{#if !$selectedEvent}
 
 <!-- テスト ここから -->
 <button onclick={()=>Vibrate.Play(Vibrate.READ_OK)} class="btn w-20 h-20"
 	style="border:1px solid black;">振動<br>READ_OK</button>
 <button onclick={()=>Vibrate.Play(Vibrate.NOT_FOUND)} class="btn w-20 h-20"
 	style="border:1px solid black;">振動<br>NOT_FOUND</button>
-<!-- テスト ここまで -->
+
+	<button onclick={()=>{console.log('on');turnScannerOn();}} class="btn w-20 h-20"
+		style="border:1px solid black;">スキャナON</button>
+	<button onclick={()=>{console.log('off');turnScannerOff();}} class="btn w-20 h-20"
+		style="border:1px solid black;">スキャナOFF</button>
+
+	<!-- テスト ここまで -->
 
 	<section class="flex justify-center p-6 text-lg">
 		<Icon icon="mdi:alert-circle-outline" font-size="30" />
 		<div>イベントを読み込んでください</div>
 	</section>
-{:else if $selectedPoint}
+{:else if !$selectedPoint}
 	<section class="flex justify-center p-6 text-lg">
 		<Icon icon="mdi:alert-circle-outline" font-size="30" />
 		<div>地点を選択してください</div>

@@ -5,12 +5,12 @@
 	import { TimingEvent } from '$lib/api/TimingEvent';
 	import { TimingPoint } from '$lib/api/TimingPoint';
 
-	// let eventCode: string = '21test';
-	// let userId: string = '21test';
-	// let userPassword: string = 'Ez6t';
-	let eventCode: string = '24qrtest';
-	let userId: string = 'test';
-	let userPassword: string = 'test';
+	let eventCode: string = '21test';
+	let userId: string = '21test';
+	let userPassword: string = 'Ez6t';
+	// let eventCode: string = '24qrtest';
+	// let userId: string = 'test';
+	// let userPassword: string = 'test';
 
 	let loading = false;
 
@@ -24,6 +24,7 @@
 			const data = resApiEvent.data;
 
 			const event = new TimingEvent({
+				eventId:data.event_id,
 				eventCode:data.event_code,
 				eventDate:data.event_date,	//dayjs(data.event_date),
 				eventTitle:data.event_title,

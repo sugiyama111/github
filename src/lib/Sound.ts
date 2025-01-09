@@ -4,6 +4,7 @@ import { Howl } from 'howler';
 const soundTypes = {
   READ_OK: '/sound/ok1.mp3',
   NOT_FOUND: '/sound/ng49.mp3',
+  INVALID: '/sound/ng49.mp3',
   // 他の音を追加する場合はここに追加
 } as const;
 

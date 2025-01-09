@@ -2,6 +2,7 @@
 import { TimingPoint } from '$lib/api/TimingPoint';
 
 type TimingEventParams = {
+	eventId: number;
 	eventCode: string;
 	eventDate: string;	//Dayjs;
 	eventTitle: string;
@@ -10,13 +11,15 @@ type TimingEventParams = {
 }
 
 export class TimingEvent {
+	public eventId: number;
 	public eventCode: string;
 	public eventDate: string;	//Dayjs;
 	public eventTitle: string;
 	public eventUpdatedAt: string;	//Dayjs;
 	public points: TimingPoint[];
 
-	constructor({eventCode, eventDate, eventTitle, eventUpdatedAt, points }: TimingEventParams) {
+	constructor({eventId, eventCode, eventDate, eventTitle, eventUpdatedAt, points }: TimingEventParams) {
+		this.eventId = eventId;
 		this.eventCode = eventCode;
 		this.eventDate = eventDate;
 		this.eventTitle = eventTitle;
