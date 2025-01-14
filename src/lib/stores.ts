@@ -7,6 +7,7 @@ import { TimingPoint } from '$lib/api/TimingPoint';
 import { Config } from '$lib/type/Config';
 import type RecordEntity from '$lib/db/RecordEntity';
 import { dayjs, type Dayjs } from '$lib/type/Dayjs';
+import { ScannerMessenger } from './ScannerMessenger';
 
 export const selectedRegisterMode = writable<RegisterModeState>(new RegisterModeState(RegisterMode.CHECK));
 
@@ -18,6 +19,7 @@ export const showsPointSelectDialog = writable(false);		// 地点選択
 export const showsMemberLoadDialog = writable(false);			// 名簿取り込み
 export const showsMemberSelectDialog = writable(false);		// メンバーを複数から選択
 export const showsRegisterConfirmDialog = writable(false);	// 登録確認ダイアログ
+export const scanner = writable<ScannerMessenger>();
 
 //export const selectedEvent = writable<TimingEvent | null>(null);
 export const selectedEvent = persisted('selectedEvent', <TimingEvent | null>(null));

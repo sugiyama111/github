@@ -15,7 +15,7 @@
 			//$showsConfigDialog = true;
 			//$showsConfigLoginDialog = false;
 
-			console.log(`ShowsConfigLoginDialog:${$showsConfigLoginDialog}`);
+			//console.log(`ShowsConfigLoginDialog:${$showsConfigLoginDialog}`);
 		} else {
 			password = '';
 			toast.error('パスワードが違います');

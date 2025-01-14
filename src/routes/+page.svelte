@@ -7,7 +7,7 @@
 	import MemberEntity from "$lib/db/MemberEntity";
 	import RecordEntity from "$lib/db/RecordEntity";
 	import { toast } from "$lib/QRTToast";
-	import { config, selectedEvent, selectedPoint, selectedLogId, selectedRegisterMode, 
+	import { scanner, config, selectedEvent, selectedPoint, selectedLogId, selectedRegisterMode, 
 		showsMemberSelectDialog, showsRegisterConfirmDialog,
 		lastRegistered, lastRegisteredTime, unsentCount } from "$lib/stores";
 	import MemberSelectDialog from '$lib/components/MemberSelectDialog.svelte';
@@ -21,6 +21,9 @@
 	import { ScanInputValidator } from "$lib/ScanInputValidator";
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
 	import { TimingEvent } from "$lib/api/TimingEvent";
+    import { onMount } from "svelte";
+    import { WebSocketConnector } from "$lib/WebSocketConnector";
+    import { ScannerMessenger } from "$lib/ScannerMessenger";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -44,6 +47,8 @@
 
 	// メンバーコードでの登録
 	const asyncRegisterByMemberCode = async (inputCode:string, method:RegisterMethod) => {
+		console.log('asyncRegisterByMemberCode');
+		console.log(inputCode);
 		const memberList = await (await db.asyncFetchByMembercode(inputCode)).toArray();
 
 		measuringTime = dayjs();
@@ -150,6 +155,14 @@
 
 	}
 
+// @TODO Zebra端末の時のみ起動する
+(async () => {
+	$scanner = await ScannerMessenger.asyncGetInstance((input:string)=>{
+		console.log('INPUT: ' + input);
+		asyncRegisterByMemberCode(input, RegisterMethod.SCANNER);
+	});
+})();
+
 
 
 
@@ -235,56 +248,17 @@
 	}
 
 
+// let scanner:ScannerMessenger | null = null;
 
-///////////Socketテストここから
-let switcherWebSocket:WebSocket | null = null;
-let isSwitcherSocketClosed = true;
+// // @TODO Zebra端末の時のみ起動する
+// (async () => {
+// 	scanner = await ScannerMessenger.asyncGetInstance();
+// })();
 
-const initSwitcherSocket = () => {
-	console.log('initSwitchSocket()')
-	switcherWebSocket = new WebSocket('ws://127.0.0.1:12345/')
+// $: {
+// 	if ($showsRegisterConfirmDialog)
+// }
 
-	switcherWebSocket.onmessage = function(event) {
-		console.log(`ON MESSAGE: ${event.data}`)
-	}
-	switcherWebSocket.onclose = function() {
-		isSwitcherSocketClosed = true
-		console.log(`socket closed`)
-	}
-	switcherWebSocket.onopen = function() {
-		isSwitcherSocketClosed = false
-		console.log(`socket opened(isSwitchSocketClosed: ${isSwitcherSocketClosed})`)
-	}
-}
-
-const sendMessageToSwitcherServer = (json_msg:object) => {
-	console.log('sendMessageToSwitcherServer')
-	console.log(`isSwitcherSocketClosed: ${isSwitcherSocketClosed}`)
-	if (isSwitcherSocketClosed || !switcherWebSocket) {
-		initSwitcherSocket()
-	} else {
-		console.log(`SendMessage: ${JSON.stringify(json_msg)}`);
-		switcherWebSocket.send(JSON.stringify(json_msg))
-	}
-}
-const turnScannerOn = () => {
-	const json = {
-		"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
-		"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
-		"extra_value": "ENABLE_PLUGIN"
-	}
-	sendMessageToSwitcherServer(json)
-}
-const turnScannerOff = () => {
-	const json = {
-		"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
-		"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
-		"extra_value": "DISABLE_PLUGIN"
-	}
-	sendMessageToSwitcherServer(json)
-}
-
-/////////////Socketテストここまで
 </script>
 
 <!-- <svelte:body bind:this={bodyElement} on:keydown={(e)=>{stackKey(e);}}/> -->
@@ -305,9 +279,9 @@ const turnScannerOff = () => {
 <button onclick={()=>Vibrate.Play(Vibrate.NOT_FOUND)} class="btn w-20 h-20"
 	style="border:1px solid black;">振動<br>NOT_FOUND</button>
 
-	<button onclick={()=>{console.log('on');turnScannerOn();}} class="btn w-20 h-20"
+	<button onclick={()=>{console.log('on');$scanner?.asyncTurnOn();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナON</button>
-	<button onclick={()=>{console.log('off');turnScannerOff();}} class="btn w-20 h-20"
+	<button onclick={()=>{console.log('off');$scanner?.asyncTurnOff();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナOFF</button>
 
 	<!-- テスト ここまで -->

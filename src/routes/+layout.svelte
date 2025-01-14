@@ -1,14 +1,17 @@
 <script lang="ts">
 	import '../app.css';
+	import { derived } from 'svelte/store';
 	import Icon from "@iconify/svelte";
 	import { Button } from 'flowbite-svelte';
-	import { selectedEvent, selectedPoint } from '$lib/stores';
+	import { selectedEvent, selectedPoint, scanner } from '$lib/stores';
+	import { showsConfigLoginDialog } from '$lib/stores';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
 	import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
 
 	import { Toaster } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
+    import { ScannerMessenger } from '$lib/ScannerMessenger';
 
 	let { children } = $props();
 
@@ -29,6 +32,27 @@ console.log($page.url.href);
 
 	// drawerの設定
 	let drawerHidden = $state(true);
+
+
+/*
+// ダイアログ表示時にturnoffするテスト
+$effect(()=>{
+	showsConfigLoginDialog.subscribe(shows=>{
+		if (shows) {
+			console.log('effect:shows? ' + shows);
+			console.log('scanner info.');
+			console.log($scanner);
+			$scanner.asyncTurnOff;
+			console.log('called asyncTurnOff')
+		} 
+		else {
+			console.log('effect:shows? ' + shows);
+			console.log($scanner);
+			$scanner?.asyncTurnOn;
+		}
+	})
+});
+*/
 
 </script>
 

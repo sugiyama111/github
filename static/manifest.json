@@ -1,5 +1,6 @@
 {
   "name": "QR-Timing ver.3sα desu",
+	"short_name": "PWAApp",
   "description": "Svelte version",
   "display": "standalone",
   "start_url": "/",
