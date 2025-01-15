@@ -213,7 +213,7 @@
 
 			// キーをスタックする
 			scannerStackStr += key;
-			//console.log(`Stacked: ${key}`);
+			console.log(`Stacked: ${key}`);
 		}
 	}
 
