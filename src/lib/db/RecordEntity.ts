@@ -9,10 +9,10 @@ export default class RecordEntity {
 	time!: string;		// dayjs
 	method!: string;
 	mode!: string;
-	sent!: boolean;
+	sent!: number;		// 0:false, 1:true
 
 	constructor(obj:{seq:number, log_id:number, member_code:string, member_name:string
-		race_num:string, time:string, method:string, mode:string, sent:boolean}) {
+		race_num:string, time:string, method:string, mode:string, sent:number}) {
 			
 		this.seq = obj.seq;
 		this.log_id = obj.log_id;

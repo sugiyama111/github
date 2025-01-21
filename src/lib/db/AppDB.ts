@@ -8,7 +8,7 @@ import { dayjs } from '$lib/type/Dayjs';
 import TestEntity from './TestEntity';
 
 export default class AppDB extends Dexie {
-	
+
 	public members!: EntityTable<MemberEntity, 'member_code'>;
 	public logs!: EntityTable<LogEntity, 'log_id'>;
 	//public records!: EntityTable<RecordEntity, 'seq'>;
@@ -27,7 +27,7 @@ export default class AppDB extends Dexie {
    *  *	Multi-entry index
    *  [A+B]	Compound index or primary key
    */
-  
+
     this.version(1).stores({
       // events: '&event_code',
       // configs: '&terminal_id',
@@ -36,10 +36,10 @@ export default class AppDB extends Dexie {
 			// 初期化したいため、log_idはオートインクリメントでない
       logs: '&log_id, event_code, point_id, point_code, point_name, log_start_time, record_count, sent_count',
 			// 初期化したいため、seqはオートインクリメントでない
-      records: '&seq, [log_id+sent], member_code, member_name, race_num, time, method, mode', 
+      records: '&seq, log_id, sent, member_code, member_name, race_num, time, method, mode',
 			tests: '&id',
     });
-		
+
 		this.members.mapToClass(MemberEntity);
 		this.logs.mapToClass(LogEntity);
 		this.records.mapToClass(RecordEntity);
@@ -47,16 +47,16 @@ export default class AppDB extends Dexie {
 
   }
 
-	
+
 	async asyncFetchByNumber(number:string) {
-		
+
     return this.members
       .where('bib_number')
       .equals(number)
 	}
 
 	async asyncFetchByMembercode(code:string) {
-		
+
     return this.members
       .where('member_code')
       .equals(code);
@@ -96,11 +96,39 @@ export default class AppDB extends Dexie {
 
 	async asyncFetchUnsentCount(logId:number): Promise<number> {
 		console.log('fetch unsent count on logid: ' + logId);
-		const key:[number, boolean] = [logId, false];
+		const key:[number, number]  = [logId, 0];
+
+		// console.log('mark A');
+
+		// //const w = await this.records.where({log_id:logId, sent:false});
+		// //const w = this.records.where(['log_id', 'sent']).equals(key as any).count();
+		// const count = await this.records.where('[log_id+sent]').equals(key).count();
+		// //const z = await this.records.where('log_id').equals(logId);
+		// //const cn = await z.count();
+		// //console.log(w);		// Collection2
+		// //console.log(cn);
+
+		// console.log('mark B');
+
+		// //const e = await w.equals(key as any);
+
+		// console.log('mark C');
+
+		// //console.log(await w.first());
+		// //const c = w;
+
+		// console.log('mark D');
+
+		// //const c = await w.count();
+		// //console.log(c);
+
+		// console.log('mark E');
+
     return this.records
-      .where('[log_id+sent]')
-      //.equals(key as IndexableType)
-			.equals(key)
+			.where({log_id:logId, sent:0})
+      // .where('[log_id+sent]')
+      // //.equals(key as IndexableType)
+			// .equals(key as any) // 型アサーション
 			.count();
 	}
 }

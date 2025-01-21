@@ -20,10 +20,7 @@
   import { ScanInput } from "$lib/type/ScanInput";
 	import { ScanInputValidator } from "$lib/ScanInputValidator";
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
-	import { TimingEvent } from "$lib/api/TimingEvent";
-    import { onMount } from "svelte";
-    import { WebSocketConnector } from "$lib/WebSocketConnector";
-    import { ScannerMessenger } from "$lib/ScannerMessenger";
+	import { ScannerMessenger } from "$lib/ScannerMessenger";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -111,8 +108,6 @@
 		}
 
 		const nextSeq = await db.asyncFetchNewRecordSeq();
-		console.log(nextSeq);
-		console.log(measuringTime);
 
 		// 登録するデータ
 		const regRecordObj = {
@@ -123,35 +118,39 @@
 			race_num: specifiedMember.bib_number,
 			time: measuringTime.format('YYYY/MM/DD HH:mm:ss.SSS'),
 			method: registerMethod.code,
-			mode:$selectedRegisterMode.getCode(),
-			sent: false,
+			mode: $selectedRegisterMode.getCode(),
+			sent: 0,
 		};
+console.log(regRecordObj);
 
     // 登録
 		try {
 			const record = new RecordEntity(regRecordObj);
+			console.log(record);
 			await db.records.add(record);
 
 			// storeを更新：最終登録
 			$lastRegistered[$selectedRegisterMode.getCode() as keyof typeof $lastRegistered] = record;
-			
-			
+		} catch (e) {
+			toast.error('登録できませんでした');
+			return;
+		}
 
-			Sound.Play(Sound.READ_OK);			// 音を鳴らす
-			Vibrate.Play(Vibrate.READ_OK);	// 振動
-			toast.success('登録しました');		// Toast
-
+		Sound.Play(Sound.READ_OK);				// 音を鳴らす
+		Vibrate.Play(Vibrate.READ_OK);		// 振動
+		toast.success('登録しました');		 // Toast
+		
+		try {
 			// storeを更新：未送信件数
 			$unsentCount = await db.asyncFetchUnsentCount($selectedLogId);
-
-			// モーダルを条件によっては閉じる
-
+			console.log('e');
 
 		} catch (e) {
-			console.error('登録エラー db.records.add');
-			console.error(measuringTime);
-
+			console.error(e);
 		}
+
+		// モーダルを条件によっては閉じる
+
 
 	}
 
@@ -179,7 +178,7 @@
 	// スキャナーからの入力を受け付けるために、入力キーをスタックする。
 	// body:onloadにて割り当て
 	function stackKey(e:any) {
-		//if ($selectedEvent == null) return;
+		if ($selectedEvent == null) return;
 
 		const key = e.key;
 // console.log('code - which');
@@ -196,7 +195,8 @@
 				dayjs().format('YYYY/MM/DD HH:mm:ss.SSS'),
 				new RegisterMethodState(RegisterMethod.SCANNER),		// スキャナ限定
 				$selectedRegisterMode,
-				1,//$selectedEvent.eventId,		// @TODO テストコード戻す
+				//1,//$selectedEvent.eventId,		// @TODO テストコード戻す
+				$selectedEvent.eventId,
 			);
 
 			// 読取り後処理
@@ -219,13 +219,14 @@
 
 
 	async function afterScan(_scanInput:ScanInput) {
-		//if (!$selectedEvent) return;
+		if (!$selectedEvent) return;
 
 		const validator = new ScanInputValidator(_scanInput);
 
-		// @TODO テストコード戻す
-//		const valResState:ValidationResultState = await validator.asyncValidate($selectedEvent);
-		const valResState:ValidationResultState = await validator.asyncValidate(new TimingEvent({eventId:1, eventCode:'24test', eventTitle:'テスト', eventDate:'2025-1-5 18:28:20', eventUpdatedAt:'2025-1-5 18:28:20', points:[]}));
+		
+		const valResState:ValidationResultState = await validator.asyncValidate($selectedEvent);
+		// @TODO テストコード消す
+		//const valResState:ValidationResultState = await validator.asyncValidate(new TimingEvent({eventId:1, eventCode:'24test', eventTitle:'テスト', eventDate:'2025-1-5 18:28:20', eventUpdatedAt:'2025-1-5 18:28:20', points:[]}));
 
 		// 異常時の処理
 		if (!valResState.isSuccess()) {
@@ -259,10 +260,19 @@
 // 	if ($showsRegisterConfirmDialog)
 // }
 
+	async function handleVisibilityChange() {
+		alert('document.visibilityState:' + document.visibilityState);
+		
+		if (document.visibilityState == 'visible') {
+			
+		}
+	}
+
 </script>
 
 <!-- <svelte:body bind:this={bodyElement} on:keydown={(e)=>{stackKey(e);}}/> -->
-	<svelte:body on:keydown={(e)=>{stackKey(e);}}/>
+<svelte:document on:visibilitychange={handleVisibilityChange} />
+<svelte:body on:keydown={(e)=>{stackKey(e);}}/>
 
 <MemberSelectDialog message="複数見つかりました。対象を選んでください。" memberCollection={memberCollectionForSelect} onMemberSelected={(member:MemberEntity)=>{specifiedMember = member; asyncConfirmProcess();}} />
 <RegisterConfirmDialog message="登録してよいですか？" member={memberForConfirm} onRegisterConfirmed={asyncRegisterProcess} />
