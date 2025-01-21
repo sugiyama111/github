@@ -260,6 +260,8 @@ console.log(regRecordObj);
 // 	if ($showsRegisterConfirmDialog)
 // }
 
+
+	// ◎これは有効。タスク管理では発行されない（残念）
 	function handleVisibilityChange() {
 		console.log('document.visibilityState:' + document.visibilityState);
 		toast.success(`visibility: ${document.visibilityState}`);
@@ -272,13 +274,20 @@ console.log(regRecordObj);
 			$scanner?.asyncTurnOff();
 		}
 	}
+	// 発行されない
 	function handlePageshow() {
 		console.log('pageshow');
 		toast.success('pageshow');
 	}
+	// 発行されない
 	function handlePagehide() {
 		console.log('pagehide');
 		toast.success('pagehide');
+	}
+	function handleBeforeUnload() {
+		$scanner?.asyncTurnOff();
+		console.log('beforeunload');
+		toast.success('beforeunload');
 	}
 	function handleBlur() {
 		console.log('blur');
@@ -294,7 +303,8 @@ console.log(regRecordObj);
 
 <svelte:window on:blur={()=>handleBlur} on:focus={()=>handleFocus}
 	on:pageshow={()=>handlePageshow}
-	on:pagehide={()=>handlePagehide}  />
+	on:pagehide={()=>handlePagehide} 
+	on:beforeunload={()=>handleBeforeUnload} />
 <svelte:document on:visibilitychange={handleVisibilityChange} 
   />
 <svelte:body on:keydown={(e)=>{stackKey(e);}}/>
