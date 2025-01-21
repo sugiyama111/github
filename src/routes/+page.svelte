@@ -263,6 +263,8 @@ console.log(regRecordObj);
 	function handleVisibilityChange() {
 		console.log('document.visibilityState:' + document.visibilityState);
 		toast.success(`visibility: ${document.visibilityState}`);
+		
+		toast.info(window.location.origin);
 
 		if (document.visibilityState == 'visible') {
 			$scanner?.asyncTurnOn();
