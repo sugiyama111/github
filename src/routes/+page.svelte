@@ -21,6 +21,7 @@
 	import { ScanInputValidator } from "$lib/ScanInputValidator";
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
 	import { ScannerMessenger } from "$lib/ScannerMessenger";
+    import { onMount } from "svelte";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -261,6 +262,12 @@ console.log(regRecordObj);
 // }
 
 
+	onMount(()=>{
+		$scanner?.asyncTurnOn();
+		console.log('mount');
+		toast.success('mount');
+	});
+
 	// ◎これは有効。タスク管理では発行されない（残念）
 	function handleVisibilityChange() {
 		console.log('document.visibilityState:' + document.visibilityState);
@@ -279,12 +286,14 @@ console.log(regRecordObj);
 		console.log('pageshow');
 		toast.success('pageshow');
 	}
-	// 発行されない
+	// Androidでタブ一覧表示時に発行される（タブ削除操作前）。
+	// ただし、「最近使ったタブ」で開くと発行されるものが無い。→ PWAなら不要か?
 	function handlePagehide() {
 		$scanner?.asyncTurnOff();
 		console.log('pagehide');
 		toast.success('pagehide');
 	}
+	// PWAをkillした時に実行される
 	function handleBeforeUnload() {
 		$scanner?.asyncTurnOff();
 		console.log('beforeunload');
@@ -298,7 +307,7 @@ console.log(regRecordObj);
 		console.log('focus');
 		toast.success('focus');
 	}
-
+	
 
 </script>
 
