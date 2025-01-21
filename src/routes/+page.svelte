@@ -281,6 +281,7 @@ console.log(regRecordObj);
 	}
 	// 発行されない
 	function handlePagehide() {
+		$scanner?.asyncTurnOff();
 		console.log('pagehide');
 		toast.success('pagehide');
 	}
