@@ -68,7 +68,8 @@
 
 		$showsMemberLoadDialog = true;
 
-		const serverName:string = import.meta.env.VITE_API_BASE_URL;
+		// @TODO PWA化時にenvの内容がundefinedになってしまう
+		const serverName:string = 'https://stg56.qr-timing.jp';//import.meta.env.VITE_API_BASE_URL;
 		
 		try {
 			const apiData = await axios.get(`${serverName}/api/v1/members/${$selectedEvent.eventCode}`);
