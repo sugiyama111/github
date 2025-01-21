@@ -260,19 +260,43 @@ console.log(regRecordObj);
 // 	if ($showsRegisterConfirmDialog)
 // }
 
-	async function handleVisibilityChange() {
-		alert('document.visibilityState:' + document.visibilityState);
-		
+	function handleVisibilityChange() {
+		console.log('document.visibilityState:' + document.visibilityState);
+		toast.success(`visibility: ${document.visibilityState}`);
+
 		if (document.visibilityState == 'visible') {
-			
+			$scanner?.asyncTurnOn();
+		} else {
+			$scanner?.asyncTurnOff();
 		}
 	}
+	function handlePageshow() {
+		console.log('pageshow');
+		toast.success('pageshow');
+	}
+	function handlePagehide() {
+		console.log('pagehide');
+		toast.success('pagehide');
+	}
+	function handleBlur() {
+		console.log('blur');
+		toast.success('blur');
+	}
+	function handleFocus() {
+		console.log('focus');
+		toast.success('focus');
+	}
+
 
 </script>
 
-<!-- <svelte:body bind:this={bodyElement} on:keydown={(e)=>{stackKey(e);}}/> -->
-<svelte:document on:visibilitychange={handleVisibilityChange} />
+<svelte:window on:blur={()=>handleBlur} on:focus={()=>handleFocus}
+	on:pageshow={()=>handlePageshow}
+	on:pagehide={()=>handlePagehide}  />
+<svelte:document on:visibilitychange={handleVisibilityChange} 
+  />
 <svelte:body on:keydown={(e)=>{stackKey(e);}}/>
+	<!-- <svelte:body bind:this={bodyElement} on:keydown={(e)=>{stackKey(e);}}/> -->
 
 <MemberSelectDialog message="複数見つかりました。対象を選んでください。" memberCollection={memberCollectionForSelect} onMemberSelected={(member:MemberEntity)=>{specifiedMember = member; asyncConfirmProcess();}} />
 <RegisterConfirmDialog message="登録してよいですか？" member={memberForConfirm} onRegisterConfirmed={asyncRegisterProcess} />
