@@ -48,7 +48,8 @@ export const lastRegisteredTime = derived<typeof lastRegistered, RegisteredTime>
 
 export const config = persisted('config', <Config>(new Config({
 	allowsDuplicate: false,
-	allowsSending: false, sendingIntervalSec:30,
+	allowsSending: false,
+	sendingIntervalSec:30,
 	//availableRegisterModes: [RegisterMode.CHECK] as RegisterMode[],
 	availableRegisterModes: [RegisterMode.CHECK],
 	memberCount: 0,

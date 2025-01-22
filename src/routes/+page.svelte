@@ -21,7 +21,7 @@
 	import { ScanInputValidator } from "$lib/ScanInputValidator";
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
 	import { ScannerMessenger } from "$lib/ScannerMessenger";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -261,62 +261,8 @@ console.log(regRecordObj);
 // 	if ($showsRegisterConfirmDialog)
 // }
 
-
-	onMount(()=>{
-		$scanner?.asyncTurnOn();
-		console.log('mount');
-		toast.success('mount');
-	});
-
-	// ◎これは有効。タスク管理では発行されない（残念）
-	function handleVisibilityChange() {
-		console.log('document.visibilityState:' + document.visibilityState);
-		toast.success(`visibility: ${document.visibilityState}`);
-		
-		toast.info(window.location.origin);
-
-		if (document.visibilityState == 'visible') {
-			$scanner?.asyncTurnOn();
-		} else {
-			$scanner?.asyncTurnOff();
-		}
-	}
-	// 発行されない
-	function handlePageshow() {
-		console.log('pageshow');
-		toast.success('pageshow');
-	}
-	// Androidでタブ一覧表示時に発行される（タブ削除操作前）。
-	// ただし、「最近使ったタブ」で開くと発行されるものが無い。→ PWAなら不要か?
-	function handlePagehide() {
-		$scanner?.asyncTurnOff();
-		console.log('pagehide');
-		toast.success('pagehide');
-	}
-	// PWAをkillした時に実行される
-	function handleBeforeUnload() {
-		$scanner?.asyncTurnOff();
-		console.log('beforeunload');
-		toast.success('beforeunload');
-	}
-	function handleBlur() {
-		console.log('blur');
-		toast.success('blur');
-	}
-	function handleFocus() {
-		console.log('focus');
-		toast.success('focus');
-	}
-	
-
 </script>
 
-<svelte:window on:blur={()=>handleBlur} on:focus={()=>handleFocus}
-	on:pageshow={()=>handlePageshow}
-	on:pagehide={()=>handlePagehide} 
-	on:beforeunload={()=>handleBeforeUnload} />
-<svelte:document on:visibilitychange={handleVisibilityChange} 
-  />
 <svelte:body on:keydown={(e)=>{stackKey(e);}}/>
 	<!-- <svelte:body bind:this={bodyElement} on:keydown={(e)=>{stackKey(e);}}/> -->
 
@@ -371,7 +317,9 @@ console.log(regRecordObj);
 
 				<section class="pt-4 bg-check">
 					<article class="last-data">
-						<div class="mode-chip bg-check"><Icon icon="material-symbols:check-circle-outline" />チェック</div>
+						<div class="mode-chip bg-check" style="float:right;">
+							<Icon icon="material-symbols:check-circle-outline" />チェック
+						</div>
 						<div>No. { $lastRegistered['check']?.race_num}</div>
 						<div>{ $lastRegistered['check']?.member_name }</div>
 						<div>
@@ -396,7 +344,9 @@ console.log(regRecordObj);
 
 				<section class="pt-4 bg-retire">
 					<article class="last-data">
-						<div class="mode-chip bg-retire"><Icon icon="material-symbols:close" />リタイア</div>
+						<div class="mode-chip bg-retire" style="float:right;">
+							<Icon icon="material-symbols:close" />リタイア
+						</div>
 						<div>No. { $lastRegistered['retire']?.race_num}</div>
 						<div>{ $lastRegistered['retire']?.member_name }</div>
 						<div>
@@ -421,7 +371,9 @@ console.log(regRecordObj);
 
 				<section class="pt-4 bg-skip">
 					<article class="last-data">
-						<div class="mode-chip bg-skip"><Icon icon="material-symbols:step-over" />スキップ</div>
+						<div class="mode-chip bg-skip" style="float:right;">
+							<Icon icon="material-symbols:step-over" />スキップ
+						</div>
 						<div>No. { $lastRegistered['skip']?.race_num}</div>
 						<div>{ $lastRegistered['skip']?.member_name }</div>
 						<div>
@@ -468,10 +420,10 @@ console.log(regRecordObj);
 	<Button class="p-3 fixed rounded-full
 		flex justify-center items-center
 		text-primary-text bg-primary
-		w-36 h-36 left-[-25px] bottom-[-25px]">
-		<div class="-mt-4 -mr-1">
-			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-20 h-20" />
-			<div class="text-lg -mt-3">すぐ送信</div>
+		w-28 h-28 left-[-25px] bottom-[-25px]">
+		<div class="-mt-4 -mr-3">
+			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
+			<div class="-mt-1">すぐ送信</div>
 		</div>
 {#if $unsentCount >= 1}
 		<div class="rounded-full h-6 w-6 border-white bg-red-600

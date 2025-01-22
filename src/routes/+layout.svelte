@@ -12,7 +12,9 @@
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
     import { ScannerMessenger } from '$lib/ScannerMessenger';
-
+    import { toast } from '$lib/QRTToast';
+    import { onDestroy, onMount } from 'svelte';
+	
 	let { children } = $props();
 
 console.log('page');
@@ -54,10 +56,86 @@ $effect(()=>{
 });
 */
 
+const resetScannerByUrl = (path:string) => {
+	if (path === '/') $scanner?.asyncTurnOn();
+	else $scanner?.asyncTurnOff();
+}
+
+
+	let currentPath:string;
+  // ページ遷移を検知して処理を実行
+  $effect(() => {
+		// URL入力しての画面表示時に発行(undefined -> /)。
+		// スキャナついてなくてリロード時にONにする
+		resetScannerByUrl($page.url.pathname);
+    // const newPath = $page.url.pathname;
+
+    // if (newPath !== currentPath) {
+    //   handleRouteChange(currentPath, newPath);
+    //   currentPath = newPath;
+    // }
+  });
+
+  // ページ遷移時の処理
+	// (Web限定)履歴から開いた時も実行されるが、TurnOnが効いていない
+  function handleRouteChange(from:string, to:string) {
+    console.log(`ページ遷移: ${from} → ${to}`);
+		toast.info(`ページ遷移: ${from} → ${to}`);
+    // 必要な処理をここに記述
+
+		if (to == '/') {
+			$scanner?.asyncTurnOn();
+			console.log('route change /');
+			toast.success('route change /');
+		} else if (to == '/config') {
+			$scanner?.asyncTurnOff();
+			console.log('route change /config');
+			toast.success('route change /config TurnOFF');
+		}
+  }
+
+
+	// 初期表示時・画面遷移時に発行
+	onMount(()=>{
+		toast.info(`mount url:${$page.url.pathname}`);
+		resetScannerByUrl($page.url.pathname);
+	});
+	// // 他画面に遷移時に発行
+	// onDestroy(()=>{
+	// 	$scanner?.asyncTurnOff();
+	// 	console.log('destroy');
+	// 	toast.success('destroy');
+	// });
+
+	// ◎これは有効。タスク管理では発行されない（残念）
+	// ホーム画面表示時にhiddenが発行。
+	// Androidでタブ一覧表示時に発行される（タブ削除操作前）。
+	function handleVisibilityChange() {
+		console.log('document.visibilityState:' + document.visibilityState);
+		toast.success(`visibility: ${document.visibilityState} path:${$page.url.pathname}`);
+		
+		if (document.visibilityState === 'visible' && $page.url.pathname == '/') {
+			$scanner?.asyncTurnOn();
+		} else {
+			$scanner?.asyncTurnOff();
+		}
+	}
+
+	// PWAをkillした時に実行される
+	function handleBeforeUnload() {
+		$scanner?.asyncTurnOff();
+		console.log('beforeunload');
+		toast.success('beforeunload');
+	}
+	
+
 </script>
 
 <style lang="postcss">
 </style>
+
+<svelte:window on:beforeunload={()=>handleBeforeUnload} />
+<svelte:document on:visibilitychange={handleVisibilityChange} />
 
 <!-- PWAのためのmanifest.json読込 -->
 <svelte:head>

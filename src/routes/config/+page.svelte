@@ -2,7 +2,7 @@
 	import { goto } from "$app/navigation";
   import { Button, Checkbox, Modal, Range, Toggle } from 'flowbite-svelte';
 	import { inputPassword, selectedEvent, selectedPoint, lastRegistered, config, 
-		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog } from "../../lib/stores";
+		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, scanner } from "../../lib/stores";
 	import { RegisterMode } from "$lib/type/RegisterMode";
 	import { onMount, onDestroy } from "svelte";
 	import { dayjs } from '$lib/type/Dayjs';
@@ -13,23 +13,21 @@
 	import { Member } from "$lib/api/Member";
 	import { db } from "$lib/db/db";
 	import Icon from "@iconify/svelte";
+    import { derived } from "svelte/store";
 
 	const loggedIn = $inputPassword == 'neo5179';
 	let showsConfigClearConfirm = $state(false);
 	let showsMembersClearConfirm = $state(false);
 	
 	onMount(()=>{
-		if (!loggedIn) {
-			goto('/');		// ログインしていない場合はメイン画面に戻す
-		}
+		if (!loggedIn) goto('/');		// ログインしていない場合はメイン画面に戻す
 	});
 
 	onDestroy(()=>{
 		$inputPassword = null;		// 一旦別画面に遷移するとログイン状態を解除
 	});
 
-	//$: disablesSending = !$config.allowsSending;
-	let disablesSending = $state(!$config.allowsSending);
+	const disablesSending = derived(config, $config=>!$config.allowsSending);
 
 	// モードのチェック切り替え
 	const toggleModeCheck = (changedMode:RegisterMode) => {
@@ -116,6 +114,7 @@ console.log(memberList)
 
 		$showsMemberLoadDialog = false;
 	}
+
 </script>
 
 <style lang="postcss">
@@ -248,7 +247,7 @@ console.log(memberList)
 	</section>
 	<section class="flex items-center" style="line-height:2em;">
 		<Range size="sm" min="0" max="60" step="15"
-			bind:value={$config.sendingIntervalSec} bind:disabled={disablesSending} />
+			bind:value={$config.sendingIntervalSec} bind:disabled={$disablesSending} />
 	</section>
 </div>
 
