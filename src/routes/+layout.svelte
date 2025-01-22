@@ -17,14 +17,26 @@
 	
 	let { children } = $props();
 
-console.log('page');
-console.log($page.url.href);
+	let isUpdateAvailable = false;
 
 	// PWAのためのservice-worker登録
 	if ('serviceWorker' in navigator) {
 		window.addEventListener('load', function() {
-			this.navigator.serviceWorker.register('/service-worker.js', { scope: './' }).then(function (registration) {
+			this.navigator.serviceWorker.register('/service-worker.js', { scope: './' })
+			.then((registration) => {
 				console.log('ServiceWorker registration successfull with scope: ', registration.scope);
+
+				registration.onupdatefound = () => {
+					const installingWorker = registration.installing;
+					if (installingWorker) {
+						installingWorker.onstatechange = () => {
+							if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+								isUpdateAvailable = true;
+							}
+						};
+					}
+				}
+
 			}, function (err) {
 				console.log('ServiceWorker registration failed: ', err);
 			});
@@ -162,9 +174,13 @@ const resetScannerByUrl = (path:string) => {
 	</Button>
 
 	<div class="grow">
-		<div id="point_name" class="text-primary-text text-xl whitespace-nowrap" style="text-align:left;">{ $selectedPoint?.pointTitle }</div>
+		z<div id="point_name" class="text-primary-text text-xl whitespace-nowrap" style="text-align:left;">{ $selectedPoint?.pointTitle }</div>
 		<div id="event_name" class="text-primary-text text-xs whitespace-nowrap" style="text-align:left;">{ $selectedEvent?.eventTitle }</div>
 	</div>
+
+{#if isUpdateAvailable}
+	アップデートあり
+{/if}
 
 <!-- 	
 	<Button class="p-2">
