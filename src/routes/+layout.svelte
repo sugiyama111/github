@@ -57,7 +57,7 @@ $effect(()=>{
 */
 
 const resetScannerByUrl = (path:string) => {
-	if (path === '/') $scanner?.asyncTurnOn();
+	if (path === '/' && $selectedEvent && $selectedPoint) $scanner?.asyncTurnOn();
 	else $scanner?.asyncTurnOff();
 }
 
