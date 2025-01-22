@@ -32,6 +32,9 @@
 						installingWorker.onstatechange = () => {
 							if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
 								isUpdateAvailable = true;
+								if (confirm('更新があります。更新しますか？')) {
+									registration.update();
+								}
 							}
 						};
 					}
