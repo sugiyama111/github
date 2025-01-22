@@ -316,13 +316,13 @@ console.log(regRecordObj);
 				</section>
 
 				<section class="pt-4 bg-check">
-					<article class="last-data">
+					<article class="last-data leading-2">
 						<div class="mode-chip bg-check" style="float:right;">
 							<Icon icon="material-symbols:check-circle-outline" />チェック
 						</div>
-						<div>No. { $lastRegistered['check']?.race_num}</div>
-						<div>{ $lastRegistered['check']?.member_name }</div>
-						<div>
+						<div class="h-5">No. { $lastRegistered['check']?.race_num}</div>
+						<div class="h-5">{ $lastRegistered['check']?.member_name }</div>
+						<div class="h-5">
 							{#if $lastRegisteredTime['check']}
 							<span class="text-sm">{ $lastRegisteredTime['check'].format('YYYY') }/</span>{ $lastRegisteredTime['check'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['check'].format('ss') }</span>
 							{/if}
@@ -343,13 +343,13 @@ console.log(regRecordObj);
 				</section>
 
 				<section class="pt-4 bg-retire">
-					<article class="last-data">
+					<article class="last-data leading-2">
 						<div class="mode-chip bg-retire" style="float:right;">
 							<Icon icon="material-symbols:close" />リタイア
 						</div>
-						<div>No. { $lastRegistered['retire']?.race_num}</div>
-						<div>{ $lastRegistered['retire']?.member_name }</div>
-						<div>
+						<div class="h-5">No. { $lastRegistered['retire']?.race_num}</div>
+						<div class="h-5">{ $lastRegistered['retire']?.member_name }</div>
+						<div class="h-5">
 							{#if $lastRegisteredTime['retire']}
 							<span class="text-sm">{ $lastRegisteredTime['retire'].format('YYYY') }/</span>{ $lastRegisteredTime['retire'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['retire'].format('ss') }</span>
 							{/if}
@@ -370,13 +370,13 @@ console.log(regRecordObj);
 				</section>
 
 				<section class="pt-4 bg-skip">
-					<article class="last-data">
+					<article class="last-data leading-2">
 						<div class="mode-chip bg-skip" style="float:right;">
 							<Icon icon="material-symbols:step-over" />スキップ
 						</div>
-						<div>No. { $lastRegistered['skip']?.race_num}</div>
-						<div>{ $lastRegistered['skip']?.member_name }</div>
-						<div>
+						<div class="h-5">No. { $lastRegistered['skip']?.race_num}</div>
+						<div class="h-5">{ $lastRegistered['skip']?.member_name }</div>
+						<div class="h-5">
 							{#if $lastRegisteredTime['skip']}
 							<span class="text-sm">{ $lastRegisteredTime['skip'].format('YYYY') }/</span>{ $lastRegisteredTime['skip'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['skip'].format('ss') }</span>
 							{/if}
@@ -463,9 +463,6 @@ console.log(regRecordObj);
 		@apply rounded-md;
 		@apply bg-slate-300 shadow-md;
 		@apply text-black text-left;
-	}
-	article.last-data div {
-		height: 1.6em;
 	}
 
 	section.control-panel {

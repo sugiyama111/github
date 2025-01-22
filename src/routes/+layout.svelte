@@ -132,6 +132,9 @@ const resetScannerByUrl = (path:string) => {
 </script>
 
 <style lang="postcss">
+	body {
+		user-select: none;
+	}
 </style>
 
 <svelte:window on:beforeunload={()=>handleBeforeUnload} />

@@ -72,7 +72,7 @@
 <div class="mode-chip bg-skip"><Icon icon="material-symbols:step-over" />スキップ</div>
 {/if}
 
-<div class="p-5">
+<div class="p-3 pt-1">
 	<section class="p-3 h-16 text-4xl text-center align-middle bg-white">
 		{ inputBibNumber }
 	</section>
