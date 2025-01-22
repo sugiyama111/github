@@ -21,7 +21,6 @@
 	import { ScanInputValidator } from "$lib/ScanInputValidator";
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
 	import { ScannerMessenger } from "$lib/ScannerMessenger";
-    import { onDestroy, onMount } from "svelte";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -163,7 +162,10 @@ console.log(regRecordObj);
 	});
 })();
 
-
+	const handleScannerButton = () => {
+		$scanner?.asyncTurnOn();
+		toast.info('端末横の黄色いボタンでスキャンして下さい');
+	}
 
 
 	let scannerStackStr:string = '';
@@ -420,7 +422,7 @@ console.log(regRecordObj);
 	<Button class="p-3 fixed rounded-full
 		flex justify-center items-center
 		text-primary-text bg-primary
-		w-28 h-28 left-[-25px] bottom-[-25px]">
+		w-28 h-28 left-[-28px] bottom-[-28px]">
 		<div class="-mt-4 -mr-3">
 			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
 			<div class="-mt-1">すぐ送信</div>
@@ -428,17 +430,21 @@ console.log(regRecordObj);
 {#if $unsentCount >= 1}
 		<div class="rounded-full h-6 w-6 border-white bg-red-600
 			flex justify-center items-center
-			absolute right-[10px] top-[10px]">{ $unsentCount }</div>
+			absolute right-[8px] top-[4px]">{ $unsentCount }</div>
 {/if}
 	</Button>
 
-	<Button pill={true} class="!p-3 fixed bg-primary" style="right:90px; bottom:10px;"
-		on:click={()=>inputPanel = 'camera'}>
-		<Icon icon="material-symbols:photo-camera-outline" class="w-10 h-10" />
+	<Button pill={true} class="!p-2.5 fixed bg-primary" style="right:130px; bottom:8px;"
+		on:click={()=>{inputPanel='info'; handleScannerButton();}}>
+		<Icon icon="material-symbols:point-scan-rounded" class="w-8 h-8" />
 	</Button>
-	<Button pill={true} class="!p-3 fixed bg-primary" style="right:10px; bottom:10px;"
-		on:click={()=>inputPanel = 'keypad'}>
-		<Icon icon="material-symbols:dialpad" class="w-10 h-10" />
+	<Button pill={true} class="!p-2.5 fixed bg-primary" style="right:70px; bottom:8px;"
+		on:click={()=>inputPanel='camera'}>
+		<Icon icon="material-symbols:photo-camera-outline" class="w-8 h-8" />
+	</Button>
+	<Button pill={true} class="!p-2.5 fixed bg-primary" style="right:10px; bottom:8px;"
+		on:click={()=>inputPanel='keypad'}>
+		<Icon icon="material-symbols:dialpad" class="w-8 h-8" />
 	</Button>
 
 </section>

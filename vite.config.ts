@@ -10,4 +10,12 @@ export default defineConfig({
     port: 3000,      // 使用するポート番号
     open: false,      // 自動でブラウザを開く
   },
+
+	build: {
+		rollupOptions: {
+			input: {
+				ServiceWorker: './src/service-worker.js',
+			},
+		},
+	},
 });

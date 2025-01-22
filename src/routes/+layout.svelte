@@ -20,31 +20,35 @@
 	let isUpdateAvailable = false;
 
 	// PWAのためのservice-worker登録
-	if ('serviceWorker' in navigator) {
-		window.addEventListener('load', function() {
-			this.navigator.serviceWorker.register('/service-worker.js', { scope: './' })
-			.then((registration) => {
-				console.log('ServiceWorker registration successfull with scope: ', registration.scope);
+	// console.log('service workerがregisterできているか');
+	// console.log(window);
+	// if ('serviceWorker' in navigator) {
+	// 	//window.addEventListener('load', function() {
+	// 	window.addEventListener('load', () => {
+	// 		console.log('load');
+	// 		window.navigator.serviceWorker.register('/service-worker.js')	//, { scope: './' })
+	// 		.then((registration:ServiceWorkerRegistration) => {
+	// 			console.log('ServiceWorker registration successfull with scope: ', registration.scope);
 
-				registration.onupdatefound = () => {
-					const installingWorker = registration.installing;
-					if (installingWorker) {
-						installingWorker.onstatechange = () => {
-							if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-								isUpdateAvailable = true;
-								if (confirm('更新があります。更新しますか？')) {
-									registration.update();
-								}
-							}
-						};
-					}
-				}
+	// 			registration.onupdatefound = () => {
+	// 				const installingWorker = registration.installing;
+	// 				if (installingWorker) {
+	// 					installingWorker.onstatechange = () => {
+	// 						if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+	// 							isUpdateAvailable = true;
+	// 							if (confirm('更新があります。更新しますか？')) {
+	// 								registration.update();
+	// 							}
+	// 						}
+	// 					};
+	// 				}
+	// 			}
 
-			}, function (err) {
-				console.log('ServiceWorker registration failed: ', err);
-			});
-		});
-	}
+	// 		}, function (err:Error) {
+	// 			console.log('ServiceWorker registration failed: ', err);
+	// 		});
+	// 	});
+	// }
 
 
 	// drawerの設定
@@ -112,7 +116,36 @@ const resetScannerByUrl = (path:string) => {
 
 	// 初期表示時・画面遷移時に発行
 	onMount(()=>{
-		toast.info(`mount url:${$page.url.pathname}`);
+		console.log('onMount@layout');
+		if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/service-worker.js', { type:'module' })  // サービスワーカーを登録するパス
+        .then((registration:ServiceWorkerRegistration) => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+
+					registration.onupdatefound = () => {
+						const installingWorker = registration.installing;
+						if (installingWorker) {
+							installingWorker.onstatechange = () => {
+								if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+									isUpdateAvailable = true;
+									if (confirm('更新があります。更新しますか？')) {
+										registration.update();
+									}
+								}
+							};
+						}
+					}
+	
+        })
+        .catch((error) => {
+          console.log('ServiceWorker registration failed: ', error);
+        });
+    } else {
+      console.log('Service Worker not supported');
+    }
+
+		//toast.info(`mount url:${$page.url.pathname}`);
 		resetScannerByUrl($page.url.pathname);
 	});
 	// // 他画面に遷移時に発行
@@ -126,8 +159,8 @@ const resetScannerByUrl = (path:string) => {
 	// ホーム画面表示時にhiddenが発行。
 	// Androidでタブ一覧表示時に発行される（タブ削除操作前）。
 	function handleVisibilityChange() {
-		console.log('document.visibilityState:' + document.visibilityState);
-		toast.success(`visibility: ${document.visibilityState} path:${$page.url.pathname}`);
+		//console.log('document.visibilityState:' + document.visibilityState);
+		//toast.success(`visibility: ${document.visibilityState} path:${$page.url.pathname}`);
 		
 		if (document.visibilityState === 'visible' && $page.url.pathname == '/') {
 			$scanner?.asyncTurnOn();
@@ -139,11 +172,10 @@ const resetScannerByUrl = (path:string) => {
 	// PWAをkillした時に実行される
 	function handleBeforeUnload() {
 		$scanner?.asyncTurnOff();
-		console.log('beforeunload');
-		toast.success('beforeunload');
+		// console.log('beforeunload');
+		// toast.success('beforeunload');
 	}
 	
-
 </script>
 
 <style lang="postcss">
@@ -177,7 +209,7 @@ const resetScannerByUrl = (path:string) => {
 	</Button>
 
 	<div class="grow">
-		z<div id="point_name" class="text-primary-text text-xl whitespace-nowrap" style="text-align:left;">{ $selectedPoint?.pointTitle }</div>
+		<div id="point_name" class="text-primary-text text-xl whitespace-nowrap" style="text-align:left;">{ $selectedPoint?.pointTitle }</div>
 		<div id="event_name" class="text-primary-text text-xs whitespace-nowrap" style="text-align:left;">{ $selectedEvent?.eventTitle }</div>
 	</div>
 

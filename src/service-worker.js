@@ -4,6 +4,8 @@ import { build, files, version } from '$service-worker';
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
 
+console.log(files);
+
 const ASSETS = [
 	...build, // the app itself
 	...files  // everything in `static`
@@ -19,16 +21,16 @@ self.addEventListener('install', (event) => {
 	event.waitUntil(addFilesToCache());
 });
 
-// self.addEventListener('activate', (event) => {
-// 	// Remove previous cached data from disk
-// 	async function deleteOldCaches() {
-// 		for (const key of await caches.keys()) {
-// 			if (key !== CACHE) await caches.delete(key);
-// 		}
-// 	}
+self.addEventListener('activate', (event) => {
+	// Remove previous cached data from disk
+	async function deleteOldCaches() {
+		for (const key of await caches.keys()) {
+			if (key !== CACHE) await caches.delete(key);
+		}
+	}
 
-// 	event.waitUntil(deleteOldCaches());
-// });
+	event.waitUntil(deleteOldCaches());
+});
 
 self.addEventListener('fetch', (event) => {
 	// ignore POST requests etc
