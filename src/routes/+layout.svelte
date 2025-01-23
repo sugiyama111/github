@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Icon from "@iconify/svelte";
 	import { Button } from 'flowbite-svelte';
-	import { config, unsentCount, selectedEvent, selectedPoint, scanner } from '$lib/stores';
+	import { config, unsentCount, selectedEvent, selectedPoint, scanner, isSending } from '$lib/stores';
 	import { sendingProcessId, selectedLogId } from '$lib/stores';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
 	import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
@@ -11,9 +11,8 @@
 	import { Toaster } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
-    import { ScannerMessenger } from '$lib/ScannerMessenger';
-    import { toast } from '$lib/QRTToast';
-    import { onDestroy, onMount, setContext } from 'svelte';
+  import { toast } from '$lib/QRTToast';
+  import { onDestroy, onMount, setContext } from 'svelte';
 	
 	let { children } = $props();
 
@@ -158,29 +157,49 @@ const resetScannerByUrl = (path:string) => {
 		resetScannerByUrl($page.url.pathname);
 	});
 
+
+
+	function wait(ms:number) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
 	// 送信処理＋次の送信予約
 	const asyncRoutineSending = async () => {
 		// 送信処理
 		console.log('do');
-		if ($selectedLogId) {
-			// 未送信を取得
-			const records = await db.asyncFetchUnsentRecord($selectedLogId);
-
-			// サーバーへ送信
-
-			// 送信済みにする
-			const seqList = records.map(record=>record.seq);
-			console.log(seqList);
-			await db.asyncUpdateRecordToSent(seqList);
-
-			// 未送信件数を更新
-			$unsentCount = await db.asyncFetchUnsentCount($selectedLogId);
-		}
+		await asyncSendRecords();
 
 		// 送信処理が終わってから、次の実行を予約
 		if ($config.allowsSending) {
 			reserveSending();
 		}
+	}
+
+	const asyncSendRecords = async() => {
+		if (!$selectedLogId) return;
+		if ($isSending) {
+			console.log('already sending. passed.')
+			return;		// 処理中は入らない
+		}
+
+		$isSending = true;
+
+		// 未送信を取得
+		const records = await db.asyncFetchUnsentRecord($selectedLogId);
+
+		// サーバーへ送信
+		
+		await wait(3000);
+
+		// 送信済みにする
+		const seqList = records.map(record=>record.seq);
+		console.log(seqList);
+		await db.asyncUpdateRecordToSent(seqList);
+
+		// 未送信件数を更新
+		$unsentCount = await db.asyncFetchUnsentCount($selectedLogId);
+
+		$isSending = false;
+
 	}
 
 	// 送信予約をする処理
@@ -191,6 +210,7 @@ const resetScannerByUrl = (path:string) => {
 		$sendingProcessId = setTimeout(asyncRoutineSending, interval * 1000);
 	}
 	// 子コンポーネントで利用できるようにする
+	setContext('asyncSendRecords', asyncSendRecords);
 	setContext('reserveSending', reserveSending);
 
 

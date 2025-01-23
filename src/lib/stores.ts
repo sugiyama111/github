@@ -22,6 +22,7 @@ export const showsRegisterConfirmDialog = writable(false);	// 登録確認ダイ
 export const scanner = writable<ScannerMessenger>();
 
 export const sendingProcessId = writable<number|null>(null);	// 定期送信プロセスID
+export const isSending = writable<boolean>(false);				// 送信中であるか
 
 
 //export const selectedEvent = writable<TimingEvent | null>(null);

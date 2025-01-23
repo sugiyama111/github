@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getContext } from "svelte";
 	import Icon from "@iconify/svelte";
 	import { Tabs, TabItem, Button } from 'flowbite-svelte';
 	import Camera from "$lib/components/Camera_html5.svelte";
@@ -9,7 +10,8 @@
 	import { toast } from "$lib/QRTToast";
 	import { scanner, config, selectedEvent, selectedPoint, selectedLogId, selectedRegisterMode, 
 		showsMemberSelectDialog, showsRegisterConfirmDialog,
-		lastRegistered, lastRegisteredTime, unsentCount } from "$lib/stores";
+		lastRegistered, lastRegisteredTime, unsentCount, 
+        isSending} from "$lib/stores";
 	import MemberSelectDialog from '$lib/components/MemberSelectDialog.svelte';
 	import RegisterConfirmDialog from '$lib/components/RegisterConfirmDialog.svelte';
 	import { dayjs, type Dayjs } from '$lib/type/Dayjs';
@@ -251,6 +253,9 @@ console.log(regRecordObj);
 
 	}
 
+	
+	// 親コンポーネント(layout)からの関数
+	const asyncSendRecords:Function = getContext('asyncSendRecords');
 
 // let scanner:ScannerMessenger | null = null;
 
@@ -262,6 +267,40 @@ console.log(regRecordObj);
 // $: {
 // 	if ($showsRegisterConfirmDialog)
 // }
+
+
+function sendIntentTurnOn() {
+		const action = "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN"; // Intentのアクション
+		const extraKey = "com.symbol.datawedge.api.EXTRA_PARAMETER"; // 送信するキー
+		const extraValue = "ENABLE_PLUGIN"; // 送信する値
+
+		// IntentのURLを組み立てる
+    var intentUrl = "intent://" +
+                    "#Intent;" +
+                    "action=" + action + ";" +
+                    "S." + extraKey + "=" + encodeURIComponent(extraValue) + ";" + // Extra情報を含める
+                    "end";
+
+
+		// Android端末を開くように促す
+		location.href = intentUrl;
+}
+function sendIntentTurnOff() {
+		const action = "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN"; // Intentのアクション
+		const extraKey = "com.symbol.datawedge.api.EXTRA_PARAMETER"; // 送信するキー
+		const extraValue = "DISABLE_PLUGIN"; // 送信する値
+
+		// IntentのURLを組み立てる
+    var intentUrl = "intent://" +
+                    "#Intent;" +
+                    "action=" + action + ";" +
+                    "S." + extraKey + "=" + encodeURIComponent(extraValue) + ";" + // Extra情報を含める
+                    "end";
+
+
+		// Android端末を開くように促す
+		window.location.href = intentUrl;
+}
 
 </script>
 
@@ -287,6 +326,12 @@ console.log(regRecordObj);
 		style="border:1px solid black;">スキャナON</button>
 	<button onclick={()=>{console.log('off');$scanner?.asyncTurnOff();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナOFF</button>
+
+<button onclick={()=>{console.log('on');sendIntentTurnOn();}} class="btn w-20 h-20"
+	style="border:1px solid black;">JsIntentスキャナON</button>
+<button onclick={()=>{console.log('off');sendIntentTurnOff();}} class="btn w-20 h-20"
+	style="border:1px solid black;">JsIntentスキャナOFF</button>
+	
 
 	<!-- テスト ここまで -->
 
@@ -422,10 +467,17 @@ console.log(regRecordObj);
 	<Button class="p-3 fixed rounded-full
 		flex justify-center items-center
 		text-primary-text bg-primary
-		w-28 h-28 left-[-28px] bottom-[-28px]">
+		w-28 h-28 left-[-28px] bottom-[-28px]"
+		disabled={$isSending}
+		onclick={()=>asyncSendRecords()}>
 		<div class="-mt-4 -mr-3">
+			{#if !$isSending}
 			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
 			<div class="-mt-1">すぐ送信</div>
+			{:else}
+			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
+			<div class="-mt-1">送信中...</div>
+			{/if}
 		</div>
 {#if $unsentCount >= 1}
 		<div class="rounded-full h-6 w-6 border-white bg-red-600

@@ -11,11 +11,11 @@ export default defineConfig({
     open: false,      // 自動でブラウザを開く
   },
 
-	build: {
-		rollupOptions: {
-			input: {
-				ServiceWorker: './src/service-worker.js',
-			},
-		},
-	},
+	// build: {
+	// 	rollupOptions: {
+	// 		input: {
+	// 			ServiceWorker: './src/service-worker.js',
+	// 		},
+	// 	},
+	// },
 });
