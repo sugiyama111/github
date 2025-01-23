@@ -2,9 +2,9 @@
 	import { goto } from "$app/navigation";
   import { Button, Checkbox, Modal, Range, Toggle } from 'flowbite-svelte';
 	import { inputPassword, selectedEvent, selectedPoint, lastRegistered, config, 
-		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, scanner } from "../../lib/stores";
+		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, sendingProcessId } from "../../lib/stores";
 	import { RegisterMode } from "$lib/type/RegisterMode";
-	import { onMount, onDestroy } from "svelte";
+	import { onMount, onDestroy, getContext } from "svelte";
 	import { dayjs } from '$lib/type/Dayjs';
 	import EventLoadDialog from "$lib/components/EventLoadDialog.svelte";
 	import { toast } from "$lib/QRTToast";
@@ -47,9 +47,17 @@
 		$selectedPoint = null;
 		$lastRegistered = {check:null, retire:null, skip:null};
 		
+		// @TODO selectedLogIdはクリアする？
+		
 		// 名簿のクリア
 		db.members.clear();
 		$config.memberCount = null;
+
+		// 送信処理中止
+		if ($sendingProcessId) {
+			clearTimeout($sendingProcessId);
+			$sendingProcessId = null;
+		}
 
 		toast.success('イベントを初期化しました');
 	}
@@ -58,6 +66,12 @@
 		db.members.clear();
 		$config.memberCount = null;
 		toast.success('名簿を初期化しました');
+
+		// 送信処理中止
+		if ($sendingProcessId) {
+			clearTimeout($sendingProcessId);
+			$sendingProcessId = null;
+		}
 	}
 
 	// 名簿の取り込み
@@ -115,6 +129,21 @@ console.log(memberList)
 		$showsMemberLoadDialog = false;
 	}
 
+	// 親コンポーネント(layout)からの関数
+	const reserveSending:Function = getContext('reserveSending');
+
+	const handleAllowsSendingClick = () => {
+		// 送信予約があれば一旦停止
+		if ($sendingProcessId) {
+			clearTimeout($sendingProcessId);
+			$sendingProcessId = null;
+		}
+
+		// 送信可にした瞬間に予約をする
+		if (!$config.allowsSending) {		// ← 更新前の値を指定する
+			reserveSending();
+		}
+	}
 </script>
 
 <style lang="postcss">
@@ -235,7 +264,7 @@ console.log(memberList)
 	<section class="body {$config.allowsSending ? '' : 'alert'}">
 		{ $config.allowsSending ? '送信可' : '送信不可' }
 	</section>
-	<Toggle color="green" bind:checked={$config.allowsSending} />
+	<Toggle color="green" bind:checked={$config.allowsSending} onclick={handleAllowsSendingClick} />
 </div>
 
 <div class="row">

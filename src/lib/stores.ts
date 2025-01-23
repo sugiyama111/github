@@ -21,6 +21,9 @@ export const showsMemberSelectDialog = writable(false);		// メンバーを複�
 export const showsRegisterConfirmDialog = writable(false);	// 登録確認ダイアログ
 export const scanner = writable<ScannerMessenger>();
 
+export const sendingProcessId = writable<number|null>(null);	// 定期送信プロセスID
+
+
 //export const selectedEvent = writable<TimingEvent | null>(null);
 export const selectedEvent = persisted('selectedEvent', <TimingEvent | null>(null));
 export const selectedPoint = persisted('selectedPoint', <TimingPoint | null>(null));

@@ -23,12 +23,15 @@
 		// 地点を選択
 		$selectedPoint = point;
 
-		// ログを切り替える
+		// @TODO ログを切り替える
 		// 旧ログを更新
 		
 
 		const newLogId = await db.asyncSwitchNextLog($selectedEvent, point);
 		$selectedLogId = newLogId;
+
+		// ＠TODO 送信処理を再実行
+		
 	}
 
 </script>

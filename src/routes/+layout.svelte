@@ -1,19 +1,19 @@
 <script lang="ts">
 	import '../app.css';
-	import { derived } from 'svelte/store';
 	import Icon from "@iconify/svelte";
 	import { Button } from 'flowbite-svelte';
-	import { selectedEvent, selectedPoint, scanner } from '$lib/stores';
-	import { showsConfigLoginDialog } from '$lib/stores';
+	import { config, unsentCount, selectedEvent, selectedPoint, scanner } from '$lib/stores';
+	import { sendingProcessId, selectedLogId } from '$lib/stores';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
 	import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
-
+	import { db } from "$lib/db/db";
+	
 	import { Toaster } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
     import { ScannerMessenger } from '$lib/ScannerMessenger';
     import { toast } from '$lib/QRTToast';
-    import { onDestroy, onMount } from 'svelte';
+    import { onDestroy, onMount, setContext } from 'svelte';
 	
 	let { children } = $props();
 
@@ -113,10 +113,11 @@ const resetScannerByUrl = (path:string) => {
 		}
   }
 
-
 	// 初期表示時・画面遷移時に発行
 	onMount(()=>{
 		console.log('onMount@layout');
+
+		// service workerの登録
 		if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/service-worker.js', { type:'module' })  // サービスワーカーを登録するパス
@@ -145,8 +146,61 @@ const resetScannerByUrl = (path:string) => {
       console.log('Service Worker not supported');
     }
 
+		// 送信ルーティンの開始
+		if ($config.allowsSending) {
+			console.log('start sending ' + $config.sendingIntervalSec);
+			
+			reserveSending();
+		}
+
+
 		//toast.info(`mount url:${$page.url.pathname}`);
 		resetScannerByUrl($page.url.pathname);
+	});
+
+	// 送信処理＋次の送信予約
+	const asyncRoutineSending = async () => {
+		// 送信処理
+		console.log('do');
+		if ($selectedLogId) {
+			// 未送信を取得
+			const records = await db.asyncFetchUnsentRecord($selectedLogId);
+
+			// サーバーへ送信
+
+			// 送信済みにする
+			const seqList = records.map(record=>record.seq);
+			console.log(seqList);
+			await db.asyncUpdateRecordToSent(seqList);
+
+			// 未送信件数を更新
+			$unsentCount = await db.asyncFetchUnsentCount($selectedLogId);
+		}
+
+		// 送信処理が終わってから、次の実行を予約
+		if ($config.allowsSending) {
+			reserveSending();
+		}
+	}
+
+	// 送信予約をする処理
+	const reserveSending = () => {
+		console.log('reserve after '+$config.sendingIntervalSec);
+
+		const interval = $config.sendingIntervalSec == 0 ? 2 : $config.sendingIntervalSec;
+		$sendingProcessId = setTimeout(asyncRoutineSending, interval * 1000);
+	}
+	// 子コンポーネントで利用できるようにする
+	setContext('reserveSending', reserveSending);
+
+
+	onDestroy(()=>{
+		// 送信予約があれば一旦停止
+		if ($sendingProcessId) {
+			clearTimeout($sendingProcessId);
+			$sendingProcessId = null;
+		}
+
 	});
 	// // 他画面に遷移時に発行
 	// onDestroy(()=>{
