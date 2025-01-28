@@ -23,6 +23,7 @@
 	import { ScanInputValidator } from "$lib/ScanInputValidator";
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
 	import { ScannerMessenger } from "$lib/ScannerMessenger";
+    import LastRegisteredInfo from "$lib/components/LastRegisteredInfo.svelte";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -353,84 +354,15 @@ function sendIntentTurnOff() {
 	<Tabs contentClass="m-0 p-0" class="bg-gray-600">
     <div class="flex w-full">
 	{#if $config.availableRegisterModes.findIndex(m => m.code == RegisterMode.CHECK.code) !== -1}
-			<TabItem open={!$selectedRegisterMode.isRetire() && !$selectedRegisterMode.isSkip()}
-				class="flex-1 rounded-t-lg"
-				defaultClass="w-full hover:!bg-check !bg-check"
-				onclick={()=>$selectedRegisterMode=new RegisterModeState(RegisterMode.CHECK)}>
-				<section slot="title" class="flex gap-1 -m-3 p-3">
-					<Icon icon="material-symbols:check-circle-outline" class="size-5 m-0 p-0" />
-					<div class="whitespace-nowrap">チェック</div>
-				</section>
-
-				<section class="pt-4 bg-check">
-					<article class="last-data leading-2">
-						<div class="mode-chip bg-check" style="float:right;">
-							<Icon icon="material-symbols:check-circle-outline" />チェック
-						</div>
-						<div class="h-5">No. { $lastRegistered['check']?.race_num}</div>
-						<div class="h-5">{ $lastRegistered['check']?.member_name }</div>
-						<div class="h-5">
-							{#if $lastRegisteredTime['check']}
-							<span class="text-sm">{ $lastRegisteredTime['check'].format('YYYY') }/</span>{ $lastRegisteredTime['check'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['check'].format('ss') }</span>
-							{/if}
-						</div>
-					</article>
-				</section>
-			</TabItem>
+			<LastRegisteredInfo registerMode={RegisterMode.CHECK} />
 	{/if}
 
 	{#if $config.availableRegisterModes.findIndex(m => m.code == RegisterMode.RETIRE.code) !== -1}
-			<TabItem open={$selectedRegisterMode.isRetire()}
-				class="flex-1 rounded-t-lg"
-				defaultClass="w-full hover:!bg-retire !bg-retire"
-				onclick={()=>$selectedRegisterMode=new RegisterModeState(RegisterMode.RETIRE)}>
-				<section slot="title" class="flex gap-1 -m-3 p-3">
-					<Icon icon="material-symbols:close" class="size-5 p-0" />
-					<div class="whitespace-nowrap">リタイア</div>
-				</section>
-
-				<section class="pt-4 bg-retire">
-					<article class="last-data leading-2">
-						<div class="mode-chip bg-retire" style="float:right;">
-							<Icon icon="material-symbols:close" />リタイア
-						</div>
-						<div class="h-5">No. { $lastRegistered['retire']?.race_num}</div>
-						<div class="h-5">{ $lastRegistered['retire']?.member_name }</div>
-						<div class="h-5">
-							{#if $lastRegisteredTime['retire']}
-							<span class="text-sm">{ $lastRegisteredTime['retire'].format('YYYY') }/</span>{ $lastRegisteredTime['retire'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['retire'].format('ss') }</span>
-							{/if}
-						</div>
-					</article>
-				</section>
-			</TabItem>
+			<LastRegisteredInfo registerMode={RegisterMode.RETIRE} />
 	{/if}
-
+	
 	{#if $config.availableRegisterModes.findIndex(m => m.code == RegisterMode.SKIP.code) !== -1}
-			<TabItem open={$selectedRegisterMode.isSkip()}
-				class="flex-1 rounded-t-lg"
-				defaultClass="w-full hover:!bg-skip !bg-skip"
-				onclick={()=>$selectedRegisterMode=new RegisterModeState(RegisterMode.SKIP)}>
-				<section slot="title" class="flex gap-1 -m-3 p-3">
-					<Icon icon="material-symbols:step-over" class="size-5 p-0" />
-					<div class="whitespace-nowrap">スキップ</div>
-				</section>
-
-				<section class="pt-4 bg-skip">
-					<article class="last-data leading-2">
-						<div class="mode-chip bg-skip" style="float:right;">
-							<Icon icon="material-symbols:step-over" />スキップ
-						</div>
-						<div class="h-5">No. { $lastRegistered['skip']?.race_num}</div>
-						<div class="h-5">{ $lastRegistered['skip']?.member_name }</div>
-						<div class="h-5">
-							{#if $lastRegisteredTime['skip']}
-							<span class="text-sm">{ $lastRegisteredTime['skip'].format('YYYY') }/</span>{ $lastRegisteredTime['skip'].format('MM/DD HH:mm') }<span class="text-sm">:{ $lastRegisteredTime['skip'].format('ss') }</span>
-							{/if}
-						</div>
-					</article>
-				</section>
-			</TabItem>
+		<LastRegisteredInfo registerMode={RegisterMode.SKIP} />
 	{/if}
     </div>
   </Tabs>
@@ -506,23 +438,6 @@ function sendIntentTurnOff() {
 </section>
 
 <style lang="postcss">
-	.mode-chip {
-		@apply flex;
-		@apply rounded-xl;
-		@apply pl-2 pr-3 pt-1 pb-1;
-		width: fit-content;
-		line-height: 1.1rem;
-		box-shadow: 1px 1px gray;
-	}
-	
-	article.last-data {
-		@apply p-2 ml-auto mr-auto mb-4;
-		@apply w-3/4 max-w-96;
-		@apply rounded-md;
-		@apply bg-slate-300 shadow-md;
-		@apply text-black text-left;
-	}
-
 	section.control-panel {
 		@apply p-2 ml-auto mr-auto mb-10;
 		@apply w-3/4 max-w-96;
