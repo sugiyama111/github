@@ -23,7 +23,7 @@
 	import { ScanInputValidator } from "$lib/ScanInputValidator";
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
 	import { ScannerMessenger } from "$lib/ScannerMessenger";
-    import LastRegisteredInfo from "$lib/components/LastRegisteredInfo.svelte";
+	import RegisterModeTab from "$lib/components/RegisterModeTab.svelte";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -354,15 +354,15 @@ function sendIntentTurnOff() {
 	<Tabs contentClass="m-0 p-0" class="bg-gray-600">
     <div class="flex w-full">
 	{#if $config.availableRegisterModes.findIndex(m => m.code == RegisterMode.CHECK.code) !== -1}
-			<LastRegisteredInfo registerMode={RegisterMode.CHECK} />
+			<RegisterModeTab registerMode={RegisterMode.CHECK} />
 	{/if}
 
 	{#if $config.availableRegisterModes.findIndex(m => m.code == RegisterMode.RETIRE.code) !== -1}
-			<LastRegisteredInfo registerMode={RegisterMode.RETIRE} />
+			<RegisterModeTab registerMode={RegisterMode.RETIRE} />
 	{/if}
 	
 	{#if $config.availableRegisterModes.findIndex(m => m.code == RegisterMode.SKIP.code) !== -1}
-		<LastRegisteredInfo registerMode={RegisterMode.SKIP} />
+		<RegisterModeTab registerMode={RegisterMode.SKIP} />
 	{/if}
     </div>
   </Tabs>
