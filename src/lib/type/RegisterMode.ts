@@ -5,18 +5,21 @@ export const RegisterMode = {
 		value: '1',
 		color: 'white',
 		text: 'チェック',
+		icon: 'material-symbols:check-circle-outline',
 	},
 	RETIRE: {
 		code: 'retire',
 		value: '2',
 		color: '#faa',
 		text: 'リタイア',
+		icon: 'material-symbols:close',
 	},
 	SKIP: {
 		code: 'skip',
 		value: '3',
 		color: '#8cf',
 		text: 'スキップ',
+		icon: 'material-symbols:step-over',
 	},
 	
 } as const;

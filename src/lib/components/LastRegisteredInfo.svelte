@@ -8,12 +8,6 @@ import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
 const props = $props();
 const componentRegisterMode:RegisterMode = props.registerMode;		// このコンポーネントの登録モード
 
-const iconName =
-	componentRegisterMode.code == RegisterMode.CHECK.code ? 'material-symbols:check-circle-outline' :
-	componentRegisterMode.code == RegisterMode.RETIRE.code ? 'material-symbols:close' :
-	componentRegisterMode.code == RegisterMode.SKIP.code ? 'material-symbols:step-over' : '';
-
-
 </script>
 
 <TabItem open={$selectedRegisterMode.getCode() == componentRegisterMode.code}
@@ -21,14 +15,14 @@ const iconName =
 	defaultClass={`w-full hover:!bg-${componentRegisterMode.code} !bg-${componentRegisterMode.code}`}
 	onclick={()=>$selectedRegisterMode=new RegisterModeState(componentRegisterMode)}>
 	<section slot="title" class="flex gap-1 -m-3 p-3">
-		<Icon icon={ iconName } class="size-5 m-0 p-0" />
+		<Icon icon={ componentRegisterMode.icon } class="size-5 m-0 p-0" />
 		<div class="whitespace-nowrap">{ componentRegisterMode.text }</div>
 	</section>
 
 	<section class={`pt-4 bg-${componentRegisterMode.code}`}>
 		<article class="last-data leading-2">
 			<div class={`mode-chip bg-${componentRegisterMode.code}`} style="float:right;">
-				<Icon icon={ iconName } />{ componentRegisterMode.text }
+				<Icon icon={ componentRegisterMode.icon } />{ componentRegisterMode.text }
 			</div>
 			<div class="h-5">No. { $lastRegistered[componentRegisterMode.code]?.race_num}</div>
 			<div class="h-5">{ $lastRegistered[componentRegisterMode.code]?.member_name }</div>
