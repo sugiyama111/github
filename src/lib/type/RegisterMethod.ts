@@ -5,18 +5,21 @@ export const RegisterMethod = {
 		value: '1',
 		text: 'スキャナ',
 		serverValue: '2',
+		icon: 'material-symbols:point-scan-rounded',
 	},
 	CAMERA: {
 		code: 'camera',
 		value: '2',
 		text: 'カメラ',
 		serverValue: '0',
+		icon: 'material-symbols:photo-camera-outline',
 	},
 	KEYPAD: {
 		code: 'keypad',
 		value: '3',
 		text: 'キーパッド',
 		serverValue: '1',
+		icon: 'material-symbols:dialpad',
 	},
 	
 } as const;
@@ -29,6 +32,13 @@ export class RegisterMethodState {
 
 	constructor(method: RegisterMethod) {
 			this.method = method;
+	}
+
+	static CodeToMethod(code:string): RegisterMethod | null {
+		if (code == 'scanner') return RegisterMethod.SCANNER;
+		else if (code == 'camera') return RegisterMethod.CAMERA;
+		else if (code == 'keypad') return RegisterMethod.KEYPAD;
+		else return null;
 	}
 
 	getMethod(): RegisterMethod {

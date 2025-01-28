@@ -45,7 +45,11 @@ export class ScannerMessenger {
 			"extra_value": "DISABLE_PLUGIN"
 		}
 
-		await ScannerMessenger.connector.asyncSend(json);
+		try {
+			await ScannerMessenger.connector.asyncSend(json);
+		} catch (e) {
+			console.log(e);
+		}
 
 		console.log('ScannerMessenger.asyncTurnOff end');
 	}

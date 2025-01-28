@@ -192,8 +192,9 @@ const resetScannerByUrl = (path:string) => {
 
 		// 送信済みにする
 		const seqList = records.map(record=>record.seq);
+		console.log('reg seqList');
 		console.log(seqList);
-		await db.asyncUpdateRecordToSent(seqList);
+		await db.asyncUpdateRecordToSent($selectedLogId, seqList);
 
 		// 未送信件数を更新
 		$unsentCount = await db.asyncFetchUnsentCount($selectedLogId);
@@ -282,9 +283,21 @@ const resetScannerByUrl = (path:string) => {
 		<Icon icon="material-symbols:menu-rounded" class="w-8 h-6" />
 	</Button>
 
-	<div class="grow">
-		<div id="point_name" class="text-primary-text text-xl whitespace-nowrap" style="text-align:left;">{ $selectedPoint?.pointTitle }</div>
-		<div id="event_name" class="text-primary-text text-xs whitespace-nowrap" style="text-align:left;">{ $selectedEvent?.eventTitle }</div>
+	<div class="grow flex items-center text-primary-text text-left whitespace-nowrap">
+	{#if ($page.url.pathname == '/')}
+		<div>
+			<div class="text-xs">{ $selectedEvent?.eventTitle }</div>
+			<div class="text-2xl -mt-1">{ $selectedPoint?.pointTitle }</div>
+		</div>
+	{:else if ($page.url.pathname == '/config')}
+		<div class="text-xl">管理者設定</div>
+	{:else if ($page.url.pathname == '/ref')}
+		<div class="text-xl">記録参照 - ログ選択</div>
+	{:else if (/^\/refd\/.+$/.test($page.url.pathname))}
+		<div class="text-xl">
+			記録参照 - 詳細
+		</div>
+	{/if}
 	</div>
 
 {#if isUpdateAvailable}

@@ -37,7 +37,7 @@
 
 	// 番号での登録
 	const asyncRegisterByNumber = async (inputNumber:string, method:RegisterMethod) => {
-		const memberList = await (await db.asyncFetchByNumber(inputNumber)).toArray();
+		const memberList = await (await db.asyncFetchMemberByNumber(inputNumber)).toArray();
 		
 		measuringTime = dayjs();
 		registerMethod = method;
@@ -49,7 +49,7 @@
 	const asyncRegisterByMemberCode = async (inputCode:string, method:RegisterMethod) => {
 		console.log('asyncRegisterByMemberCode');
 		console.log(inputCode);
-		const memberList = await (await db.asyncFetchByMembercode(inputCode)).toArray();
+		const memberList = await (await db.asyncFetchMemberByCode(inputCode)).toArray();
 
 		measuringTime = dayjs();
 		registerMethod = method;
@@ -110,7 +110,7 @@
 			return;
 		}
 
-		const nextSeq = await db.asyncFetchNewRecordSeq();
+		const nextSeq = await db.asyncFetchNewRecordSeq($selectedLogId);
 
 		// 登録するデータ
 		const regRecordObj = {
@@ -130,7 +130,7 @@ console.log(regRecordObj);
 		try {
 			const record = new RecordEntity(regRecordObj);
 			console.log(record);
-			await db.records.add(record);
+			await db.asyncRegisterRecord($selectedLogId, record);
 
 			// storeを更新：最終登録
 			$lastRegistered[$selectedRegisterMode.getCode() as keyof typeof $lastRegistered] = record;
@@ -420,15 +420,15 @@ function sendIntentTurnOff() {
 
 	<Button pill={true} class="!p-2.5 fixed bg-primary" style="right:130px; bottom:8px;"
 		on:click={()=>{inputPanel='info'; handleScannerButton();}}>
-		<Icon icon="material-symbols:point-scan-rounded" class="w-8 h-8" />
+		<Icon icon={ RegisterMethod.SCANNER.icon } class="w-8 h-8" />
 	</Button>
 	<Button pill={true} class="!p-2.5 fixed bg-primary" style="right:70px; bottom:8px;"
 		on:click={()=>inputPanel='camera'}>
-		<Icon icon="material-symbols:photo-camera-outline" class="w-8 h-8" />
+		<Icon icon={ RegisterMethod.CAMERA.icon } class="w-8 h-8" />
 	</Button>
 	<Button pill={true} class="!p-2.5 fixed bg-primary" style="right:10px; bottom:8px;"
 		on:click={()=>inputPanel='keypad'}>
-		<Icon icon="material-symbols:dialpad" class="w-8 h-8" />
+		<Icon icon={ RegisterMethod.KEYPAD.icon } class="w-8 h-8" />
 	</Button>
 
 </section>

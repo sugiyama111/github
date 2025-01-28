@@ -34,6 +34,13 @@ export class RegisterModeState {
 			this.mode = mode;
 	}
 
+	static CodeToMode(code:string): RegisterMode | null {
+		if (code == 'check') return RegisterMode.CHECK;
+		else if (code == 'retire') return RegisterMode.RETIRE;
+		else if (code == 'skip') return RegisterMode.SKIP;
+		else return null;
+	}
+
 	isCheck(): boolean {
 			return this.mode.code === RegisterMode.CHECK.code;
 	}

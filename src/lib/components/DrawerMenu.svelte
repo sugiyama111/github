@@ -40,7 +40,8 @@
 					</svelte:fragment>
 				</SidebarItem>
 
-				<SidebarItem label="参照画面" {spanClass}>
+				<SidebarItem label="参照画面" {spanClass}
+					on:click={(e)=>{console.log('ref'); hidden=true; e.preventDefault(); goto('/ref');}}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:data-table" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
