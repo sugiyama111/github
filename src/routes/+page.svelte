@@ -527,7 +527,7 @@ function sendIntentTurnOff() {
 		@apply p-2 ml-auto mr-auto mb-10;
 		@apply w-3/4 max-w-96;
 		@apply rounded-md;
-		@apply bg-yellow-100 shadow-md;
+		@apply bg-slate-300 shadow-md;
 		@apply text-black text-left;
 	}
 

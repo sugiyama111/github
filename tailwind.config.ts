@@ -15,7 +15,8 @@ export default {
       colors: {
 			// flowbite-svelte
 				primary: {
-					DEFAULT: '#22b186',
+					//DEFAULT: '#22b186',
+					DEFAULT: '#1d9672',
 					text: 'white',
 				},
 				light: {
@@ -30,10 +31,12 @@ export default {
 					DEFAULT: 'white',
 				},
 				retire: {
-					DEFAULT: '#FFAAAA',
+					//DEFAULT: '#FFAAAA',
+					DEFAULT: '#ff7d7d',
 				},
 				skip: {
-					DEFAULT: '#acf',
+					//DEFAULT: '#acf',
+					DEFAULT: '#55c5ff',
 				},
 				config: {
 					DEFAULT: 'blue-600',
