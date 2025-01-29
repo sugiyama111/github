@@ -2,8 +2,10 @@
 	import { goto } from "$app/navigation";
   import { Button, Checkbox, Modal, Range, Toggle } from 'flowbite-svelte';
 	import { inputPassword, selectedEvent, selectedPoint, lastRegistered, config, 
-		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, sendingProcessId } from "../../lib/stores";
-	import { RegisterMode } from "$lib/type/RegisterMode";
+		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, sendingProcessId, 
+        selectedLogId,
+        selectedRegisterMode} from "../../lib/stores";
+	import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
 	import { onMount, onDestroy, getContext } from "svelte";
 	import { dayjs } from '$lib/type/Dayjs';
 	import EventLoadDialog from "$lib/components/EventLoadDialog.svelte";
@@ -30,34 +32,60 @@
 	const disablesSending = derived(config, $config=>!$config.allowsSending);
 
 	// モードのチェック切り替え
-	const toggleModeCheck = (changedMode:RegisterMode) => {
+	const toggleModeCheck = (e:Event & { target: HTMLInputElement }, changedMode:RegisterMode) => {
 		const index = $config.availableRegisterModes.findIndex(m => m.code == changedMode.code);
 		if (index === -1) {
 			// 新しいモードを追加
-			$config.availableRegisterModes = [...$config.availableRegisterModes, changedMode];
+			//$config.availableRegisterModes = [...$config.availableRegisterModes, changedMode];　← ×：後からチェックしたものが後に来る
+
+			// CHECK->RETIRE->SKIPの順で優先的に選択させるため、その並び順で$config.avaiableRegisterModeを指定する。
+			const modes:Array<RegisterMode> = [];
+			[RegisterMode.CHECK, RegisterMode.RETIRE, RegisterMode.SKIP].forEach((orderedMode)=>{
+				if (changedMode.code == orderedMode.code
+				 || $config.availableRegisterModes.findIndex(availableMode => availableMode.code == orderedMode.code) !== -1) {
+					modes.push(orderedMode);
+				}
+			});
+			$config.availableRegisterModes = modes;
+
 		} else {
-			 // モードを削除
+			// モードを削除
+
+			// ただし、結果的に0件になる場合は、チェック変更を拒否する
+			if ($config.availableRegisterModes.length <= 1) {
+				e.target.checked = true;
+				return;
+			}
+
+			// チェックしたものを外す
 			$config.availableRegisterModes = $config.availableRegisterModes.filter(m => m.code !== changedMode.code);
 		}
 	}
 
 	// イベントのクリア
-	const clearConfig = () => {
-		$selectedEvent = null;
-		$selectedPoint = null;
-		$lastRegistered = {check:null, retire:null, skip:null};
-		
-		// @TODO selectedLogIdはクリアする？
-		
-		// 名簿のクリア
-		db.members.clear();
-		$config.memberCount = null;
+	const asyncClearConfig = async () => {
 
 		// 送信処理中止
 		if ($sendingProcessId) {
 			clearTimeout($sendingProcessId);
 			$sendingProcessId = null;
 		}
+
+		// storeのクリア
+		$selectedEvent = null;
+		$selectedPoint = null;
+		$selectedLogId = null;
+		$lastRegistered = {check:null, retire:null, skip:null};
+		$selectedRegisterMode = new RegisterModeState(RegisterMode.CHECK);
+
+		// DBのクリア
+		await Promise.all([
+			db.members.clear(),
+			db.records.clear(),
+			db.logs.clear(),
+		]);
+		$config.memberCount = null;
+
 
 		toast.success('イベントを初期化しました');
 	}
@@ -189,7 +217,7 @@ console.log(memberList)
 	</section>
 	<svelte:fragment slot="footer">
 		<Button on:click={()=>showsConfigClearConfirm=false} color="alternative">キャンセル</Button>
-		<Button on:click={()=>{clearConfig();showsConfigClearConfirm=false;}} class="text-primary">OK</Button>
+		<Button on:click={()=>{asyncClearConfig();showsConfigClearConfirm=false;}} class="text-primary">OK</Button>
 	</svelte:fragment>
 </Modal>
 
@@ -285,19 +313,19 @@ console.log(memberList)
 	<section class="body select-mode">
 		<article>
 			<Checkbox checked={$config.availableRegisterModes.some(mode => mode.code === RegisterMode.CHECK.code)}
-				on:change={()=>toggleModeCheck(RegisterMode.CHECK)}>
+				onchange={(e)=>toggleModeCheck(e, RegisterMode.CHECK)}>
 				<span class="check-label">{ RegisterMode.CHECK.text }</span>
 			</Checkbox>
 		</article>
 		<article>
 			<Checkbox checked={$config.availableRegisterModes.some(mode => mode.code === RegisterMode.RETIRE.code)}
-				on:change={()=>toggleModeCheck(RegisterMode.RETIRE)}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          >
+				onchange={(e)=>toggleModeCheck(e, RegisterMode.RETIRE)}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          >
 				<span class="check-label">{ RegisterMode.RETIRE.text }</span>
 			</Checkbox>
 		</article>
 		<article>
 			<Checkbox checked={$config.availableRegisterModes.some(mode => mode.code === RegisterMode.SKIP.code)}
-				on:change={()=>toggleModeCheck(RegisterMode.SKIP)}>
+				onchange={(e)=>toggleModeCheck(e, RegisterMode.SKIP)}>
 				<span class="check-label">{ RegisterMode.SKIP.text }</span>
 			</Checkbox>
 		</article>

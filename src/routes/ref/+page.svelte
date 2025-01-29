@@ -7,6 +7,7 @@
 	import type { TimingPoint } from "$lib/api/TimingPoint";
 	import { dayjs } from '$lib/type/Dayjs';
 	import Icon from "@iconify/svelte";
+	import { Button } from 'flowbite-svelte';
 
 	if (!$selectedEvent) goto('/');
 
@@ -75,6 +76,10 @@
 </table>
 
 <style lang="postcss">
+	.menu:hover {
+		border: 1px solid blue;
+	}
+
 	table {
 		@apply m-1;
 		border: 1px solid lightgray;

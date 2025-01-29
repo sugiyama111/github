@@ -17,6 +17,7 @@
 	const goBackToMain = () => {
 		hidden = true;
 		//history.back;
+		console.log('goto /');
 		goto('/');
 	}
 </script>
@@ -33,15 +34,15 @@
     <SidebarWrapper divClass="overflow-y-auto py-4 px-3 rounded">
       <SidebarGroup>
 				
-				<SidebarItem label="計測画面" {spanClass}
-					on:click={goBackToMain}>
+				<SidebarItem label="計測" {spanClass}
+					onclick={goBackToMain}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:motion-play-outline" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
 				</SidebarItem>
 
-				<SidebarItem label="参照画面" {spanClass}
-					on:click={(e)=>{console.log('ref'); hidden=true; e.preventDefault(); goto('/ref');}}>
+				<SidebarItem label="記録参照" {spanClass}
+					onclick={(e)=>{console.log('ref'); hidden=true; e.preventDefault(); goto('/ref');}}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:data-table" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
@@ -50,14 +51,14 @@
 				<hr style="margin-top:20px; margin-bottom:20px;" />
 				
 				<SidebarItem label="地点選択" {spanClass}
-					on:click={()=>{$showsPointSelectDialog = true; hidden=true;}}>
+					onclick={()=>{$showsPointSelectDialog = true; hidden=true;}}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:location-on" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
 				</SidebarItem>
 				
 				<SidebarItem label="管理者設定" {spanClass}
-					on:click={()=>{$showsConfigLoginDialog = true; hidden=true;}}>
+					onclick={()=>{$showsConfigLoginDialog = true; hidden=true;}}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:settings" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>

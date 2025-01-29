@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, Modal, Radio } from 'flowbite-svelte';
-	import { selectedEvent, selectedLogId, selectedPoint } from '$lib/stores';
+	import { lastRegistered, selectedEvent, selectedLogId, selectedPoint, unsentCount } from '$lib/stores';
 	import { showsPointSelectDialog } from '$lib/stores';
 	import type { TimingPoint } from '$lib/api/TimingPoint';
 	import { db } from '$lib/db/db';
@@ -27,6 +27,11 @@
 		// 旧ログを更新
 		
 
+		// リセットすべきstoreをリセットする
+		$unsentCount = 0;
+		$lastRegistered = {check:null, retire:null, skip:null};
+
+		
 		const newLogId = await db.asyncSwitchNextLog($selectedEvent, point);
 		$selectedLogId = newLogId;
 

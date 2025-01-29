@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from "svelte";
 	import Icon from "@iconify/svelte";
-	import { Tabs, TabItem, Button } from 'flowbite-svelte';
+	import { Tabs, Button } from 'flowbite-svelte';
 	import Camera from "$lib/components/Camera_html5.svelte";
 	import Keypad from "$lib/components/Keypad.svelte";
 	import { db } from "$lib/db/db";
@@ -33,6 +33,18 @@
 
 	// 特定済みメンバー（各ダイアログで共有のためここに保持）
 	let specifiedMember:MemberEntity | null = null;
+
+
+	// 万一、選択可能なモードが無い場合はチェックを強制的に可能にする
+	if ($config.availableRegisterModes.length == 0) {
+		$config.availableRegisterModes.push(RegisterMode.CHECK);
+	}
+	// selectedRegisterModeがavailableに無い場合は、availableのうち左から優先的に選択する。
+	// $config.availableRegisterModesには(CHEKC->RETIRE->SKIP)の順に入っている。
+	if ($config.availableRegisterModes.findIndex(m => m.code == $selectedRegisterMode.getCode()) === -1) {
+		const code = $config.availableRegisterModes[0].code;
+		$selectedRegisterMode = new RegisterModeState(RegisterModeState.CodeToMode(code)!);
+	}
 
 
 	// 番号での登録
@@ -124,7 +136,6 @@
 			mode: $selectedRegisterMode.getCode(),
 			sent: 0,
 		};
-console.log(regRecordObj);
 
     // 登録
 		try {
@@ -145,7 +156,7 @@ console.log(regRecordObj);
 		
 		try {
 			// storeを更新：未送信件数
-			$unsentCount = await db.asyncFetchUnsentCount($selectedLogId);
+			$unsentCount = await db.asyncFetchUnsentRecordCount($selectedLogId);
 			console.log('e');
 
 		} catch (e) {
@@ -187,10 +198,6 @@ console.log(regRecordObj);
 		if ($selectedEvent == null) return;
 
 		const key = e.key;
-// console.log('code - which');
-// console.log(e.keyCode)
-// console.log(e.which);
-// console.log(e.key);
 		
 		// セミコロンが来たら出力
 		if (key == ';') {
@@ -201,7 +208,6 @@ console.log(regRecordObj);
 				dayjs().format('YYYY/MM/DD HH:mm:ss.SSS'),
 				new RegisterMethodState(RegisterMethod.SCANNER),		// スキャナ限定
 				$selectedRegisterMode,
-				//1,//$selectedEvent.eventId,		// @TODO テストコード戻す
 				$selectedEvent.eventId,
 			);
 

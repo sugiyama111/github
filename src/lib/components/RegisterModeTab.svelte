@@ -13,7 +13,7 @@ const componentRegisterMode:RegisterMode = props.registerMode;		// このコン�
 <TabItem open={$selectedRegisterMode.getCode() == componentRegisterMode.code}
 	class="flex-1 rounded-t-lg"
 	defaultClass={`w-full hover:!bg-${componentRegisterMode.code} !bg-${componentRegisterMode.code}`}
-	onclick={()=>$selectedRegisterMode=new RegisterModeState(componentRegisterMode)}>
+	onclick={()=>{console.log('componentRegisterMode'); console.log(componentRegisterMode); $selectedRegisterMode=new RegisterModeState(componentRegisterMode); console.log($selectedRegisterMode);}}>
 	<section slot="title" class="flex gap-1 -m-3 p-3">
 		<Icon icon={ componentRegisterMode.icon } class="size-5 m-0 p-0" />
 		<div class="whitespace-nowrap">{ componentRegisterMode.text }</div>

@@ -61,6 +61,23 @@ export default class AppDB extends Dexie {
       .equals(code);
 	}
 
+	async asyncFetchMemberUnreadOnLog(logId:number) {
+		const recordList = await this.records
+			.where({log_id:logId}).toArray();
+
+		// レコードのあるメンバーコードの一覧（重複除外）
+		const readMemberCodeList = recordList.map((rec:RecordEntity)=>rec.member_code)
+			.filter((value, index, self) => self.indexOf(value) === index);
+
+		// 上記のメンバーコードを除くメンバー一覧を取得
+		const allMemberQuery = await this.members.toCollection();
+		readMemberCodeList.forEach(readMemberCode=>{
+			allMemberQuery.and(member => member.member_code !== readMemberCode)
+		});
+
+		return allMemberQuery.toArray();
+	}
+
 	// ログを次に切り替え
 	async asyncSwitchNextLog(event:TimingEvent, point:TimingPoint):Promise<number> {
 		const newLogId = await this.asyncFetchNewLogId()
@@ -129,7 +146,7 @@ export default class AppDB extends Dexie {
 	}
 
 	// 未送信のレコードの件数を取得
-	async asyncFetchUnsentCount(logId:number): Promise<number> {
+	async asyncFetchUnsentRecordCount(logId:number): Promise<number> {
 		console.log('fetch unsent count on logid: ' + logId);
 		const key:[number, number]  = [logId, 0];
 
@@ -140,20 +157,11 @@ export default class AppDB extends Dexie {
 
 	// 未送信のレコードを送信済みに更新
 	async asyncUpdateRecordToSent(logId:number, seqList:Array<number>) {
+		
 		seqList.forEach((seq:number)=>{
 			this.records.where({log_id:logId, seq:seq}).modify({sent:1});
 		});
 
-		// const updates:any = [];
-		// seqList.forEach((seq:number)=>{
-		// 	updates.push({
-		// 		key: {log_id:logId, seq:seq}, 
-		// 		changes: { sent:1 }
-		// 	});
-		// });
-		// console.log(updates);
-
-		// this.records.bulkUpdate(updates);
 	}
 
 	// recordsのレコード1件を登録

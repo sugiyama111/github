@@ -9,6 +9,7 @@ import type RecordEntity from '$lib/db/RecordEntity';
 import { dayjs, type Dayjs } from '$lib/type/Dayjs';
 import { ScannerMessenger } from './ScannerMessenger';
 
+// オブジェクトのため、persistedにはしない(できない)
 export const selectedRegisterMode = writable<RegisterModeState>(new RegisterModeState(RegisterMode.CHECK));
 
 // ダイアログの表示

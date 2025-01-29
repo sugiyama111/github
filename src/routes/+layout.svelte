@@ -13,8 +13,16 @@
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
   import { toast } from '$lib/QRTToast';
   import { onDestroy, onMount, setContext } from 'svelte';
+    import { RegisterMode } from '$lib/type/RegisterMode';
 	
 	let { children } = $props();
+
+	////// フェールセーフ処理
+	// 万一、選択可能なモードが無い場合はチェックを強制的に可能にする
+	if ($config.availableRegisterModes.length == 0) {
+		$config.availableRegisterModes.push(RegisterMode.CHECK);
+	}
+
 
 	let isUpdateAvailable = false;
 
@@ -197,7 +205,7 @@ const resetScannerByUrl = (path:string) => {
 		await db.asyncUpdateRecordToSent($selectedLogId, seqList);
 
 		// 未送信件数を更新
-		$unsentCount = await db.asyncFetchUnsentCount($selectedLogId);
+		$unsentCount = await db.asyncFetchUnsentRecordCount($selectedLogId);
 
 		$isSending = false;
 
@@ -294,9 +302,7 @@ const resetScannerByUrl = (path:string) => {
 	{:else if ($page.url.pathname == '/ref')}
 		<div class="text-xl">記録参照 - ログ選択</div>
 	{:else if (/^\/refd\/.+$/.test($page.url.pathname))}
-		<div class="text-xl">
-			記録参照 - 詳細
-		</div>
+		<div class="text-xl">記録参照 - 詳細</div>
 	{/if}
 	</div>
 
