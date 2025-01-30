@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-	import { Html5Qrcode } from 'html5-qrcode';
-    import Icon from '@iconify/svelte';
-    import { selectedRegisterMode } from '$lib/stores';
-    import { RegisterMode } from '$lib/type/RegisterMode';
-    import { Img } from 'flowbite-svelte';
-	
+	import { Html5Qrcode, type CameraDevice } from 'html5-qrcode';
+	import Icon from '@iconify/svelte';
+	import { selectedRegisterMode, selectedCameraId, showsCameraSelectDialog } from '$lib/stores';
+	import { RegisterMode } from '$lib/type/RegisterMode';
+	import { Button, Img } from 'flowbite-svelte';
+    import CameraSelectDialog from './CameraSelectDialog.svelte';
+
 	const props = $props();
 	const { onClose, onRegister } = props;
 
@@ -14,37 +15,67 @@
   let html5QrCode: Html5Qrcode | null;
   let videoElementId = 'qr-reader';
 
+	let cameraList:Array<CameraDevice> = [];
+	let cameraFound:boolean = false;
 
-  // カメラを開始する関数
-  const asyncStartCamera = async () => {
-    if (cameraActive) return;
+	console.log(`camera id: ${$selectedCameraId}`);
 
-    html5QrCode = new Html5Qrcode(videoElementId);
-    try {
-      const cameras = await Html5Qrcode.getCameras();
-      if (cameras && cameras.length > 0) {
-        const cameraId = cameras[0].id;
+	onMount(async () => {
+		cameraList = await Html5Qrcode.getCameras();
 
-        await html5QrCode.start(
-          cameraId,
-          {
-            fps: 10, // フレーム毎秒
-            qrbox: { width: 250, height: 250 }, // QRコード読み取りエリアのサイズ
-          },
-          onScanSuccess,
-          onScanFailure,
-        );
-      } else {
-        console.error('カメラが見つかりません');
-      }
-    } catch (error) {
-      console.error('カメラの起動に失敗:', error);
-    } finally {
+		if (!cameraList || cameraList.length == 0) return;
+
+		// カメラの選択が無い場合は先頭のものを選択
+		if (!$selectedCameraId) {
+			$selectedCameraId = cameraList[0].id;
+			cameraFound = true;
+		}
+
+		await asyncStartCamera();
+	});
+
+  onDestroy(async () => {
+    await asyncStopCamera(); // コンポーネント破棄時にカメラを停止
+  });
+
+	const asyncStartCamera = async () => {
+		if (cameraActive) return;
+		if (!$selectedCameraId) return;
+
+		// @TODO カメラ一覧に$selectedCameraIdが無い場合はカメラを選ばせる？
+		if (cameraList.map(camera=>camera.id).indexOf($selectedCameraId) === -1) {
+			cameraFound = false;
+			return;
+		}
+
+		html5QrCode = new Html5Qrcode(videoElementId);
+		try {
+			//cameraList = await Html5Qrcode.getCameras();
+			//cameraOptions = [];
+			//cameraList.forEach((camera, idx)=>cameraOptions.push({value:camera.id, name:`${idx} : ${camera.label}　　`}));
+
+			if (cameraList && cameraList.length > 0) {
+
+				await html5QrCode.start(
+					$selectedCameraId,
+					{
+						fps: 10, // フレーム毎秒
+						qrbox: { width: 250, height: 250 }, // QRコード読み取りエリアのサイズ
+					},
+					onScanSuccess,
+					onScanFailure,
+				);
+			} else {
+				console.error('カメラが見つかりません');
+			}
+		} catch (error) {
+			console.error('カメラの起動に失敗:', error);
+		} finally {
 			cameraActive = true;
 		}
-  };
+	};
 
-  // カメラを停止する関数
+  // カメラを停止する
   const asyncStopCamera = async () => {
     if (!cameraActive || !html5QrCode) return;
 
@@ -53,13 +84,11 @@
     cameraActive = false;
   };
 
-	onMount(async () => {
-    await asyncStartCamera();
-  });
-
-  onDestroy(async () => {
-    await asyncStopCamera(); // コンポーネント破棄時にカメラを停止
-  });
+	// カメラを再起動する
+	const asyncResetCamera = async () => {
+		await asyncStopCamera();
+		await asyncStartCamera();
+	}
 
 	const onScanSuccess = (decodedText:string) => {
 		if (isScanSuccessProcessing) return;
@@ -89,14 +118,23 @@
 </script>
 
 
+<CameraSelectDialog onCameraSelected={()=>{asyncResetCamera();}} />
+
 <div>
+	<div class="flex justify-between" style="align-items:flex-start;">
 {#if $selectedRegisterMode.isCheck()}
-	<div class="mode-chip bg-check"><Icon icon="material-symbols:check-circle-outline" />チェック</div>
+		<div class="mode-chip bg-check whitespace-nowrap"><Icon icon={RegisterMode.CHECK.icon} />チェック</div>
 {:else if $selectedRegisterMode.isRetire()}
-	<div class="mode-chip bg-retire"><Icon icon="material-symbols:close" />リタイア</div>
+		<div class="mode-chip bg-retire whitespace-nowrap"><Icon icon={RegisterMode.RETIRE.icon} />リタイア</div>
 {:else if $selectedRegisterMode.isSkip()}
-	<div class="mode-chip bg-skip"><Icon icon="material-symbols:step-over" />スキップ</div>
+		<div class="mode-chip bg-skip whitespace-nowrap"><Icon icon={RegisterMode.SKIP.icon} />スキップ</div>
 {/if}
+
+		<Button class="bg-primary rounded-full w-8 h-8 p-0" onclick={()=>{$showsCameraSelectDialog = true;}} >
+			<Icon icon="material-symbols:cameraswitch-outline" class="w-7 h-7" />
+		</Button>
+	</div>
+
   <h1 class="text-center">QRコードを四角い枠に映してください</h1>
   <div id="qr-reader" style="transform: scaleX(-100%);" class="min-h-60 flex justify-center items-center">
 		<Img src="loading.gif" class="h-20 w-20" />

@@ -20,6 +20,7 @@ export const showsPointSelectDialog = writable(false);		// 地点選択
 export const showsMemberLoadDialog = writable(false);			// 名簿取り込み
 export const showsMemberSelectDialog = writable(false);		// メンバーを複数から選択
 export const showsRegisterConfirmDialog = writable(false);	// 登録確認ダイアログ
+export const showsCameraSelectDialog = writable(false);		// カメラ選択ダイアログ
 export const scanner = writable<ScannerMessenger>();
 
 export const sendingProcessId = writable<number|null>(null);	// 定期送信プロセスID
@@ -32,6 +33,8 @@ export const selectedPoint = persisted('selectedPoint', <TimingPoint | null>(nul
 export const inputPassword = persisted('inputPassword', <string | null>null);
 export const selectedLogId = persisted('selectedLogId', <number | null>null);
 export const unsentCount = persisted('unsentCount', <number>0);
+
+export const selectedCameraId = persisted('selectedCameraId', <string | null>null);
 
 // check/retire/skip いずれかをキーとし、それぞれの最終登録RecordEntity(nullable)を扱う型
 type Registered = {

@@ -317,7 +317,6 @@ function sendIntentTurnOff() {
 <MemberSelectDialog message="複数見つかりました。対象を選んでください。" memberCollection={memberCollectionForSelect} onMemberSelected={(member:MemberEntity)=>{specifiedMember = member; asyncConfirmProcess();}} />
 <RegisterConfirmDialog message="登録してよいですか？" member={memberForConfirm} onRegisterConfirmed={asyncRegisterProcess} />
 
-
 <!-- body全体 -->
 <section class={`bg-${$selectedRegisterMode.getCode()} flex-1 overflow-y-hidden`}>
 
