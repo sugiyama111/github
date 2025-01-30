@@ -26,7 +26,7 @@
 		if (cameraList.length == 0) return;
 
 		// カメラの選択が無い場合は先頭のものを選択
-		if (!$selectedCameraId) {
+		if (!$selectedCameraId || !isTargetCameraInList(cameraList, $selectedCameraId)) {
 			$selectedCameraId = cameraList[0].id;
 			cameraFound = true;
 		}
@@ -38,12 +38,16 @@
     await asyncStopCamera(); // コンポーネント破棄時にカメラを停止
   });
 
+	const isTargetCameraInList = (cameraList:Array<CameraDevice>, targetCameraId:string) => {
+		return (cameraList.map(camera=>camera.id).indexOf(targetCameraId) !== -1);
+	}
+
 	const asyncStartCamera = async () => {
 		if (cameraActive) return;
 		if (!$selectedCameraId) return;
 
-		// @TODO カメラ一覧に$selectedCameraIdが無い場合はカメラを選ばせる？
-		if (cameraList.map(camera=>camera.id).indexOf($selectedCameraId) === -1) {
+		// 選択済みのカメラが、カメラ一覧に無い場合
+		if (!isTargetCameraInList(cameraList, $selectedCameraId)) {
 			cameraFound = false;
 			return;
 		}

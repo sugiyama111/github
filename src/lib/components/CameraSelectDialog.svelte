@@ -15,7 +15,7 @@
 		$showsCameraSelectDialog = false;
 	}
 
-	let cameraList:Array<CameraDevice> = [];
+	let cameraList:Array<CameraDevice> = $state([]);
 
 	onMount(async() => {
 		// カメラ一覧を取得

@@ -146,6 +146,7 @@
 			// storeを更新：最終登録
 			$lastRegistered[$selectedRegisterMode.getCode() as keyof typeof $lastRegistered] = record;
 		} catch (e) {
+			console.log(e);
 			toast.error('登録できませんでした');
 			return;
 		}
