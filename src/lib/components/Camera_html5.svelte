@@ -23,7 +23,7 @@
 	onMount(async () => {
 		cameraList = await Html5Qrcode.getCameras();
 
-		if (!cameraList || cameraList.length == 0) return;
+		if (cameraList.length == 0) return;
 
 		// カメラの選択が無い場合は先頭のものを選択
 		if (!$selectedCameraId) {
@@ -54,7 +54,7 @@
 			//cameraOptions = [];
 			//cameraList.forEach((camera, idx)=>cameraOptions.push({value:camera.id, name:`${idx} : ${camera.label}　　`}));
 
-			if (cameraList && cameraList.length > 0) {
+			if (cameraList.length > 0) {
 
 				await html5QrCode.start(
 					$selectedCameraId,

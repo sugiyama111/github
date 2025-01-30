@@ -36,6 +36,9 @@
 
 <Modal title="カメラの切り替え" size="xs" bind:open={$showsCameraSelectDialog}>
 
+{#if cameraList.length == 0}
+	<div>カメラが見つかりません</div>
+{:else}
 	<ul class="w-100 divide-y divide-gray-200 dark:divide-gray-600">
 	{#each cameraList as camera, idx}
 		<li>
@@ -47,6 +50,7 @@
 		</li>
 	{/each}
 	</ul>
+{/if}
 
 
 	<svelte:fragment slot="footer">
