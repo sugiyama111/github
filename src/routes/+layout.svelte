@@ -14,7 +14,7 @@
   import { toast } from '$lib/QRTToast';
   import { onDestroy, onMount, setContext } from 'svelte';
     import { RegisterMode } from '$lib/type/RegisterMode';
-    import { afterNavigate, goto, replaceState } from '$app/navigation';
+    import { afterNavigate, beforeNavigate, goto, replaceState } from '$app/navigation';
 	
 	let { children } = $props();
 
@@ -123,10 +123,8 @@ $effect(()=>{
 
 	// 初期表示時・画面遷移時に発行
 	onMount(()=>{
-
+		console.log('◆pushState');
 		history.pushState(null, '', location.href);
-
-		console.log('onMount@layout');
 
 		// service workerの登録
 		if ('serviceWorker' in navigator) {
@@ -170,9 +168,9 @@ $effect(()=>{
 
 
 
-		window.addEventListener('popstate', handleGotBack);
+		window.addEventListener('popstate', handleGetBack);
 
-		return () => window.removeEventListener('popstate', handleGotBack);		// ← ここはonDestroy内でも良い
+		return () => window.removeEventListener('popstate', handleGetBack);		// ← ここはonDestroy内でも良い
 	});
 
 
@@ -269,9 +267,42 @@ $effect(()=>{
 		// toast.success('beforeunload');
 	}
 
-	afterNavigate(()=>{
-		console.log('$page.url:' + $page.url.pathname);
-		const path = $page.url.pathname;
+	// beforeNavigate((event)=>{
+	// 	console.log('◆beforeNavigate');
+	// 	console.log(event.to?.url.pathname);
+	// 	if (event.to?.url.pathname == '/') {
+	// 		$goBackUrl = null;
+	// 	} else if (event.to?.url.pathname == '/config') {
+	// 		$goBackUrl = '/';
+	// 	} else if (event.to?.url.pathname == '/ref') {
+	// 		$goBackUrl = '/';
+	// 	} else if (/^\/refd\//.test(event.to?.url.pathname ?? '')) {
+	// 		$goBackUrl = '/ref';
+	// 	}
+
+	// 	console.log('goback: ' + $goBackUrl);
+	// });
+	
+	const handleGetBack = () => {
+		console.log('◆handleGotBack');
+		console.log('goBackUrl=: ' + $goBackUrl);
+
+		if ($goBackUrl === null) {
+			goto('/');
+			//history.replaceState('', '');
+//		history.pushState(null, '', location.href);
+
+		} else {
+			goto($goBackUrl);
+		}
+	}
+
+
+	afterNavigate((event)=>{
+		console.log('◆afterNavigate');
+		//console.log('$page.url:' + $page.url.pathname);
+		//const path = $page.url.pathname;
+		const path = event.to?.url.pathname ?? '';
 
 		if (path == '/') {
 			$goBackUrl = null;
@@ -283,22 +314,12 @@ $effect(()=>{
 			$goBackUrl = '/ref';
 		}
 
-		console.log('UrlStackChanged');
-		console.log($goBackUrl);
+		console.log('now: '+path+' and goBackUrl set to:'+$goBackUrl);
+
+		// console.log('UrlStackChanged');
+		// console.log($goBackUrl);
 	});
 	
-	const handleGotBack = () => {
-		console.log('handleGotBack');
-
-		if ($goBackUrl === null) {
-			history.replaceState('', '');
-//		history.pushState(null, '', location.href);
-
-		} else {
-			goto($goBackUrl);
-		}
-	}
-
 </script>
 
 <style lang="postcss">
