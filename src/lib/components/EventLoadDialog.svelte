@@ -99,7 +99,7 @@
 
 {:else}
 	<div class="flex justify-center content-center">
-		<Img src="/loading.gif" class="w-10 h-10" />
+		<Img src="/loading.svg" class="w-10 h-10" />
 		<div class="m-2">読込中</div>
 	</div>
 {/if}

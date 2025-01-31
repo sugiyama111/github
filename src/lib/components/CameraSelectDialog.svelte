@@ -1,10 +1,12 @@
 <script lang="ts">
   import { Button, Modal, Radio } from 'flowbite-svelte';
-	import { selectedCameraId, selectedEvent } from '$lib/stores';
+	import { isCameraMirrored, selectedCameraId, selectedEvent } from '$lib/stores';
 	import { showsCameraSelectDialog } from '$lib/stores';
 	
 	import { onMount } from 'svelte';
 	import { Html5Qrcode, type CameraDevice } from 'html5-qrcode';
+    import { asyncCameraDevices, Camera } from '$lib/type/CameraManager';
+
 
 	const props = $props();
 	const { onCameraSelected } = props;
@@ -15,17 +17,23 @@
 		$showsCameraSelectDialog = false;
 	}
 
-	let cameraList:Array<CameraDevice> = $state([]);
+	//let cameraList:Array<CameraDevice> = $state([]);
+		let cameraList:Array<Camera> = $state([]);
 
 	onMount(async() => {
 		// カメラ一覧を取得
-		cameraList = await Html5Qrcode.getCameras();
+		//cameraList = await Html5Qrcode.getCameras();
+		cameraList = await asyncCameraDevices();
 
 	});
 	
-	const handleCameraSelectClick = (camera:CameraDevice) => {
+	const handleCameraSelectClick = async (camera:Camera) => {
 		$selectedCameraId = camera.id;
 		$showsCameraSelectDialog = false;
+
+		// 左右反転の自動設定
+		$isCameraMirrored = await camera.asyncIsFacing();
+
 		onCameraSelected();		// 親から指定のコールバック
 	}
 </script>

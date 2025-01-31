@@ -35,6 +35,7 @@ export const selectedLogId = persisted('selectedLogId', <number | null>null);
 export const unsentCount = persisted('unsentCount', <number>0);
 
 export const selectedCameraId = persisted('selectedCameraId', <string | null>null);
+export const isCameraMirrored = persisted('isCameraMirrored', <boolean>false);
 
 // check/retire/skip いずれかをキーとし、それぞれの最終登録RecordEntity(nullable)を扱う型
 type Registered = {

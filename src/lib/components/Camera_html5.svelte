@@ -2,9 +2,9 @@
   import { onMount, onDestroy } from 'svelte';
 	import { Html5Qrcode, type CameraDevice } from 'html5-qrcode';
 	import Icon from '@iconify/svelte';
-	import { selectedRegisterMode, selectedCameraId, showsCameraSelectDialog } from '$lib/stores';
+	import { selectedRegisterMode, selectedCameraId, showsCameraSelectDialog, isCameraMirrored } from '$lib/stores';
 	import { RegisterMode } from '$lib/type/RegisterMode';
-	import { Button, Img } from 'flowbite-svelte';
+	import { Button, Img, Toggle } from 'flowbite-svelte';
     import CameraSelectDialog from './CameraSelectDialog.svelte';
 
 	const props = $props();
@@ -133,15 +133,22 @@
 {:else if $selectedRegisterMode.isSkip()}
 		<div class="mode-chip bg-skip whitespace-nowrap"><Icon icon={RegisterMode.SKIP.icon} />スキップ</div>
 {/if}
-
-		<Button class="bg-primary rounded-full w-8 h-8 p-0" onclick={()=>{$showsCameraSelectDialog = true;}} >
-			<Icon icon="material-symbols:cameraswitch-outline" class="w-7 h-7" />
-		</Button>
+		<div>
+			<Toggle color="green" bind:checked={$isCameraMirrored}>
+				<span class="-ml-2">左右反転</span>
+			</Toggle>
+		</div>
+		
+		<div>
+			<Button class="bg-primary rounded-full w-8 h-8 p-0" onclick={()=>{$showsCameraSelectDialog = true;}} >
+				<Icon icon="material-symbols:cameraswitch-outline" class="w-7 h-7" />
+			</Button>
+		</div>
 	</div>
 
   <h1 class="text-center">QRコードを四角い枠に映してください</h1>
-  <div id="qr-reader" style="transform: scaleX(-100%);" class="min-h-60 flex justify-center items-center">
-		<Img src="loading.gif" class="h-20 w-20" />
+  <div id="qr-reader" style={`transform:${$isCameraMirrored ? 'scaleX(-100%)' : 'scaleX(100%)'};`} class="min-h-60 flex justify-center items-center">
+		<Img src="loading.svg" class="h-20 w-20" />
 	</div>
 </div>
 
