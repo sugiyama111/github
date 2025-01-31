@@ -84,7 +84,7 @@
 </script>
 
 <section>
-	<Button class="bg-primary m-2" onclick={asyncDownloadRecords}>recordダウンロード</Button>
+	<Button class="bg-primary m-2 whitespace-nowrap" onclick={asyncDownloadRecords}>recordダウンロード</Button>
 
 </section>
 
@@ -160,11 +160,17 @@
 	thead {
 		@apply bg-gray-300;
 	}
+	th {
+		@apply text-sm;
+		@apply font-normal;
+		@apply whitespace-nowrap;
+	}
 	tbody tr {
 		border-bottom: 1px solid lightgray;
 	}
 	td {
 		@apply text-center;
+		@apply text-sm;
 	}
 
 	.scroll-container {

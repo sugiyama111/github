@@ -52,14 +52,21 @@
 			<td>
 				<div>{ log.log_id.toString().padStart(4, '0') }</div>
 				<div class="-mt-1">
-					<span class="text-xs">
-						{dayjs(log.log_start_time).format('YYYY/')}
+					<span class="whitespace-nowrap">
+						<span class="text-xs">
+							{dayjs(log.log_start_time).format('YYYY/')}
+						</span>
+						<span class="text-sm">
+							{dayjs(log.log_start_time).format('MM/DD')}
+						</span>
 					</span>
-					<span class="text-sm">
-						{dayjs(log.log_start_time).format('MM/DD HH:mm')}
-					</span>
-					<span class="text-xs">
-						{dayjs(log.log_start_time).format(':ss')}
+					<span class="whitespace-nowrap">
+						<span class="text-sm">
+							{dayjs(log.log_start_time).format(' HH:mm')}
+						</span>
+						<span class="text-xs">
+							{dayjs(log.log_start_time).format(':ss')}
+						</span>
 					</span>
 				</div>
 			</td>
@@ -87,6 +94,11 @@
 	thead {
 		@apply bg-gray-300;
 	}
+	th {
+		@apply text-sm;
+		@apply font-normal;
+		@apply whitespace-nowrap;
+	}
 	tbody tr {
 		border-bottom: 1px solid lightgray;
 	}
@@ -99,5 +111,6 @@
 	}
 	td {
 		@apply text-center;
+		@apply text-sm;
 	}
 </style>
