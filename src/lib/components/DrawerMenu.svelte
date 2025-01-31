@@ -14,12 +14,12 @@
 		easing: sineIn
 	};
 
-	const goBackToMain = () => {
+	const gotoFromDrawer = (e:Event, target:string) => {
 		hidden = true;
-		//history.back;
-		console.log('goto /');
-		goto('/');
+		e.preventDefault();
+		goto(target);
 	}
+	
 </script>
 
 <style lang="postcss">
@@ -35,14 +35,14 @@
       <SidebarGroup>
 				
 				<SidebarItem label="計測" {spanClass}
-					onclick={goBackToMain}>
+					onclick={(e)=>gotoFromDrawer(e, '/')}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:motion-play-outline" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
 				</SidebarItem>
 
 				<SidebarItem label="記録参照" {spanClass}
-					onclick={(e)=>{console.log('ref'); hidden=true; e.preventDefault(); goto('/ref');}}>
+					onclick={(e)=>gotoFromDrawer(e, '/ref')}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:data-table" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>

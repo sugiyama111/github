@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Icon from "@iconify/svelte";
 	import { Button } from 'flowbite-svelte';
-	import { config, unsentCount, selectedEvent, selectedPoint, scanner, isSending } from '$lib/stores';
+	import { config, unsentCount, selectedEvent, selectedPoint, scanner, isSending, goBackUrl } from '$lib/stores';
 	import { sendingProcessId, selectedLogId } from '$lib/stores';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
 	import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
@@ -14,6 +14,7 @@
   import { toast } from '$lib/QRTToast';
   import { onDestroy, onMount, setContext } from 'svelte';
     import { RegisterMode } from '$lib/type/RegisterMode';
+    import { afterNavigate, goto, replaceState } from '$app/navigation';
 	
 	let { children } = $props();
 
@@ -82,10 +83,10 @@ $effect(()=>{
 });
 */
 
-const resetScannerByUrl = (path:string) => {
-	if (path === '/' && $selectedEvent && $selectedPoint) $scanner?.asyncTurnOn();
-	else $scanner?.asyncTurnOff();
-}
+	const resetScannerByUrl = (path:string) => {
+		if (path === '/' && $selectedEvent && $selectedPoint) $scanner?.asyncTurnOn();
+		else $scanner?.asyncTurnOff();
+	}
 
 
 	let currentPath:string;
@@ -122,6 +123,9 @@ const resetScannerByUrl = (path:string) => {
 
 	// 初期表示時・画面遷移時に発行
 	onMount(()=>{
+
+		history.pushState(null, '', location.href);
+
 		console.log('onMount@layout');
 
 		// service workerの登録
@@ -163,6 +167,12 @@ const resetScannerByUrl = (path:string) => {
 
 		//toast.info(`mount url:${$page.url.pathname}`);
 		resetScannerByUrl($page.url.pathname);
+
+
+
+		window.addEventListener('popstate', handleGotBack);
+
+		return () => window.removeEventListener('popstate', handleGotBack);		// ← ここはonDestroy内でも良い
 	});
 
 
@@ -258,7 +268,37 @@ const resetScannerByUrl = (path:string) => {
 		// console.log('beforeunload');
 		// toast.success('beforeunload');
 	}
+
+	afterNavigate(()=>{
+		console.log('$page.url:' + $page.url.pathname);
+		const path = $page.url.pathname;
+
+		if (path == '/') {
+			$goBackUrl = null;
+		} else if (path == '/config') {
+			$goBackUrl = '/';
+		} else if (path == '/ref') {
+			$goBackUrl = '/';
+		} else if (/^\/refd\//.test(path)) {
+			$goBackUrl = '/ref';
+		}
+
+		console.log('UrlStackChanged');
+		console.log($goBackUrl);
+	});
 	
+	const handleGotBack = () => {
+		console.log('handleGotBack');
+
+		if ($goBackUrl === null) {
+			history.replaceState('', '');
+//		history.pushState(null, '', location.href);
+
+		} else {
+			goto($goBackUrl);
+		}
+	}
+
 </script>
 
 <style lang="postcss">
