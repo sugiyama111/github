@@ -1,5 +1,7 @@
 import { Html5Qrcode, type CameraDevice } from "html5-qrcode";
 
+// カメラデバイスの情報を扱うクラス
+// html5-qrcodeのCameraDeviceにインカメラ判定メソッドを追加するためのもの
 export const asyncCameraDevices = async ():Promise<Array<Camera>> => {
 	const cameraDeviceList = await Html5Qrcode.getCameras();
 
@@ -17,14 +19,16 @@ export class Camera {
 		this.label = label;
 	}
 
+	// html5-qrcodeのCameraDeviceからCameraインスタンスを作成する
 	static FromCameraDevice = (dev:CameraDevice) => {
 		return new Camera({id:dev.id, label:dev.label});
 	}
 
+	// インカメラであるかどうか
 	asyncIsFacing = async ():Promise<boolean> => {
 		console.log('asyncIsFacing');
 
-		// カメラのラベルに"front"が入っていればFacingとみなす
+		// カメラのラベルに"front"が入っていればインカメラとみなす
 		if (/front/.test(this.label)) return true;
 
 		// ラベルで判断できない場合は、デバイスのfacingModeを取得して確認する
@@ -35,9 +39,6 @@ export class Camera {
 	
 			const track = stream.getVideoTracks()[0];
 			const settings = track.getSettings();
-	
-			console.log(`Camera ID: ${this.id}`);
-			console.log(`Facing Mode: ${settings.facingMode}`);
 	
 			track.stop(); // 使用後はストリームを停止
 	

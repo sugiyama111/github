@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-	import { Html5Qrcode, type CameraDevice } from 'html5-qrcode';
+	import { Html5Qrcode } from 'html5-qrcode';
 	import Icon from '@iconify/svelte';
 	import { selectedRegisterMode, selectedCameraId, showsCameraSelectDialog, isCameraMirrored } from '$lib/stores';
 	import { RegisterMode } from '$lib/type/RegisterMode';
 	import { Button, Img, Toggle } from 'flowbite-svelte';
-    import CameraSelectDialog from './CameraSelectDialog.svelte';
+	import CameraSelectDialog from './CameraSelectDialog.svelte';
+	import { asyncCameraDevices, Camera } from '$lib/type/CameraManager';
 
 	const props = $props();
 	const { onClose, onRegister } = props;
@@ -15,13 +16,14 @@
   let html5QrCode: Html5Qrcode | null;
   let videoElementId = 'qr-reader';
 
-	let cameraList:Array<CameraDevice> = [];
+	let cameraList:Array<Camera> = [];
 	let cameraFound:boolean = false;
 
 	console.log(`camera id: ${$selectedCameraId}`);
 
 	onMount(async () => {
-		cameraList = await Html5Qrcode.getCameras();
+		cameraList = await asyncCameraDevices();
+		//cameraList = await Html5Qrcode.getCameras();
 
 		if (cameraList.length == 0) return;
 
@@ -38,7 +40,7 @@
     await asyncStopCamera(); // コンポーネント破棄時にカメラを停止
   });
 
-	const isTargetCameraInList = (cameraList:Array<CameraDevice>, targetCameraId:string) => {
+	const isTargetCameraInList = (cameraList:Array<Camera>, targetCameraId:string) => {
 		return (cameraList.map(camera=>camera.id).indexOf(targetCameraId) !== -1);
 	}
 

@@ -4,8 +4,7 @@
 	import { showsCameraSelectDialog } from '$lib/stores';
 	
 	import { onMount } from 'svelte';
-	import { Html5Qrcode, type CameraDevice } from 'html5-qrcode';
-    import { asyncCameraDevices, Camera } from '$lib/type/CameraManager';
+	import { asyncCameraDevices, Camera } from '$lib/type/CameraManager';
 
 
 	const props = $props();
