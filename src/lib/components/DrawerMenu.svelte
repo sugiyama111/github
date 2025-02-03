@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { goto, pushState } from '$app/navigation';
 	import { showsConfigLoginDialog, showsPointSelectDialog } from '$lib/stores';
 	import Icon from '@iconify/svelte';
 	import { Drawer, CloseButton, Sidebar, SidebarWrapper, SidebarGroup, SidebarItem, SidebarBrand, Button, Modal } from 'flowbite-svelte';
@@ -13,12 +13,6 @@
 		duration: 200,
 		easing: sineIn
 	};
-
-	const gotoFromDrawer = (e:Event, target:string) => {
-		hidden = true;
-		e.preventDefault();
-		goto(target);
-	}
 	
 </script>
 
@@ -34,15 +28,13 @@
     <SidebarWrapper divClass="overflow-y-auto py-4 px-3 rounded">
       <SidebarGroup>
 				
-				<SidebarItem label="計測" {spanClass}
-					onclick={(e)=>gotoFromDrawer(e, '/')}>
+				<SidebarItem label="計測" {spanClass} onclick={()=>hidden=true} href="/">
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:motion-play-outline" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
 				</SidebarItem>
 
-				<SidebarItem label="記録参照" {spanClass}
-					onclick={(e)=>gotoFromDrawer(e, '/ref')}>
+				<SidebarItem label="記録参照" {spanClass} onclick={()=>hidden=true} href="/ref">
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:data-table" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>

@@ -36,7 +36,7 @@ export default class AppDB extends Dexie {
 			// 初期化したいため、log_idはオートインクリメントでない
       logs: '&log_id, event_code, point_id, point_code, point_name, log_start_time, record_count, sent_count',
 			// 初期化したいため、seqはオートインクリメントでない
-      records: '&[log_id+seq], sent, member_code, member_name, race_num, time, method, mode',
+      records: '&[log_id+seq], [log_id+sent], member_code, member_name, race_num, time, method, mode',
 			tests: '&id',
     });
 

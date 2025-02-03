@@ -12,9 +12,9 @@
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
   import { toast } from '$lib/QRTToast';
-  import { onDestroy, onMount, setContext } from 'svelte';
+  import { onDestroy, onMount, setContext, tick } from 'svelte';
     import { RegisterMode } from '$lib/type/RegisterMode';
-    import { afterNavigate, beforeNavigate, goto, replaceState } from '$app/navigation';
+    import { afterNavigate, beforeNavigate, goto, pushState, replaceState } from '$app/navigation';
 	
 	let { children } = $props();
 
@@ -124,7 +124,6 @@ $effect(()=>{
 	// 初期表示時・画面遷移時に発行
 	onMount(()=>{
 		console.log('◆pushState');
-		history.pushState(null, '', location.href);
 
 		// service workerの登録
 		if ('serviceWorker' in navigator) {
@@ -169,8 +168,13 @@ $effect(()=>{
 
 
 		window.addEventListener('popstate', handleGetBack);
+		window.addEventListener('beforeunload', handleBeforeUnload);
+		
+		return () => {
+			window.removeEventListener('popstate', handleGetBack);		// ← ここはonDestroy内でも良い
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		}
 
-		return () => window.removeEventListener('popstate', handleGetBack);		// ← ここはonDestroy内でも良い
 	});
 
 
@@ -204,7 +208,7 @@ $effect(()=>{
 
 		// サーバーへ送信
 		
-		await wait(3000);
+		await wait(2500);
 
 		// 送信済みにする
 		const seqList = records.map(record=>record.seq);
@@ -261,10 +265,14 @@ $effect(()=>{
 	}
 
 	// PWAをkillした時に実行される
-	function handleBeforeUnload() {
+	function handleBeforeUnload(e:Event) {
 		$scanner?.asyncTurnOff();
 		// console.log('beforeunload');
 		// toast.success('beforeunload');
+//		goto('/');
+		//e.preventDefault();
+		//e.returnValue = '';
+
 	}
 
 	// beforeNavigate((event)=>{
@@ -283,25 +291,48 @@ $effect(()=>{
 	// 	console.log('goback: ' + $goBackUrl);
 	// });
 	
-	const handleGetBack = () => {
+	const handleGetBack = (e:Event) => {
 		console.log('◆handleGotBack');
 		console.log('goBackUrl=: ' + $goBackUrl);
 
-		if ($goBackUrl === null) {
-			goto('/');
+
+		const to = $goBackUrl;
+
+		if (to === null) {
+			//e.preventDefault();
+			$goBackUrl = null;
+			goto('/');		// メインに戻るべき時のみgotoさせる（それ以外は、自身のback操作で戻ってもらう
+			// ここ以外でgotoすると画面が閉じる？refd->(back)->ref->(back)->閉じようとする
+			
+			//replaceState('', {});
 			//history.replaceState('', '');
 //		history.pushState(null, '', location.href);
+		}else if (to === '/') {			// ここが無いと、参照→設定→(back)で参照に戻ってしまう
+			$goBackUrl = null;
+			goto('/');
 
-		} else {
-			goto($goBackUrl);
 		}
+
 	}
 
+	// beforeNavigate(({from, to, cancel})=>{
+	// 	console.log('◆beforeNavigate');
+	// 	if ($goBackUrl === null) {
+	// 		console.log('goto / !');
+			
+	// 		return '/';
+	// 	} else {
+	// 		console.log('goto '+$goBackUrl);
+			
+	// 		return $goBackUrl;
+	// 	}
+	// });
 
+	// onpopstateは afterNavigate(beforeNavigate) との実行順序は保証できない？
+	// afterNavigateではgotoせず、戻るべき先のみを指示する
 	afterNavigate((event)=>{
 		console.log('◆afterNavigate');
-		//console.log('$page.url:' + $page.url.pathname);
-		//const path = $page.url.pathname;
+
 		const path = event.to?.url.pathname ?? '';
 
 		if (path == '/') {
@@ -315,9 +346,6 @@ $effect(()=>{
 		}
 
 		console.log('now: '+path+' and goBackUrl set to:'+$goBackUrl);
-
-		// console.log('UrlStackChanged');
-		// console.log($goBackUrl);
 	});
 	
 </script>
