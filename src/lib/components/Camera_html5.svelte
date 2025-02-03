@@ -4,12 +4,14 @@
 	import Icon from '@iconify/svelte';
 	import { selectedRegisterMode, selectedCameraId, showsCameraSelectDialog, isCameraMirrored } from '$lib/stores';
 	import { RegisterMode } from '$lib/type/RegisterMode';
-	import { Button, Img, Toggle } from 'flowbite-svelte';
+	import { Button, Img, Progressbar, Toggle } from 'flowbite-svelte';
 	import CameraSelectDialog from './CameraSelectDialog.svelte';
 	import { asyncCameraDevices, Camera } from '$lib/type/CameraManager';
+    import { TimeoutTicker } from '$lib/type/TimeoutTicker';
+		import { sineOut } from 'svelte/easing';
 
 	const props = $props();
-	const { onClose, onRegister } = props;
+	const { onClose, onRegister, onTimeout } = props;
 
 	let isScanSuccessProcessing = false;
   let cameraActive = false;
@@ -19,7 +21,21 @@
 	let cameraList:Array<Camera> = [];
 	let cameraFound:boolean = false;
 
+	let ratio = $state<number>(1);		// 0～1
+	const handleTick = () => {
+		ratio = ticker.ratio();
+	}
+
+	const ticker = new TimeoutTicker(5, {milsecPerTick:1000, onTimeout:onTimeout, onTick:handleTick});
+	
+
+
+
 	console.log(`camera id: ${$selectedCameraId}`);
+
+	//const ticker = $state<CameraTimeoutTicker>(new CameraTimeoutTicker({onTimeout:onTimeout, onTick:handleTick}));
+	
+	
 
 	onMount(async () => {
 		cameraList = await asyncCameraDevices();
@@ -34,9 +50,15 @@
 		}
 
 		await asyncStartCamera();
+
+		// 残り時間タイマー開始
+		ticker.start();
 	});
 
   onDestroy(async () => {
+		// 残り時間タイマー停止
+		ticker.stop();
+		
     await asyncStopCamera(); // コンポーネント破棄時にカメラを停止
   });
 
@@ -121,6 +143,7 @@
 			throw new Error('データ形式が正しくありません');
 		}
 	}
+
 </script>
 
 
@@ -151,6 +174,9 @@
   <h1 class="text-center">QRコードを四角い枠に映してください</h1>
   <div id="qr-reader" style={`transform:${$isCameraMirrored ? 'scaleX(-100%)' : 'scaleX(100%)'};`} class="min-h-60 flex justify-center items-center">
 		<Img src="loading.svg" class="h-20 w-20" />
+	</div>
+	<div>
+		<Progressbar animate easing={sineOut} progress={ratio*100} color="blue" size="h-1" />
 	</div>
 </div>
 

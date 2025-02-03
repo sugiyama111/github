@@ -388,7 +388,8 @@ function sendIntentTurnOff() {
 {:else if inputPanel == 'keypad'}
 	<Keypad onClose={()=>inputPanel = 'info'} onRegister={(num:string)=>{asyncRegisterByNumber(num, RegisterMethod.KEYPAD);}} />
 {:else if inputPanel == 'camera' }
-	<Camera onRegister={(code:string)=>{asyncRegisterByMemberCode(code, RegisterMethod.CAMERA);}} />
+	<Camera onRegister={(code:string)=>{asyncRegisterByMemberCode(code, RegisterMethod.CAMERA);}} 
+		onTimeout={()=>setTimeout(()=>{inputPanel = 'info'}, 200)} />
 {/if}
 
 </section>
