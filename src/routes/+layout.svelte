@@ -295,19 +295,15 @@ $effect(()=>{
 		console.log('◆handleGotBack');
 		console.log('goBackUrl=: ' + $goBackUrl);
 
-
 		const to = $goBackUrl;
 
 		if (to === null) {
-			//e.preventDefault();
 			$goBackUrl = null;
+			
 			goto('/');		// メインに戻るべき時のみgotoさせる（それ以外は、自身のback操作で戻ってもらう
 			// ここ以外でgotoすると画面が閉じる？refd->(back)->ref->(back)->閉じようとする
 			
-			//replaceState('', {});
-			//history.replaceState('', '');
-//		history.pushState(null, '', location.href);
-		}else if (to === '/') {			// ここが無いと、参照→設定→(back)で参照に戻ってしまう
+		} else if (to === '/') {			// ここが無いと、参照→設定→(back)で参照に戻ってしまう
 			$goBackUrl = null;
 			goto('/');
 
