@@ -7,8 +7,8 @@
 	import { Button, Img, Progressbar, Toggle } from 'flowbite-svelte';
 	import CameraSelectDialog from './CameraSelectDialog.svelte';
 	import { asyncCameraDevices, Camera } from '$lib/type/CameraManager';
-    import { TimeoutTicker } from '$lib/type/TimeoutTicker';
-		import { sineOut } from 'svelte/easing';
+	import { TimeoutTicker } from '$lib/type/TimeoutTicker';
+	import { linear } from 'svelte/easing';
 
 	const props = $props();
 	const { onClose, onRegister, onTimeout } = props;
@@ -22,18 +22,19 @@
 	let cameraFound:boolean = false;
 
 	let ratio = $state<number>(1);		// 0～1
-	const handleTick = () => {
+	const updateRatio = () => {
 		ratio = ticker.ratio();
 	}
 
-	const ticker = new TimeoutTicker(5, {milsecPerTick:1000, onTimeout:onTimeout, onTick:handleTick});
+	const handleTimeout = () => {
+		setTimeout(onTimeout, 500);
+	}
+
+	const ticker = new TimeoutTicker(60, {milsecPerTick:1000, onTimeout:handleTimeout, onTick:updateRatio});
 	
-
-
-
 	console.log(`camera id: ${$selectedCameraId}`);
 
-	//const ticker = $state<CameraTimeoutTicker>(new CameraTimeoutTicker({onTimeout:onTimeout, onTick:handleTick}));
+	//const ticker = $state<CameraTimeoutTicker>(new CameraTimeoutTicker({onTimeout:onTimeout, onTick:updateRatio}));
 	
 	
 
@@ -48,7 +49,7 @@
 			$selectedCameraId = cameraList[0].id;
 			cameraFound = true;
 		}
-
+ 
 		await asyncStartCamera();
 
 		// 残り時間タイマー開始
@@ -119,6 +120,7 @@
 	}
 
 	const onScanSuccess = (decodedText:string) => {
+		// 短時間での連続読取は避ける
 		if (isScanSuccessProcessing) return;
 		isScanSuccessProcessing = true;
 
@@ -127,10 +129,19 @@
 		console.log(memberCode);
 
 		onRegister(memberCode);
+		
+		// ticker操作
+		ticker.stop();
+		ticker.resetLeftTick();
+		updateRatio();
+		setTimeout(ticker.start, 1000);			// 1秒後にtick再開
 
+		// 2秒後に次の読み取りを可能にする
 		setTimeout(()=>isScanSuccessProcessing=false, 2000);
 	}
 
+	// 読み取り失敗の時
+	// QRコードが読み取れない場合に発生。短時間で何度も発生する。
 	const onScanFailure = (errorMessage:string) => {
 		//console.error('読み取りエラー:', errorMessage);
 	}
@@ -176,7 +187,8 @@
 		<Img src="loading.svg" class="h-20 w-20" />
 	</div>
 	<div>
-		<Progressbar animate easing={sineOut} progress={ratio*100} color="blue" size="h-1" />
+		<Progressbar easing={linear} 
+				progressClass="bg-gray-400" progress={ratio*100} color="blue" size="h-1" />
 	</div>
 </div>
 

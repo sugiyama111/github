@@ -18,23 +18,37 @@ export class TimeoutTicker {
 		this.onTick = onTick;
 	}
 
-	start = () => {
+	resetLeftTick = () => {
 		this.leftTick = this.timeoutTick;
+	}
 
+	/**
+	 * 開始する。
+	 * 開始後に再度呼び出すと、既存の時間経過は停止され、最初からやり直すことになる。
+	 */
+	start = () => {
+		// 開始済みの場合は一度停止する
+		this.stop();
+
+		this.resetLeftTick();
+		//this.leftTick = this.timeoutTick;
+
+		// 一度実行してから次の予約をする
+		this.doTick();
 		this.tickDown(true);
 	}
 
 	// 1tick経過するときの処理
-	tickDown = (isFirst:boolean=false) => {
+	tickDown = (isTopLevelCall:boolean=false) => {
 		// 停止されている場合はプロセスIDにnull. 処理しない。
-		if (!isFirst && this.processId === null) return;
+		if (!isTopLevelCall && this.processId === null) return;
 
 		// 1tick経過
-		this.leftTick--;
-		this.onTick();
+		this.doTick();
 
-		// 時間が来た場合
+		// tickが0になった場合
 		if (this.leftTick === 0) {
+			this.stop();
 			this.onTimeout();
 			return;
 		}
@@ -43,15 +57,22 @@ export class TimeoutTicker {
 		this.processId = setTimeout(this.tickDown, this.milsecPerTick);
 	}
 
+	doTick = () => {
+		this.leftTick--;
+		this.onTick();
+	}
+
+	// tickerを停止する。
+	// 開始時にも一度呼ばれる。
 	stop = () => {
-		console.log('ticker stop');
 		if (this.processId) clearTimeout(this.processId);
 		this.processId = null;
 	}
 
 	// 現在の残り時間の割合
 	// 引き数には小数点の桁数を指定する
-	ratio = (digit:number=1):number => {
+	ratio = (digit:number=3):number => {
 		return Number.parseFloat((this.leftTick / this.timeoutTick).toFixed(digit));
 	}
+
 }

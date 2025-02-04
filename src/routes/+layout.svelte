@@ -13,8 +13,8 @@
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
   import { toast } from '$lib/QRTToast';
   import { onDestroy, onMount, setContext, tick } from 'svelte';
-    import { RegisterMode } from '$lib/type/RegisterMode';
-    import { afterNavigate, beforeNavigate, goto, pushState, replaceState } from '$app/navigation';
+	import { RegisterMode } from '$lib/type/RegisterMode';
+	import { afterNavigate, beforeNavigate, goto, pushState, replaceState } from '$app/navigation';
 	
 	let { children } = $props();
 
