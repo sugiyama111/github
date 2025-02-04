@@ -248,7 +248,7 @@ $effect(()=>{
 		// 稼働中の送信ルーティンがあれば一旦停止
 		if (sendingTicker) {
 			sendingTicker.stop();
-			sendingTicker = null;
+			//sendingTicker = null;	 すぐ新しいオブジェクトが代入され、前のオブジェクトはGC対象になる（null許容していない箇所と動作を合わせる）
 		}
 		
 		// 新しいtick数で開始する

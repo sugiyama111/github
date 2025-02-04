@@ -12,7 +12,6 @@ export class TimeoutTicker {
 
 	set timeoutTick(val:number) {
 		this._timeoutTick = val < 2 ? 2 : val;
-		console.log(`setter: ${this._timeoutTick}`);
 	}
 	get timeoutTick():number {
 		return this._timeoutTick;
