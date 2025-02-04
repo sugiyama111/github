@@ -2,9 +2,9 @@
 	import { goto } from "$app/navigation";
   import { Button, Checkbox, Modal, Range, Toggle } from 'flowbite-svelte';
 	import { inputPassword, selectedEvent, selectedPoint, lastRegistered, config, 
-		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, sendingProcessId, 
-        selectedLogId,
-        selectedRegisterMode} from "../../lib/stores";
+		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, 
+        selectedLogId, isSending, 
+        selectedRegisterMode } from "../../lib/stores";
 	import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
 	import { onMount, onDestroy, getContext } from "svelte";
 	import { dayjs } from '$lib/type/Dayjs';
@@ -62,15 +62,15 @@
 		}
 	}
 
+	const restartSendingTicker:Function = getContext('restartSendingTicker');
+	const stopSendingTicker:Function = getContext('stopSendingTicker');
+
 	// イベントのクリア
 	const asyncClearConfig = async () => {
 
 		// 送信処理中止
-		if ($sendingProcessId) {
-			clearTimeout($sendingProcessId);
-			$sendingProcessId = null;
-		}
-
+		stopSendingTicker();
+		
 		// storeのクリア
 		$selectedEvent = null;
 		$selectedPoint = null;
@@ -96,10 +96,7 @@
 		toast.success('名簿を初期化しました');
 
 		// 送信処理中止
-		if ($sendingProcessId) {
-			clearTimeout($sendingProcessId);
-			$sendingProcessId = null;
-		}
+		stopSendingTicker();
 	}
 
 	// 名簿の取り込み
@@ -157,21 +154,20 @@ console.log(memberList)
 		$showsMemberLoadDialog = false;
 	}
 
-	// 親コンポーネント(layout)からの関数
-	const reserveSending:Function = getContext('reserveSending');
-
 	const handleAllowsSendingClick = () => {
-		// 送信予約があれば一旦停止
-		if ($sendingProcessId) {
-			clearTimeout($sendingProcessId);
-			$sendingProcessId = null;
-		}
-
-		// 送信可にした瞬間に予約をする
 		if (!$config.allowsSending) {		// ← 更新前の値を指定する
-			reserveSending();
+			restartSendingTicker();
+		} else {
+			stopSendingTicker();
 		}
 	}
+
+	const handleChangeSendingInterval = () => {
+		if ($config.allowsSending) {
+			restartSendingTicker();
+		}
+	}
+
 </script>
 
 <style lang="postcss">
@@ -292,7 +288,8 @@ console.log(memberList)
 	<section class="body {$config.allowsSending ? '' : 'alert'}">
 		{ $config.allowsSending ? '送信可' : '送信不可' }
 	</section>
-	<Toggle color="green" bind:checked={$config.allowsSending} onclick={handleAllowsSendingClick} />
+	<Toggle color="green" disabled={$isSending}
+		bind:checked={$config.allowsSending} onclick={()=>handleAllowsSendingClick()} />
 </div>
 
 <div class="row">
@@ -303,8 +300,8 @@ console.log(memberList)
 	{/if}
 	</section>
 	<section class="flex items-center" style="line-height:2em;">
-		<Range size="sm" min="0" max="60" step="15"
-			bind:value={$config.sendingIntervalSec} bind:disabled={$disablesSending} />
+		<Range size="sm" min="0" max="60" step="15" disabled={$disablesSending || $isSending}
+			bind:value={$config.sendingIntervalSec} onchange={handleChangeSendingInterval} />
 	</section>
 </div>
 

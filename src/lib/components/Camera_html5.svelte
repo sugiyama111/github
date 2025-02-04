@@ -187,8 +187,8 @@
 		<Img src="loading.svg" class="h-20 w-20" />
 	</div>
 	<div>
-		<Progressbar easing={linear} 
-				progressClass="bg-gray-400" progress={ratio*100} color="blue" size="h-1" />
+		<Progressbar easing={linear} size="h-1" progressClass="bg-gray-400"
+			progress={ratio*100} />
 	</div>
 </div>
 

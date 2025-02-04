@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getContext } from "svelte";
 	import Icon from "@iconify/svelte";
 	import { Tabs, Button } from 'flowbite-svelte';
 	import Camera from "$lib/components/Camera_html5.svelte";
@@ -24,6 +23,7 @@
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
 	import { ScannerMessenger } from "$lib/ScannerMessenger";
 	import RegisterModeTab from "$lib/components/RegisterModeTab.svelte";
+    import { linear } from "svelte/easing";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -262,8 +262,6 @@
 	}
 
 	
-	// 親コンポーネント(layout)からの関数
-	const asyncSendRecords:Function = getContext('asyncSendRecords');
 
 // let scanner:ScannerMessenger | null = null;
 
@@ -401,29 +399,6 @@ function sendIntentTurnOff() {
 	class:check={$selectedRegisterMode.isCheck()}
 	class:retire={$selectedRegisterMode.isRetire()}
 	class:skip={$selectedRegisterMode.isSkip()}>
-
-	<!-- 送信ボタン -->
-	<Button class="p-3 fixed rounded-full
-		flex justify-center items-center
-		text-primary-text bg-primary
-		w-28 h-28 left-[-28px] bottom-[-28px]"
-		disabled={$isSending}
-		onclick={()=>asyncSendRecords()}>
-		<div class="-mt-4 -mr-3">
-			{#if !$isSending}
-			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
-			<div class="-mt-1">すぐ送信</div>
-			{:else}
-			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
-			<div class="-mt-1">送信中...</div>
-			{/if}
-		</div>
-{#if $unsentCount >= 1}
-		<div class="rounded-full h-6 w-6 border-white bg-red-600
-			flex justify-center items-center
-			absolute right-[8px] top-[4px]">{ $unsentCount }</div>
-{/if}
-	</Button>
 
 	<Button pill={true} class="!p-2.5 fixed bg-primary" style="right:130px; bottom:8px;"
 		on:click={()=>{inputPanel='info'; handleScannerButton();}}>

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import '../app.css';
 	import Icon from "@iconify/svelte";
-	import { Button } from 'flowbite-svelte';
+	import { Button, Progressbar } from 'flowbite-svelte';
 	import { config, unsentCount, selectedEvent, selectedPoint, scanner, isSending, goBackUrl } from '$lib/stores';
-	import { sendingProcessId, selectedLogId } from '$lib/stores';
+	import { selectedLogId } from '$lib/stores';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
 	import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
 	import { db } from "$lib/db/db";
@@ -15,7 +15,9 @@
   import { onDestroy, onMount, setContext, tick } from 'svelte';
 	import { RegisterMode } from '$lib/type/RegisterMode';
 	import { afterNavigate, beforeNavigate, goto, pushState, replaceState } from '$app/navigation';
-	
+	import { TimeoutTicker } from '$lib/type/TimeoutTicker';
+	import { linear } from 'svelte/easing';
+
 	let { children } = $props();
 
 	////// フェールセーフ処理
@@ -24,6 +26,31 @@
 		$config.availableRegisterModes.push(RegisterMode.CHECK);
 	}
 
+
+	//let sendingLeftRatio = $state<number>(1);		// 0～1
+	// const updateRatio = () => {
+	// 	$sendingLeftTimeRatio = sendTicker.ratio();
+	// }
+
+	// const handleTimeout = () => {
+	// 	sendTicker.stop();
+	// 	setTimeout(async()=>{
+	// 		// 送信実処理
+	// 		await asyncSendRecords();
+			
+	// 		if ($config.allowsSending) {
+	// 			sendTicker.resetLeftTick();
+	// 			updateRatio();
+
+	// 			const intervalSec = $config.sendingIntervalSec == 0 ? 2 : $config.sendingIntervalSec;
+	// 			sendTicker.setTimeoutTick(intervalSec);		// sendTickerのmilsecPerTickは1000(1秒)
+	// 			setTimeout(sendTicker.start, 500);				// 残り時間満タンを見せる
+	// 		}
+	// 	}, 500);
+	// }
+
+	//const sendTicker = new TimeoutTicker(60, {milsecPerTick:1000, onTimeout:handleTimeout, onTick:updateRatio});
+	let sendingTicker:TimeoutTicker|null = null;	
 
 	let isUpdateAvailable = false;
 
@@ -89,7 +116,6 @@ $effect(()=>{
 	}
 
 
-	let currentPath:string;
   // ページ遷移を検知して処理を実行
   $effect(() => {
 		// URL入力しての画面表示時に発行(undefined -> /)。
@@ -156,11 +182,8 @@ $effect(()=>{
 
 		// 送信ルーティンの開始
 		if ($config.allowsSending) {
-			console.log('start sending ' + $config.sendingIntervalSec);
-			
-			reserveSending();
+			restartSendingTicker();
 		}
-
 
 		//toast.info(`mount url:${$page.url.pathname}`);
 		resetScannerByUrl($page.url.pathname);
@@ -182,18 +205,7 @@ $effect(()=>{
 	function wait(ms:number) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
-	// 送信処理＋次の送信予約
-	const asyncRoutineSending = async () => {
-		// 送信処理
-		console.log('do');
-		await asyncSendRecords();
-
-		// 送信処理が終わってから、次の実行を予約
-		if ($config.allowsSending) {
-			reserveSending();
-		}
-	}
-
+	
 	const asyncSendRecords = async() => {
 		if (!$selectedLogId) return;
 		if ($isSending) {
@@ -201,6 +213,7 @@ $effect(()=>{
 			return;		// 処理中は入らない
 		}
 
+		console.log('start sending');
 		$isSending = true;
 
 		// 未送信を取得
@@ -223,24 +236,66 @@ $effect(()=>{
 
 	}
 
-	// 送信予約をする処理
-	const reserveSending = () => {
-		console.log('reserve after '+$config.sendingIntervalSec);
 
-		const interval = $config.sendingIntervalSec == 0 ? 2 : $config.sendingIntervalSec;
-		$sendingProcessId = setTimeout(asyncRoutineSending, interval * 1000);
+	let sendingLeftTimeRatio = $state<number>(1);
+	const updateRatio = () => {
+		if (!sendingTicker) return;
+		sendingLeftTimeRatio = sendingTicker.ratio();
 	}
-	// 子コンポーネントで利用できるようにする
-	setContext('asyncSendRecords', asyncSendRecords);
-	setContext('reserveSending', reserveSending);
 
+	const restartSendingTicker = () => {
+		console.log(sendingTicker?.timeoutTick);
+		// 稼働中の送信ルーティンがあれば一旦停止
+		if (sendingTicker) {
+			sendingTicker.stop();
+			sendingTicker = null;
+		}
+		
+		// 新しいtick数で開始する
+		sendingTicker = new TimeoutTicker($config.sendingIntervalSec, {
+			onTimeout: onSendingTickerTimeout,
+			onTick: updateRatio,
+		});
+
+		updateRatio();
+
+		// 開始
+		setTimeout(sendingTicker.start, 500);
+	}
+
+	const stopSendingTicker = () => {
+		sendingTicker?.stop();
+	}
+
+	const onSendingTickerTimeout = () => {
+		if (!sendingTicker) return;
+
+		sendingTicker.stop();
+
+		setTimeout(async()=>{
+			if (!sendingTicker) return;
+
+			// 送信実処理
+			await asyncSendRecords();
+			
+			if ($config.allowsSending) {
+				sendingTicker.resetLeftTick();
+				updateRatio();
+
+				sendingTicker.setTimeoutTick($config.sendingIntervalSec);		// sendTickerのmilsecPerTickは1000(1秒)
+				setTimeout(sendingTicker.start, 500);				// 残り時間満タンを見せる
+			}
+		}, 500);		// 残り0を見せる
+	}
+
+	// 子コンポーネントで利用できるようにする
+	//setContext('reserveSending', reserveSending);
+	setContext('restartSendingTicker', restartSendingTicker);
+	setContext('stopSendingTicker', stopSendingTicker);
 
 	onDestroy(()=>{
-		// 送信予約があれば一旦停止
-		if ($sendingProcessId) {
-			clearTimeout($sendingProcessId);
-			$sendingProcessId = null;
-		}
+		// 送信があれば一旦停止
+		sendingTicker?.stop();
 
 	});
 	// // 他画面に遷移時に発行
@@ -404,5 +459,35 @@ $effect(()=>{
 
 	<!-- メインコンテンツ -->
 	{@render children()}
+
+	
+	<!-- 送信ボタン -->
+{#if $config.allowsSending}
+	<Button class="p-3 fixed rounded-full
+		flex justify-center items-center
+		text-primary-text bg-primary
+		w-28 h-28 left-[-28px] bottom-[-28px]"
+		disabled={$isSending}
+		onclick={()=>asyncSendRecords()}>
+		<div class="-mt-4 -mr-3">
+		{#if !$isSending}
+			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
+			<div class="-mt-1">すぐ送信</div>
+		{:else}
+			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
+			<div class="-mt-1">送信中...</div>
+		{/if}
+			<Progressbar easing={linear} size="h-1" progressClass="bg-gray-400"
+				progress={sendingLeftTimeRatio*100} />
+		
+			</div>
+
+		{#if $unsentCount >= 1}
+			<div class="rounded-full h-6 w-6 border-white bg-red-600
+				flex justify-center items-center
+				absolute right-[8px] top-[4px]">{ $unsentCount }</div>
+		{/if}
+	</Button>
+{/if}
 
 </div>

@@ -3,16 +3,24 @@ type SecondParams = { milsecPerTick?:number, onTimeout:Function, onTick:Function
 
 export class TimeoutTicker {
 
-	timeoutTick:number;			// 残り時間の開始値
+	private _timeoutTick!:number;			// 残り時間の開始値
 	leftTick:number;				// 残り時間の値
 	milsecPerTick:number;		// 何ミリ秒で1tickするか
 	processId:number|null = null;
 	onTimeout:Function;		// タイムアウトに至った時の処理
 	onTick:Function;			// 1tickしたときの処理
 
+	set timeoutTick(val:number) {
+		this._timeoutTick = val < 2 ? 2 : val;
+		console.log(`setter: ${this._timeoutTick}`);
+	}
+	get timeoutTick():number {
+		return this._timeoutTick;
+	}
+
 	constructor(timeoutTick:number, {milsecPerTick=1000, onTimeout, onTick}:SecondParams) {
 		this.timeoutTick = timeoutTick;
-		this.leftTick = timeoutTick;
+		this.leftTick = this.timeoutTick;
 		this.milsecPerTick = milsecPerTick;
 		this.onTimeout = onTimeout;
 		this.onTick = onTick;
@@ -31,7 +39,6 @@ export class TimeoutTicker {
 		this.stop();
 
 		this.resetLeftTick();
-		//this.leftTick = this.timeoutTick;
 
 		// 一度実行してから次の予約をする
 		this.doTick();
@@ -75,4 +82,7 @@ export class TimeoutTicker {
 		return Number.parseFloat((this.leftTick / this.timeoutTick).toFixed(digit));
 	}
 
+	setTimeoutTick = (timeoutTick:number) => {
+		this.timeoutTick = timeoutTick;
+	}
 }
