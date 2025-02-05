@@ -2,7 +2,8 @@
 	import '../app.css';
 	import Icon from "@iconify/svelte";
 	import { Button, Progressbar } from 'flowbite-svelte';
-	import { config, unsentCount, selectedEvent, selectedPoint, scanner, isSending, goBackUrl } from '$lib/stores';
+	import { config, unsentCount, selectedEvent, selectedPoint, 
+		uuid, scanner, isSending, goBackUrl } from '$lib/stores';
 	import { selectedLogId } from '$lib/stores';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
 	import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
@@ -12,13 +13,17 @@
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
   import { toast } from '$lib/QRTToast';
-  import { onDestroy, onMount, setContext, tick } from 'svelte';
+  import { onDestroy, onMount, setContext } from 'svelte';
 	import { RegisterMode } from '$lib/type/RegisterMode';
 	import { afterNavigate, beforeNavigate, goto, pushState, replaceState } from '$app/navigation';
 	import { TimeoutTicker } from '$lib/type/TimeoutTicker';
 	import { linear } from 'svelte/easing';
+	import { v4 as uuidv4 } from 'uuid';
 
 	let { children } = $props();
+
+	// インストールIDとしてUUIDを作成
+	if (!$uuid) $uuid = uuidv4();
 
 	////// フェールセーフ処理
 	// 万一、選択可能なモードが無い場合はチェックを強制的に可能にする

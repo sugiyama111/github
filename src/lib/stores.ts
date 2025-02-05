@@ -9,7 +9,6 @@ import type RecordEntity from '$lib/db/RecordEntity';
 import { dayjs, type Dayjs } from '$lib/type/Dayjs';
 import { ScannerMessenger } from './ScannerMessenger';
 
-
 export const goBackUrl = writable<string|null>(null);
 
 // オブジェクトのため、persistedにはしない(できない)
@@ -29,7 +28,7 @@ export const scanner = writable<ScannerMessenger>();
 export const isSending = writable<boolean>(false);				// 送信中であるか
 
 
-//export const selectedEvent = writable<TimingEvent | null>(null);
+export const uuid = persisted('uuid', <string | null>(null));
 export const selectedEvent = persisted('selectedEvent', <TimingEvent | null>(null));
 export const selectedPoint = persisted('selectedPoint', <TimingPoint | null>(null));
 export const inputPassword = persisted('inputPassword', <string | null>null);

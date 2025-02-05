@@ -4,7 +4,7 @@
 	import { inputPassword, selectedEvent, selectedPoint, lastRegistered, config, 
 		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, 
         selectedLogId, isSending, 
-        selectedRegisterMode } from "../../lib/stores";
+        selectedRegisterMode, uuid } from "../../lib/stores";
 	import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
 	import { onMount, onDestroy, getContext } from "svelte";
 	import { dayjs } from '$lib/type/Dayjs';
@@ -343,7 +343,7 @@ console.log(memberList)
 <div class="row">
 	<section class="title">Install ID</section>
 	<section class="body grow">
-		1234567890
+		{ $uuid }
 	</section>
 </div>
 {/if}
