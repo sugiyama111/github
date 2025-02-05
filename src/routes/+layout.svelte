@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import { dev } from '$app/environment';
 	import Icon from "@iconify/svelte";
 	import { Button, Progressbar } from 'flowbite-svelte';
 	import { config, unsentCount, selectedEvent, selectedPoint, 
@@ -153,34 +154,36 @@ $effect(()=>{
 	onMount(()=>{
 		console.log('◆pushState');
 
-		// service workerの登録
-		if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/service-worker.js', { type:'module' })  // サービスワーカーを登録するパス
-        .then((registration:ServiceWorkerRegistration) => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+		// 2025/2/5 コメントアウト　svelte.config.js で登録するよう
+		// // service workerの登録
+		// if ('serviceWorker' in navigator) {
+    //   navigator.serviceWorker
+    //     .register('/service-worker.js'
+		// 			,{ type: dev ? 'module' : 'classic' })  // サービスワーカーを登録するパス
+    //     .then((registration:ServiceWorkerRegistration) => {
+    //       console.log('ServiceWorker registration successful with scope: ', registration.scope);
 
-					registration.onupdatefound = () => {
-						const installingWorker = registration.installing;
-						if (installingWorker) {
-							installingWorker.onstatechange = () => {
-								if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-									isUpdateAvailable = true;
-									if (confirm('更新があります。更新しますか？')) {
-										registration.update();
-									}
-								}
-							};
-						}
-					}
+		// 			registration.onupdatefound = () => {
+		// 				const installingWorker = registration.installing;
+		// 				if (installingWorker) {
+		// 					installingWorker.onstatechange = () => {
+		// 						if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+		// 							isUpdateAvailable = true;
+		// 							if (confirm('更新があります。更新しますか？')) {
+		// 								registration.update();
+		// 							}
+		// 						}
+		// 					};
+		// 				}
+		// 			}
 	
-        })
-        .catch((error) => {
-          console.log('ServiceWorker registration failed: ', error);
-        });
-    } else {
-      console.log('Service Worker not supported');
-    }
+    //     })
+    //     .catch((error) => {
+    //       console.log('ServiceWorker registration failed: ', error);
+    //     });
+    // } else {
+    //   console.log('Service Worker not supported');
+    // }
 
 		// 送信ルーティンの開始
 		if ($config.allowsSending) {
