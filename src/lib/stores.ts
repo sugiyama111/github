@@ -28,7 +28,6 @@ export const scanner = writable<ScannerMessenger>();
 export const isSending = writable<boolean>(false);				// 送信中であるか
 
 
-export const uuid = persisted('uuid', <string | null>(null));
 export const selectedEvent = persisted('selectedEvent', <TimingEvent | null>(null));
 export const selectedPoint = persisted('selectedPoint', <TimingPoint | null>(null));
 export const inputPassword = persisted('inputPassword', <string | null>null);

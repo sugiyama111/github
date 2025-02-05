@@ -37,8 +37,7 @@
 		"html5-qrcode": "^2.3.8",
 		"jsqr": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",
-		"svelte-sonner": "^0.3.28",
-		"uuid": "^11.0.5"
+		"svelte-sonner": "^0.3.28"
 	},
 	"engines": {
 		"node": "20.x"
