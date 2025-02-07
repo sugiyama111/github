@@ -492,11 +492,12 @@ $effect(()=>{
 	
 	<!-- 送信ボタン -->
 {#if $config.allowsSending}
-	<Button class="fixed rounded-full
+	<Button class={`${$page.url.pathname=='/' ? 'opacity-100' : 'opacity-20'}
+		fixed rounded-full
 		flex justify-center items-center flex-col
 		text-primary-text bg-primary
-		w-28 h-28 left-[-28px] bottom-[-28px]"
-		disabled={$isSending}
+		w-28 h-28 left-[-28px] bottom-[-28px]`}
+		disabled={$isSending || $page.url.pathname!='/'}
 		onclick={asyncSendManually}>
 
 		<div class="-mt-4 -mr-3 flex flex-col justify-center">
@@ -507,7 +508,10 @@ $effect(()=>{
 		{#if !$isSending}
 			<div class="-mt-1">すぐ送信</div>
 		{:else}
-			<div class="-mt-1 flex">送信中..<Icon icon="mdi:send" class="text-lg m-0 p-0" /></div>
+			<div class="-mt-1 flex">
+				送信中...
+				<!-- <Icon icon="mdi:send" class="text-lg m-0 p-0" /> -->
+			</div>
 		{/if}
 		</div>
 

@@ -12,8 +12,18 @@ const componentRegisterMode:RegisterMode = props.registerMode;		// このコン�
 
 <TabItem open={$selectedRegisterMode.getCode() == componentRegisterMode.code}
 	class="flex-1 rounded-t-lg"
-	defaultClass={`w-full hover:!bg-${componentRegisterMode.code} !bg-${componentRegisterMode.code}`}
-	onclick={()=>{console.log('componentRegisterMode'); console.log(componentRegisterMode); $selectedRegisterMode=new RegisterModeState(componentRegisterMode); console.log($selectedRegisterMode);}}>
+	defaultClass={`w-full tab-class-${componentRegisterMode.code}`}
+	onclick={()=>{$selectedRegisterMode=new RegisterModeState(componentRegisterMode);}}>
+	<style>
+		/* 直書きは有効にならない
+		hover:!bg-${componentRegisterMode.code} !bg-${componentRegisterMode.code} */
+		.tab-class-check { @apply bg-check; }
+		.tab-class-check:hover { @apply bg-check; }
+		.tab-class-retire { @apply bg-retire; }
+		.tab-class-retire:hover { @apply bg-retire; }
+		.tab-class-skip { @apply bg-skip; }
+		.tab-class-skip:hover { @apply bg-skip; }
+	</style>
 	<section slot="title" class="flex gap-1 -m-3 p-3">
 		<Icon icon={ componentRegisterMode.icon } class="size-5 m-0 p-0" />
 		<div class="whitespace-nowrap">{ componentRegisterMode.text }</div>
