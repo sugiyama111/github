@@ -216,6 +216,24 @@ $effect(()=>{
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 	
+	const asyncSendManually = async() => {
+		// 定期送信を止める
+		sendingTicker?.stop();
+
+		// 定期送信の残り時間を強制的に0表示にする
+		sendingLeftTimeRatio = 0;
+		
+
+		await asyncSendRecords();
+
+		// 満タン表示を一瞬見せて再開
+		sendingTicker?.resetLeftTick();
+		updateRatio();
+		setTimeout(()=>{
+			sendingTicker?.start()
+		}, 500);
+	}
+
 	const asyncSendRecords = async() => {
 		if (!$selectedLogId) return;
 		if ($isSending) {
@@ -479,20 +497,23 @@ $effect(()=>{
 		text-primary-text bg-primary
 		w-28 h-28 left-[-28px] bottom-[-28px]"
 		disabled={$isSending}
-		onclick={()=>asyncSendRecords()}>
-		<div class="-mt-4 -mr-3">
+		onclick={asyncSendManually}>
+
+		<div class="-mt-4 -mr-3 flex flex-col justify-center">
 			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
-			<Progressbar easing={linear} size="h-1" progressClass="bg-gray-400"
-				progress={sendingLeftTimeRatio*100}
-				class="-mt-1 mb-1" />
-		</div>
 		
-		<div class="-mr-3">
+
+		<div class="-ml-4 -mr-4 flex justify-center">
 		{#if !$isSending}
 			<div class="-mt-1">すぐ送信</div>
 		{:else}
 			<div class="-mt-1 flex">送信中..<Icon icon="mdi:send" class="text-lg m-0 p-0" /></div>
 		{/if}
+		</div>
+
+			<Progressbar easing={linear} size="h-1" progressClass="bg-gray-400"
+				progress={sendingLeftTimeRatio*100}
+				class="mb-1" />
 		</div>
 
 		{#if $unsentCount >= 1}
