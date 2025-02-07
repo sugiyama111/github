@@ -1,8 +1,9 @@
 <script lang="ts">
   import { goto, pushState } from '$app/navigation';
-	import { showsConfigLoginDialog, showsPointSelectDialog } from '$lib/stores';
+	import { selectedPoint, showsConfigLoginDialog, showsPointSelectDialog, isTrial } from '$lib/stores';
 	import Icon from '@iconify/svelte';
 	import { Drawer, CloseButton, Sidebar, SidebarWrapper, SidebarGroup, SidebarItem, SidebarBrand, Button, Modal } from 'flowbite-svelte';
+    import { getContext } from 'svelte';
 	import { sineIn } from 'svelte/easing';
 
 	export let hidden = true;
@@ -13,13 +14,28 @@
 		duration: 200,
 		easing: sineIn
 	};
+
+	const asyncSwitchLog:Function = getContext('asyncSwitchLog');
+	const startTrialAlertRoutine:Function = getContext('startTrialAlertRoutine');
+	const stopTrialAlertRoutine:Function = getContext('stopTrialAlertRoutine');
+
+	const switchTrialMode = ()=> {
+		const switchesToTrial = !$isTrial;
+
+		switchesToTrial ? startTrialAlertRoutine() : stopTrialAlertRoutine();
+
+		asyncSwitchLog($selectedPoint, switchesToTrial);
+
+		// storeの切り替え
+		$isTrial = !$isTrial;
+	}
 	
 </script>
 
 <style lang="postcss">
 </style>
 
-<Drawer class="" transitionType="fly" {transitionParams} bind:hidden={hidden} id="sidebar2">
+<Drawer  class={$isTrial ? `bg-trial text-[#222]` : ''} transitionType="fly" {transitionParams} bind:hidden={hidden} id="sidebar2">
   <div class="flex items-center">
     <h5 id="drawer-navigation-label-3" class="font-semibold text-3xl dark:text-dark-text">QR-Timing3</h5>
     <CloseButton on:click={() => hidden=true} class="mb-4 dark:text-dark-text" />
@@ -46,6 +62,15 @@
 					onclick={()=>{$showsPointSelectDialog = true; hidden=true;}}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:location-on" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+					</svelte:fragment>
+				</SidebarItem>
+				
+				<SidebarItem label={`お試しモード ${$isTrial ? '終了' : '開始'}`} {spanClass}
+					onclick={()=>{ switchTrialMode(); hidden=true;}}
+					class={$isTrial ? `font-bold` : ''}>
+					<svelte:fragment slot="icon">
+						<Icon icon="material-symbols:multimodal-hand-eye"
+							class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
 				</SidebarItem>
 				

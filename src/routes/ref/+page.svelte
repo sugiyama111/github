@@ -31,6 +31,7 @@
 	<thead>
 		<tr>
 			<th></th>
+			<th></th>
 			<th>
 				<div>LOG ID</div>
 				<div class="text-xs -mt-1 mb-1">ログ開始日時</div>
@@ -42,12 +43,16 @@
 	<tbody>
 		{#each logList as log}
 		<tr onclick={()=>goto(`/refd/${log.log_id}`)}
-			class:current={$selectedLogId == log.log_id}>
+			class:current={$selectedLogId == log.log_id}
+			class:bg-trial={log.is_trial}>
 			<td>
 			{#if $selectedLogId == log.log_id}
 				<Icon icon="material-symbols:play-circle-outline-rounded"
 					class="text-2xl text-gray-700 ml-4" />
 			{/if}
+			</td>
+			<td>
+				{#if log.is_trial}TEST{/if}
 			</td>
 			<td>
 				<div>{ log.log_id.toString().padStart(4, '0') }</div>

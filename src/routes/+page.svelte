@@ -114,11 +114,11 @@
 			return;
 		}
 		if (measuringTime === null) {
-			Toast.Error('計測時刻が異常です');
+			Toast.Error('登録時刻が異常です');
 			return;
 		}
 		if (registerMethod === null) {
-			Toast.Error('計測方法が選択されていません');
+			Toast.Error('登録方法が選択されていません');
 			return;
 		}
 
@@ -395,7 +395,7 @@ function sendIntentTurnOff() {
 
 <!-- コンテンツ３：下部ボタン -->
 <!-- layoutでclass="h-lvh"を指定。ここではsize-fullを指定。 -->
-<section class="pt-4 size-full"
+<section class="pt-4"
 	class:check={$selectedRegisterMode.isCheck()}
 	class:retire={$selectedRegisterMode.isRetire()}
 	class:skip={$selectedRegisterMode.isSkip()}>

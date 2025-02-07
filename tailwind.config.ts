@@ -38,6 +38,9 @@ export default {
 					//DEFAULT: '#acf',
 					DEFAULT: '#55c5ff',
 				},
+				trial: {
+					DEFAULT: '#FFFF00',
+				},
 				config: {
 					DEFAULT: 'blue-600',
 				},

@@ -5,11 +5,12 @@ type ActiveToastKey = {
 	success:number|null;
 	error:number|null;
 	info:number|null;
+	caution:number|null;
 };
 
 export class Toast {
 	
-	static ActiveToasts:ActiveToastKey = {success:null, error:null, info:null};
+	static ActiveToasts:ActiveToastKey = {success:null, error:null, info:null, caution:null};
 
 	static Success = (message:string) => {
 		
@@ -104,6 +105,38 @@ export class Toast {
 		});
 
 		Toast.ActiveToasts.info = id;
+	}
+
+	static Caution = (message:string) => {
+		
+    // すでに表示中のトーストを消す
+    if (Toast.ActiveToasts.caution) {
+      toast.pop(Toast.ActiveToasts.caution);
+    }
+
+		const id = toast.push({
+			component: {
+				// @ts-ignore: 型エラーを無視
+				src: ToastBase,
+				props: {
+					icon: 'material-symbols:warning-rounded',
+					message: message,
+					iconColor: '#D80',
+				},
+			},
+			duration: 7000,
+			theme: {
+				'--toastBorderRadius': '5px',
+				'--toastMinHeight': '1rem',
+				'--toastWidth': 'auto',
+				'--toastBackground': '#FFF8F8',
+				'--toastColor': '#D80',
+				'--toastBarBackground': 'gray',
+				'--toastBarHeight': '2px',
+			}
+		});
+
+		Toast.ActiveToasts.caution = id;
 	}
 
 }

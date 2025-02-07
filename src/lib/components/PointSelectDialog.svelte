@@ -1,10 +1,11 @@
 <script lang="ts">
   import { Button, Modal, Radio } from 'flowbite-svelte';
-	import { lastRegistered, selectedEvent, selectedLogId, selectedPoint, unsentCount } from '$lib/stores';
+	import { isTrial, lastRegistered, selectedEvent, selectedLogId, selectedPoint, unsentCount } from '$lib/stores';
 	import { showsPointSelectDialog } from '$lib/stores';
 	import type { TimingPoint } from '$lib/api/TimingPoint';
 	import { db } from '$lib/db/db';
 	import { Toast } from '$lib/Toast';
+    import { getContext } from 'svelte';
 
 	//$: selectedId = $selectedPoint?.pointId;
 	let selectedId = $selectedPoint?.pointId;
@@ -12,6 +13,8 @@
 	if (!$selectedEvent) {
 		$showsPointSelectDialog = false;
 	}
+
+	const asyncSwitchLog:Function = getContext('asyncSwitchLog');
 
 	const asyncSelectPoint = async (point:TimingPoint) => {
 		// 万一、イベントが選択されていない場合は何もしない
@@ -23,20 +26,8 @@
 		// 地点を選択
 		$selectedPoint = point;
 
-		// @TODO ログを切り替える
-		// 旧ログを更新
-		
-
-		// リセットすべきstoreをリセットする
-		$unsentCount = 0;
-		$lastRegistered = {check:null, retire:null, skip:null};
-
-		
-		const newLogId = await db.asyncSwitchNextLog($selectedEvent, point);
-		$selectedLogId = newLogId;
-
-		// ＠TODO 送信処理を再実行
-		
+		// ログ切り替え
+		await asyncSwitchLog(point, $isTrial);
 	}
 
 </script>

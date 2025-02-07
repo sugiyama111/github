@@ -33,6 +33,7 @@ export const selectedPoint = persisted('selectedPoint', <TimingPoint | null>(nul
 export const inputPassword = persisted('inputPassword', <string | null>null);
 export const selectedLogId = persisted('selectedLogId', <number | null>null);
 export const unsentCount = persisted('unsentCount', <number>0);
+export const isTrial = persisted('isTrial', <boolean>false);
 
 export const selectedCameraId = persisted('selectedCameraId', <string | null>null);
 export const isCameraMirrored = persisted('isCameraMirrored', <boolean>false);

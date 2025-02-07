@@ -4,13 +4,14 @@ import '../app.css';
 	import { dev } from '$app/environment';
 	import Icon from "@iconify/svelte";
 	import { Button, Progressbar } from 'flowbite-svelte';
-	import { config, unsentCount, selectedEvent, selectedPoint, 
+	import { config, unsentCount, selectedEvent, selectedPoint, lastRegistered,
 		scanner, isSending, goBackUrl } from '$lib/stores';
-	import { selectedLogId } from '$lib/stores';
+	import { selectedLogId, isTrial } from '$lib/stores';
 	import DrawerMenu from '$lib/components/DrawerMenu.svelte';
 	import ConfigLoginDialog from '$lib/components/ConfigLoginDialog.svelte';
 	import { db } from "$lib/db/db";
-	
+
+	import { TimingPoint } from '$lib/api/TimingPoint';
 	import { Toaster } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
@@ -21,6 +22,9 @@ import '../app.css';
 	import { afterNavigate, beforeNavigate, goto, pushState, replaceState } from '$app/navigation';
 	import { TimeoutTicker } from '$lib/type/TimeoutTicker';
 	import { linear } from 'svelte/easing';
+    import { Vibrate } from '$lib/Vibrate';
+    import { ToastExtended } from '$lib/ToastExtended';
+    import { derived } from 'svelte/store';
 
 	let { children } = $props();
 
@@ -123,6 +127,37 @@ $effect(()=>{
 		else $scanner?.asyncTurnOff();
 	}
 
+	const trialAlertTick = new TimeoutTicker(10, {
+		onTimeout: () => {
+			Vibrate.Play(Vibrate.NOT_FOUND);
+			ToastExtended.TrialMode('お試しモード中. データはサーバーに届きません.');
+
+			// まだお試しモードだったら再度tickを開始する
+			if ($isTrial) {
+				startTrialAlertRoutine();
+			} else {
+				stopTrialAlertRoutine();
+			}
+		},
+		onTick: () => {
+			console.log('trialmode tick');
+		}
+	})
+
+	const startTrialAlertRoutine = () => {
+		console.log('startTrialAlertRoutine');
+
+		trialAlertTick?.stop();
+		trialAlertTick?.resetLeftTick();
+		trialAlertTick?.start();
+		console.log('alert tick start');
+	}
+	const stopTrialAlertRoutine = () => {
+		console.log('stoptTrialAlertRoutine');
+		
+		trialAlertTick?.stop();
+		ToastExtended.Close();		// お試しモードトーストを閉じる
+	}
 
   // ページ遷移を検知して処理を実行
   $effect(() => {
@@ -136,6 +171,24 @@ $effect(()=>{
     //   currentPath = newPath;
     // }
   });
+
+	const asyncSwitchLog = async (point:TimingPoint, isTrial:boolean) => {
+		if (!$selectedEvent) return;
+
+		// リセットすべきstoreをリセットする
+		$unsentCount = 0;
+		$lastRegistered = {check:null, retire:null, skip:null};
+
+		
+		const newLogId = await db.asyncSwitchNextLog($selectedEvent, point, isTrial);
+		$selectedLogId = newLogId;
+
+		if (!isTrial) {
+			// ＠TODO 送信処理を再実行
+		
+
+		}
+	}
 
   // ページ遷移時の処理
 	// (Web限定)履歴から開いた時も実行されるが、TurnOnが効いていない
@@ -159,6 +212,9 @@ $effect(()=>{
 	onMount(()=>{
 		console.log('◆pushState');
 
+		if ($isTrial) {
+			startTrialAlertRoutine();
+		}
 		// 2025/2/5 コメントアウト　svelte.config.js で登録するよう
 		// // service workerの登録
 		// if ('serviceWorker' in navigator) {
@@ -247,9 +303,15 @@ $effect(()=>{
 		// 未送信を取得
 		const records = await db.asyncFetchUnsentRecord($selectedLogId);
 
-		// サーバーへ送信
-		
-		await wait(2500);
+		// サーバーへ送信(トライアルの場合は数秒待つだけ)
+		if ($isTrial) {
+			await wait(2500);
+		} else {
+			// 送信処理
+
+			await wait(2500);
+
+		}
 
 		// 送信済みにする
 		const seqList = records.map(record=>record.seq);
@@ -320,6 +382,9 @@ $effect(()=>{
 	//setContext('reserveSending', reserveSending);
 	setContext('restartSendingTicker', restartSendingTicker);
 	setContext('stopSendingTicker', stopSendingTicker);
+	setContext('asyncSwitchLog', asyncSwitchLog);
+	setContext('startTrialAlertRoutine', startTrialAlertRoutine);
+	setContext('stopTrialAlertRoutine', stopTrialAlertRoutine);
 
 	onDestroy(()=>{
 		// 送信があれば一旦停止
@@ -429,12 +494,6 @@ $effect(()=>{
 	
 </script>
 
-<style lang="postcss">
-	body {
-		user-select: none;
-	}
-</style>
-
 <svelte:window on:beforeunload={()=>handleBeforeUnload} />
 <svelte:document on:visibilitychange={handleVisibilityChange} />
 
@@ -451,6 +510,12 @@ $effect(()=>{
 <PointSelectDialog />
 <ConfigLoginDialog />
 
+<div id="trial-frame" class:hidden={!$isTrial}>
+	<div class="top-0 fixed w-full h-2 bg-trial"></div>
+	<div class="right-0 fixed w-2 h-full bg-trial"></div>
+	<div class="bottom-0 fixed w-full h-2 bg-trial"></div>
+	<div class="left-0 fixed w-2 h-full bg-trial"></div>
+</div>
 
 <div class="h-screen flex flex-col ">
 <!-- 共通ヘッダ部分 -->

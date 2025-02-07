@@ -34,7 +34,7 @@ export default class AppDB extends Dexie {
       // points: '&point_code, &point_id, sort_order',     // point_id, point_code それぞれがユニークインデックス
       members: '&member_code, bib_number, name, division, category, gender, age, nation, start_time',
 			// 初期化したいため、log_idはオートインクリメントでない
-      logs: '&log_id, event_code, point_id, point_code, point_name, log_start_time, record_count, sent_count',
+      logs: '&log_id, event_code, point_id, point_code, point_name, log_start_time, record_count, sent_count, is_trial',
 			// 初期化したいため、seqはオートインクリメントでない
       records: '&[log_id+seq], [log_id+sent], member_code, member_name, race_num, time, method, mode',
 			tests: '&id',
@@ -79,7 +79,7 @@ export default class AppDB extends Dexie {
 	}
 
 	// ログを次に切り替え
-	async asyncSwitchNextLog(event:TimingEvent, point:TimingPoint):Promise<number> {
+	async asyncSwitchNextLog(event:TimingEvent, point:TimingPoint, isTrial:boolean):Promise<number> {
 		const newLogId = await this.asyncFetchNewLogId()
 
 		await this.logs.add({
@@ -91,6 +91,7 @@ export default class AppDB extends Dexie {
 			log_start_time: dayjs().format('YYYY/MM/DD HH:mm:ss'),
 			record_count: 0,
 			sent_count: 0,
+			is_trial: isTrial === true ? 1 : 0,
 		});
 
 		return newLogId;
