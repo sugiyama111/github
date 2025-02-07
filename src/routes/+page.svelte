@@ -6,7 +6,7 @@
 	import { db } from "$lib/db/db";
 	import MemberEntity from "$lib/db/MemberEntity";
 	import RecordEntity from "$lib/db/RecordEntity";
-	import { toast } from "$lib/QRTToast";
+	import { Toast } from "$lib/Toast";
 	import { scanner, config, selectedEvent, selectedPoint, selectedLogId, selectedRegisterMode, 
 		showsMemberSelectDialog, showsRegisterConfirmDialog,
 		lastRegistered, lastRegisteredTime, unsentCount, 
@@ -75,7 +75,7 @@
 		// 複数存在する場合は選択ダイアログを表示
 		if (memberCollection.length == 0) {
 			// 音とトースト
-			toast.error('名簿にみつかりません');
+			Toast.Error('名簿にみつかりません');
 			Sound.Play(Sound.NOT_FOUND);
 		} else if (memberCollection.length == 1) {
 			// 特定できた場合(→プロセス2へ)
@@ -105,20 +105,20 @@
 	const asyncRegisterProcess = async () => {
 		// 万一、記録対象のログが選ばれていない場合
 		if ($selectedLogId === null) {
-			toast.error('ログが選択されていません');
+			Toast.Error('ログが選択されていません');
 			return;
 		}
 
 		if (specifiedMember === null) {
-			toast.error('対象メンバーが特定されていません');
+			Toast.Error('対象メンバーが特定されていません');
 			return;
 		}
 		if (measuringTime === null) {
-			toast.error('計測時刻が異常です');
+			Toast.Error('計測時刻が異常です');
 			return;
 		}
 		if (registerMethod === null) {
-			toast.error('計測方法が選択されていません');
+			Toast.Error('計測方法が選択されていません');
 			return;
 		}
 
@@ -147,13 +147,13 @@
 			$lastRegistered[$selectedRegisterMode.getCode() as keyof typeof $lastRegistered] = record;
 		} catch (e) {
 			console.log(e);
-			toast.error('登録できませんでした');
+			Toast.Error('登録できませんでした');
 			return;
 		}
 
 		Sound.Play(Sound.READ_OK);				// 音を鳴らす
 		Vibrate.Play(Vibrate.READ_OK);		// 振動
-		toast.success('登録しました');		 // Toast
+		Toast.Success('登録しました');		 // Toast
 		
 		try {
 			// storeを更新：未送信件数
@@ -179,7 +179,7 @@
 
 	const handleScannerButton = () => {
 		$scanner?.asyncTurnOn();
-		toast.info('端末横の黄色いボタンでスキャンして下さい');
+		Toast.Info('端末横の黄色いボタンでスキャンして下さい');
 	}
 
 
@@ -249,7 +249,7 @@
 			const result = valResState.getResult();
 
 			Sound.Play(Sound.INVALID);
-			toast.error(result.message);
+			Toast.Error(result.message);
 			
 			return;
 		}

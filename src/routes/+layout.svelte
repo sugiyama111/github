@@ -1,5 +1,6 @@
 <script lang="ts">
-	import '../app.css';
+import { SvelteToast } from '@zerodevx/svelte-toast'
+import '../app.css';
 	import { dev } from '$app/environment';
 	import Icon from "@iconify/svelte";
 	import { Button, Progressbar } from 'flowbite-svelte';
@@ -13,7 +14,8 @@
 	import { Toaster } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
-  import { toast } from '$lib/QRTToast';
+  //import { toast } from '$lib/QRTToast';
+	import { Toast } from '$lib/Toast';
   import { onDestroy, onMount, setContext } from 'svelte';
 	import { RegisterMode } from '$lib/type/RegisterMode';
 	import { afterNavigate, beforeNavigate, goto, pushState, replaceState } from '$app/navigation';
@@ -30,6 +32,9 @@
 	}
 
 
+  const options = {
+    
+  }
 	//let sendingLeftRatio = $state<number>(1);		// 0～1
 	// const updateRatio = () => {
 	// 	$sendingLeftTimeRatio = sendTicker.ratio();
@@ -136,17 +141,17 @@ $effect(()=>{
 	// (Web限定)履歴から開いた時も実行されるが、TurnOnが効いていない
   function handleRouteChange(from:string, to:string) {
     console.log(`ページ遷移: ${from} → ${to}`);
-		toast.info(`ページ遷移: ${from} → ${to}`);
+		Toast.Info(`ページ遷移: ${from} → ${to}`);
     // 必要な処理をここに記述
 
 		if (to == '/') {
 			$scanner?.asyncTurnOn();
 			console.log('route change /');
-			toast.success('route change /');
+			Toast.Success('route change /');
 		} else if (to == '/config') {
 			$scanner?.asyncTurnOff();
 			console.log('route change /config');
-			toast.success('route change /config TurnOFF');
+			Toast.Success('route change /config TurnOFF');
 		}
   }
 
@@ -423,6 +428,7 @@ $effect(()=>{
 
 <!-- 通常は非表示の全体で共通のコンポーネント -->
 <Toaster richColors closeButton />
+<SvelteToast {options} />
 <DrawerMenu bind:hidden={drawerHidden}></DrawerMenu>
 <PointSelectDialog />
 <ConfigLoginDialog />

@@ -9,7 +9,7 @@
 	import { onMount, onDestroy, getContext } from "svelte";
 	import { dayjs } from '$lib/type/Dayjs';
 	import EventLoadDialog from "$lib/components/EventLoadDialog.svelte";
-	import { toast } from "$lib/QRTToast";
+	import { Toast } from "$lib/Toast";
 	import MemberLoadDialog from "$lib/components/MemberLoadDialog.svelte";
 	import axios from "axios";
 	import { Member } from "$lib/api/Member";
@@ -87,13 +87,13 @@
 		$config.memberCount = null;
 
 
-		toast.success('イベントを初期化しました');
+		Toast.Success('イベントを初期化しました');
 	}
 	// 名簿のクリア
 	const asyncClearMembers = async () => {
 		db.members.clear();
 		$config.memberCount = null;
-		toast.success('名簿を初期化しました');
+		Toast.Success('名簿を初期化しました');
 
 		// 送信処理中止
 		stopSendingTicker();
@@ -143,12 +143,12 @@ console.log(memberList)
 			db.members.bulkAdd(dbMemberList);
 
 			$config.memberCount = memberList.length;
-      toast.success(`${$config.memberCount}件の名簿を取得しました`);
+      Toast.Success(`${$config.memberCount}件の名簿を取得しました`);
 
 //       // 表示上のmembers件数を更新
 //       this.applyCountMemberAsync();
 		} catch (e) {
-			toast.error(`取得できませんでした`);
+			Toast.Error(`取得できませんでした`);
 		}
 
 		$showsMemberLoadDialog = false;
