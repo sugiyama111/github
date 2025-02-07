@@ -474,24 +474,26 @@ $effect(()=>{
 	
 	<!-- 送信ボタン -->
 {#if $config.allowsSending}
-	<Button class="p-3 fixed rounded-full
-		flex justify-center items-center
+	<Button class="fixed rounded-full
+		flex justify-center items-center flex-col
 		text-primary-text bg-primary
 		w-28 h-28 left-[-28px] bottom-[-28px]"
 		disabled={$isSending}
 		onclick={()=>asyncSendRecords()}>
 		<div class="-mt-4 -mr-3">
-		{#if !$isSending}
 			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
+			<Progressbar easing={linear} size="h-1" progressClass="bg-gray-400"
+				progress={sendingLeftTimeRatio*100}
+				class="-mt-1 mb-1" />
+		</div>
+		
+		<div class="-mr-3">
+		{#if !$isSending}
 			<div class="-mt-1">すぐ送信</div>
 		{:else}
-			<Icon icon="ri:send-plane-fill" class="text-white dark:text-white w-12 h-12" />
-			<div class="-mt-1">送信中...</div>
+			<div class="-mt-1 flex">送信中..<Icon icon="mdi:send" class="text-lg m-0 p-0" /></div>
 		{/if}
-			<Progressbar easing={linear} size="h-1" progressClass="bg-gray-400"
-				progress={sendingLeftTimeRatio*100} />
-		
-			</div>
+		</div>
 
 		{#if $unsentCount >= 1}
 			<div class="rounded-full h-6 w-6 border-white bg-red-600
