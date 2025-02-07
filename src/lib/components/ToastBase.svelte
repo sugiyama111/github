@@ -5,9 +5,9 @@
 	export let iconColor;
 </script>
 
-<div class="flex align-middle whitespace-nowrap p-0">
-  <Icon icon={icon} class="text-2xl mr-1" color={iconColor} />
-  <span class="font-bold">{message}</span>
+<div class="flex items-center align-middle whitespace-nowrap p-0 -mr-2">
+  <Icon icon={icon} class="text-xl mr-1" color={iconColor} />
+  <span>{message}</span>
 </div>
 
 <style>
