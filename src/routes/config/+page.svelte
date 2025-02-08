@@ -2,9 +2,7 @@
 	import { goto } from "$app/navigation";
   import { Button, Checkbox, Modal, Range, Toggle } from 'flowbite-svelte';
 	import { inputPassword, selectedEvent, selectedPoint, lastRegistered, config, 
-		dialogVisibility, 
-        selectedLogId, isSending, 
-        selectedRegisterMode } from "../../lib/stores";
+		dialogVisibility, selectedLogId, isSending, selectedRegisterMode } from "../../lib/stores";
 	import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
 	import { onMount, onDestroy, getContext } from "svelte";
 	import { dayjs } from '$lib/type/Dayjs';

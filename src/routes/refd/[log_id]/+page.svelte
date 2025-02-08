@@ -2,18 +2,17 @@
 	import { db } from "$lib/db/db";
 	import type LogEntity from "$lib/db/LogEntity";
 	import { onMount } from "svelte";
-	import { selectedEvent, selectedPoint, selectedLogId } from '$lib/stores';
+	import { selectedEvent, selectedPoint } from '$lib/stores';
 	import { goto } from "$app/navigation";
 	import type { TimingPoint } from "$lib/api/TimingPoint";
 	import { dayjs, type Dayjs } from '$lib/type/Dayjs';
 	import { page } from '$app/stores';
 	import type RecordEntity from "$lib/db/RecordEntity";
-	import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
-    import Icon from "@iconify/svelte";
-    import { RegisterMethodState } from "$lib/type/RegisterMethod";
-    import { Button } from "flowbite-svelte";
-    import type MemberEntity from "$lib/db/MemberEntity";
-    import type { TimingEvent } from "$lib/api/TimingEvent";
+	import { RegisterModeState } from "$lib/type/RegisterMode";
+	import Icon from "@iconify/svelte";
+	import { RegisterMethodState } from "$lib/type/RegisterMethod";
+	import { Button } from "flowbite-svelte";
+	import type MemberEntity from "$lib/db/MemberEntity";
 	
 	if (!$selectedEvent) goto('/');
 
@@ -85,7 +84,6 @@
 
 <section>
 	<Button class="bg-primary m-2 whitespace-nowrap" onclick={asyncDownloadRecords}>recordダウンロード</Button>
-
 </section>
 
 <section class="head">

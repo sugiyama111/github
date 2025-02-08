@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from "@iconify/svelte";
 	import { selectedRegisterMode } from '$lib/stores';
+    import { Vibrate } from "$lib/Vibrate";
 
 	const props = $props();
 	const { onClose, onRegister } = props;
@@ -9,6 +10,7 @@
 
 
 	const inputNum = (str:string)=>{
+		Vibrate.Play(Vibrate.KEYPAD);
 		
 		if (inputBibNumber.length >= 8) return;
 		if (str == '0' && inputBibNumber == '') return;
@@ -17,10 +19,14 @@
 	}
 
 	const clearNum = () => {
+		Vibrate.Play(Vibrate.KEYPAD);
+
 		inputBibNumber = '';
 	}
 
 	const onRegisterClick = () => {
+		Vibrate.Play(Vibrate.KEYPAD);
+		
 		if (inputBibNumber == '') return;
 
 		onRegister(inputBibNumber);

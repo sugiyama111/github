@@ -73,8 +73,9 @@
 		// 複数存在する場合は選択ダイアログを表示
 		if (memberCollection.length == 0) {
 			// 音とトースト
-			Toast.Error('名簿にみつかりません');
 			Sound.Play(Sound.NOT_FOUND);
+			Vibrate.Play(Vibrate.NOT_FOUND);
+			Toast.Error('名簿にみつかりません');
 		} else if (memberCollection.length == 1) {
 			// 特定できた場合(→プロセス2へ)
 			specifiedMember = memberCollection[0];

@@ -7,7 +7,7 @@
 	import type { TimingPoint } from "$lib/api/TimingPoint";
 	import { dayjs } from '$lib/type/Dayjs';
 	import Icon from "@iconify/svelte";
-	import { Button } from 'flowbite-svelte';
+    import { Checkbox } from "flowbite-svelte";
 
 	if (!$selectedEvent) goto('/');
 
@@ -16,85 +16,95 @@
 		(point:TimingPoint)=>pointList[point.pointId] = point
 	);
 
-	
-	let logList:Array<LogEntity> = [];
+	let showsTrialLog:boolean = $state(false);
+	let logList:Array<LogEntity> = $state([]);
 	
 	onMount(async () => {
 		logList = await db.asyncFetchLogList();
 	});
 
-
 </script>
 
 
-<table>
-	<thead>
-		<tr>
-			<th></th>
-			<th></th>
-			<th>
-				<div>LOG ID</div>
-				<div class="text-xs -mt-1 mb-1">ログ開始日時</div>
-			</th>
-			<th>地点名</th>
-			<th>件数</th>
-		</tr>
-	</thead>
-	<tbody>
-		{#each logList as log}
-		<tr onclick={()=>goto(`/refd/${log.log_id}`)}
-			class:current={$selectedLogId == log.log_id}
-			class:bg-trial={log.is_trial}>
-			<td>
-			{#if $selectedLogId == log.log_id}
-				<Icon icon="material-symbols:play-circle-outline-rounded"
-					class="text-2xl text-gray-700 ml-4" />
-			{/if}
-			</td>
-			<td>
-				{#if log.is_trial}TEST{/if}
-			</td>
-			<td>
-				<div>{ log.log_id.toString().padStart(4, '0') }</div>
-				<div class="-mt-1">
-					<span class="whitespace-nowrap">
-						<span class="text-xs">
-							{dayjs(log.log_start_time).format('YYYY/')}
-						</span>
-						<span class="text-sm">
-							{dayjs(log.log_start_time).format('MM/DD')}
-						</span>
-					</span>
-					<span class="whitespace-nowrap">
-						<span class="text-sm">
-							{dayjs(log.log_start_time).format(' HH:mm')}
-						</span>
-						<span class="text-xs">
-							{dayjs(log.log_start_time).format(':ss')}
-						</span>
-					</span>
-				</div>
-			</td>
-			<td>
-				{pointList[log.point_id].pointTitle}
-			</td>
-			<td>
-				{log.record_count}
-			</td>
-		</tr>
-		{/each}
-	</tbody>
+<section class="p-2">
+	<Checkbox bind:checked={showsTrialLog}>お試しモードのログを表示</Checkbox>
+</section>
 
-</table>
+
+<div class="scroll-container">
+	<table>
+		<thead>
+			<tr>
+				<th></th>
+				<th></th>
+				<th>
+					<div>LOG ID</div>
+					<div class="text-xs -mt-1 mb-1">ログ開始日時</div>
+				</th>
+				<th>地点名</th>
+				<th>件数</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each logList as log}
+			<tr onclick={()=>goto(`/refd/${log.log_id}`)}
+				class:current={$selectedLogId == log.log_id}
+				class:bg-trial={log.is_trial}>
+				<td>
+				{#if $selectedLogId == log.log_id}
+					<Icon icon="material-symbols:play-circle-outline-rounded"
+						class="text-2xl text-gray-700 ml-4" />
+				{/if}
+				</td>
+				<td>
+					{#if log.is_trial}お試し{/if}
+				</td>
+				<td>
+					<div>{ log.log_id.toString().padStart(4, '0') }</div>
+					<div class="-mt-1">
+						<span class="whitespace-nowrap">
+							<span class="text-xs">
+								{dayjs(log.log_start_time).format('YYYY/')}
+							</span>
+							<span class="text-sm">
+								{dayjs(log.log_start_time).format('MM/DD')}
+							</span>
+						</span>
+						<span class="whitespace-nowrap">
+							<span class="text-sm">
+								{dayjs(log.log_start_time).format(' HH:mm')}
+							</span>
+							<span class="text-xs">
+								{dayjs(log.log_start_time).format(':ss')}
+							</span>
+						</span>
+					</div>
+				</td>
+				<td>
+					{pointList[log.point_id].pointTitle}
+				</td>
+				<td>
+					{log.record_count}
+				</td>
+			</tr>
+			{/each}
+		</tbody>
+
+	</table>
+</div>
+
 
 <style lang="postcss">
 	.menu:hover {
 		border: 1px solid blue;
 	}
 
+	body {
+		@apply p-1;
+	}
 	table {
-		@apply m-1;
 		border: 1px solid lightgray;
+		width: 100%;
 	}
 	thead {
 		@apply bg-gray-300;
@@ -107,15 +117,20 @@
 	tbody tr {
 		border-bottom: 1px solid lightgray;
 	}
-	/* tbody tr.current {
-		@apply bg-emerald-200;
-	} */
+	td {
+		@apply text-center;
+		@apply text-sm;
+	}
+
 	tbody tr:hover {
 		@apply bg-cyan-200;
 		cursor: pointer;
 	}
-	td {
-		@apply text-center;
-		@apply text-sm;
+	.scroll-container {
+		@apply ml-1 mr-1 mb-1;
+		width: calc(100% - 8px);  /* 幅を設定 */
+		height: 100%; /* 高さを設定 */
+		overflow: auto; /* スクロールを有効にする */
+		border: 1px solid #ccc; /* 枠線を追加 */
 	}
 </style>
