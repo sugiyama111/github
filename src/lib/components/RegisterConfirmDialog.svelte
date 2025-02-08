@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, Modal } from 'flowbite-svelte';
-	import { showsRegisterConfirmDialog } from '$lib/stores';
+	import { dialogVisibility } from '$lib/stores';
 	import type MemberEntity from '$lib/db/MemberEntity';
 	import { selectedRegisterMode } from '$lib/stores'
 
@@ -17,7 +17,7 @@
 	classHeader={`bg-${$selectedRegisterMode.getCode()}`}
 	classFooter={`bg-${$selectedRegisterMode.getCode()}`}
 	class={`bg-${$selectedRegisterMode.getCode()} text-gray-800 font-bold`}
-	bind:open={$showsRegisterConfirmDialog}>
+	bind:open={$dialogVisibility.registerConfirm}>
 
 	<section class="notice">
 		{ message }
@@ -37,8 +37,8 @@
 
 	</div>
 	<svelte:fragment slot="footer">
-		<Button on:click={()=>$showsRegisterConfirmDialog=false} color="alternative">キャンセル</Button>
-		<Button on:click={()=>{confirmRegistering(member); $showsRegisterConfirmDialog=false;}} class="text-primary bg-light-background dark:bg-dark-background">OK</Button>
+		<Button on:click={()=>$dialogVisibility.registerConfirm=false} color="alternative">キャンセル</Button>
+		<Button on:click={()=>{confirmRegistering(member); $dialogVisibility.registerConfirm=false;}} class="text-primary bg-light-background dark:bg-dark-background">OK</Button>
 	</svelte:fragment>
 
 </Modal>

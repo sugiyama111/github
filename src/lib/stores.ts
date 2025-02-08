@@ -8,6 +8,7 @@ import { Config } from '$lib/type/Config';
 import type RecordEntity from '$lib/db/RecordEntity';
 import { dayjs, type Dayjs } from '$lib/type/Dayjs';
 import { ScannerMessenger } from './ScannerMessenger';
+import { DialogVisibility } from './type/DialogVisibility';
 
 export const goBackUrl = writable<string|null>(null);
 
@@ -15,15 +16,17 @@ export const goBackUrl = writable<string|null>(null);
 export const selectedRegisterMode = writable<RegisterModeState>(new RegisterModeState(RegisterMode.CHECK));
 
 // ダイアログの表示
+export const dialogVisibility = persisted('dialogVisibility', <DialogVisibility>(new DialogVisibility()));
+
 //export const showsConfigDialog = writable(false);				// 設定ダイアログ
-export const showsConfigLoginDialog = writable(false);		// 設定ダイアログへのログイン
-export const showsEventLoadDialog = writable(false);			// イベント取得
-export const showsPointSelectDialog = writable(false);		// 地点選択
-export const showsMemberLoadDialog = writable(false);			// 名簿取り込み
-export const showsMemberSelectDialog = writable(false);		// メンバーを複数から選択
-export const showsRegisterConfirmDialog = writable(false);	// 登録確認ダイアログ
-export const showsTrialModeConfirmDialog = writable(false);	// お試しモード確認ダイアログ
-export const showsCameraSelectDialog = writable(false);		// カメラ選択ダイアログ
+//export const showsConfigLoginDialog = writable(false);		// 設定ダイアログへのログイン
+//export const showsEventLoadDialog = writable(false);			// イベント取得
+//export const showsPointSelectDialog = writable(false);		// 地点選択
+//export const showsMemberLoadDialog = writable(false);			// 名簿取り込み
+//export const showsMemberSelectDialog = writable(false);		// メンバーを複数から選択
+//export const showsRegisterConfirmDialog = writable(false);	// 登録確認ダイアログ
+//export const showsTrialModeConfirmDialog = writable(false);	// お試しモード確認ダイアログ
+//export const showsCameraSelectDialog = writable(false);		// カメラ選択ダイアログ
 export const scanner = writable<ScannerMessenger>();
 
 export const isSending = writable<boolean>(false);				// 送信中であるか

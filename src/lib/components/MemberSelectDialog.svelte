@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Modal, Radio } from 'flowbite-svelte';
-	import { showsMemberSelectDialog } from '$lib/stores';
+	import { dialogVisibility } from '$lib/stores';
 	import type MemberEntity from '$lib/db/MemberEntity';
 	import { selectedRegisterMode } from '$lib/stores'
 
@@ -15,7 +15,7 @@
 <Modal title={ $selectedRegisterMode.getText() } size="xs" 
 	classHeader={`bg-${$selectedRegisterMode.getCode()}`}
 	class={`bg-${$selectedRegisterMode.getCode()} text-gray-800 font-bold`}
-	bind:open={$showsMemberSelectDialog}>
+	bind:open={$dialogVisibility.memberSelect}>
 	
 	<section class="notice">
 		{ message }
@@ -26,7 +26,7 @@
 	<li>
 		<Radio class="pt-3 pb-3 pl-5 hover:bg-gray-300"
 			bind:group={ selectedMemberCode } value={ member.member_code }
-			on:click={()=>{selectMember(member); $showsMemberSelectDialog = false;}}>
+			onclick={()=>{selectMember(member); $dialogVisibility.memberSelect = false;}}>
 			<article class="flex flex-col">
 				<div class="text-sm">
 					No. { member.bib_number }：

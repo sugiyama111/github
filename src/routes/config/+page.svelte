@@ -2,7 +2,7 @@
 	import { goto } from "$app/navigation";
   import { Button, Checkbox, Modal, Range, Toggle } from 'flowbite-svelte';
 	import { inputPassword, selectedEvent, selectedPoint, lastRegistered, config, 
-		showsEventLoadDialog, showsPointSelectDialog, showsMemberLoadDialog, 
+		dialogVisibility, 
         selectedLogId, isSending, 
         selectedRegisterMode } from "../../lib/stores";
 	import { RegisterMode, RegisterModeState } from "$lib/type/RegisterMode";
@@ -103,7 +103,7 @@
 	const asyncLoadMember = async () => {
 		if (!$selectedEvent) return;
 
-		$showsMemberLoadDialog = true;
+		$dialogVisibility.memberLoad = true;
 
 		// @TODO PWA化時にenvの内容がundefinedになってしまう
 		const serverName:string = 'https://stg56.qr-timing.jp';//import.meta.env.VITE_API_BASE_URL;
@@ -147,7 +147,7 @@
 			Toast.Error(`取得できませんでした`);
 		}
 
-		$showsMemberLoadDialog = false;
+		$dialogVisibility.memberLoad = false;
 	}
 
 	const handleAllowsSendingClick = () => {
@@ -236,7 +236,7 @@
 </div>
 {:else}
 <div class="row">
-	<Button class="bg-primary" on:click={()=>{$showsEventLoadDialog = true;}}>イベントの取得</Button>
+	<Button class="bg-primary" on:click={()=>{$dialogVisibility.eventLoad = true;}}>イベントの取得</Button>
 </div>
 {/if}
 
@@ -268,7 +268,7 @@
 	<section class="body">
 		{ $selectedPoint?.pointTitle }
 	</section>
-	<Button class="bg-primary" on:click={()=>$showsPointSelectDialog = true}>地点</Button>
+	<Button class="bg-primary" on:click={()=>$dialogVisibility.pointSelect = true}>地点</Button>
 </div>
 
 <div class="row">

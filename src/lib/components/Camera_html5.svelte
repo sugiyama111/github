@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
 	import { Html5Qrcode } from 'html5-qrcode';
 	import Icon from '@iconify/svelte';
-	import { selectedRegisterMode, selectedCameraId, showsCameraSelectDialog, isCameraMirrored } from '$lib/stores';
+	import { selectedRegisterMode, selectedCameraId, dialogVisibility, isCameraMirrored } from '$lib/stores';
 	import { RegisterMode } from '$lib/type/RegisterMode';
 	import { Button, Img, Progressbar, Toggle } from 'flowbite-svelte';
 	import CameraSelectDialog from './CameraSelectDialog.svelte';
@@ -176,7 +176,7 @@
 		</div>
 		
 		<div>
-			<Button class="bg-primary rounded-full w-8 h-8 p-0" onclick={()=>{$showsCameraSelectDialog = true;}} >
+			<Button class="bg-primary rounded-full w-8 h-8 p-0" onclick={()=>{$dialogVisibility.cameraSelect = true;}} >
 				<Icon icon="material-symbols:cameraswitch-outline" class="w-7 h-7" />
 			</Button>
 		</div>

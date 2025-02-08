@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { showsConfigLoginDialog, showsPointSelectDialog, isTrial, showsTrialModeConfirmDialog } from '$lib/stores';
+	import { dialogVisibility, isTrial, selectedPoint } from '$lib/stores';
 	import Icon from '@iconify/svelte';
 	import { Drawer, CloseButton, Sidebar, SidebarWrapper, SidebarGroup, SidebarItem, SidebarBrand, Button, Modal } from 'flowbite-svelte';
     import { getContext } from 'svelte';
@@ -14,17 +14,24 @@
 		easing: sineIn
 	};
 
+	const asyncSwitchLog:Function = getContext('asyncSwitchLog');
 	const stopTrialAlertRoutine:Function = getContext('stopTrialAlertRoutine');
 	
-	const handleTrialModeSideMenuClick = () => {
+	const handleTrialModeSideMenuClick = async () => {
 		hidden = true;
 
 		console.log($isTrial);
 		if (!$isTrial) {
-			$showsTrialModeConfirmDialog = true;
+			// お試しモードダイアログを表示
+			$dialogVisibility.trialModeConfirm = true;
 		} else {
+			// お試しモードを停止する
 			stopTrialAlertRoutine();
-			$showsTrialModeConfirmDialog = false;
+
+			await asyncSwitchLog($selectedPoint, false);
+
+			$dialogVisibility.trialModeConfirm = false;
+			
 			$isTrial = false;
 		}
 	}
@@ -57,7 +64,7 @@
 				<hr style="margin-top:20px; margin-bottom:20px;" />
 				
 				<SidebarItem label="地点選択" {spanClass}
-					onclick={()=>{$showsPointSelectDialog = true; hidden=true;}}>
+					onclick={()=>{$dialogVisibility.pointSelect = true; hidden=true;}}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:location-on" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>
@@ -73,7 +80,7 @@
 				</SidebarItem>
 				
 				<SidebarItem label="管理者設定" {spanClass}
-					onclick={()=>{$showsConfigLoginDialog = true; hidden=true;}}>
+					onclick={()=>{$dialogVisibility.configLogin = true; hidden=true;}}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:settings" class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
 					</svelte:fragment>

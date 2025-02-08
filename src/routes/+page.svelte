@@ -8,8 +8,7 @@
 	import RecordEntity from "$lib/db/RecordEntity";
 	import { Toast } from "$lib/Toast";
 	import { scanner, config, selectedEvent, selectedPoint, selectedLogId, selectedRegisterMode, 
-		showsMemberSelectDialog, showsRegisterConfirmDialog,
-		lastRegistered, lastRegisteredTime, unsentCount, 
+		dialogVisibility, lastRegistered, lastRegisteredTime, unsentCount, 
         isSending} from "$lib/stores";
 	import MemberSelectDialog from '$lib/components/MemberSelectDialog.svelte';
 	import RegisterConfirmDialog from '$lib/components/RegisterConfirmDialog.svelte';
@@ -23,7 +22,6 @@
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
 	import { ScannerMessenger } from "$lib/ScannerMessenger";
 	import RegisterModeTab from "$lib/components/RegisterModeTab.svelte";
-    import { linear } from "svelte/easing";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
 	let memberCollectionForSelect:MemberEntity[] = $state<MemberEntity[]>([]);
@@ -85,7 +83,7 @@
 		} else {
 			// 複数存在する場合
 			memberCollectionForSelect = memberCollection;
-			$showsMemberSelectDialog = true;
+			$dialogVisibility.memberSelect = true;
 		}
 	}
 
@@ -97,7 +95,7 @@
 		} else {
 			// 確認必要の場合
 			memberForConfirm = specifiedMember;
-			$showsRegisterConfirmDialog = true;
+			$dialogVisibility.registerConfirm = true;
 		}
 	}
 
@@ -269,10 +267,6 @@
 // (async () => {
 // 	scanner = await ScannerMessenger.asyncGetInstance();
 // })();
-
-// $: {
-// 	if ($showsRegisterConfirmDialog)
-// }
 
 
 function sendIntentTurnOn() {

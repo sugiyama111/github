@@ -1,7 +1,7 @@
 <script lang="ts">
   import axios from 'axios';
 	import { Button, Img, Input, Modal } from 'flowbite-svelte';
-	import { selectedEvent, showsEventLoadDialog } from '$lib/stores';
+	import { selectedEvent, dialogVisibility } from '$lib/stores';
 	import { TimingEvent } from '$lib/api/TimingEvent';
 	import { TimingPoint } from '$lib/api/TimingPoint';
 
@@ -45,7 +45,7 @@
 			console.log(event);
 			console.log(resApiEvent.data);
 
-			$showsEventLoadDialog = false;
+			$dialogVisibility.eventLoad = false;
 		} catch (e) {
 			console.log('error');
 			console.error(e);
@@ -73,7 +73,7 @@
 	}
 </style>
 
-<Modal title="イベント情報の取得" size="xs" bind:open={$showsEventLoadDialog}>
+<Modal title="イベント情報の取得" size="xs" bind:open={$dialogVisibility.eventLoad}>
 
 {#if !loading}
 	<div class="row">
@@ -105,7 +105,7 @@
 {/if}
 
 	<svelte:fragment slot="footer">
-		<Button disabled={loading} on:click={()=>$showsEventLoadDialog=false} color="alternative">キャンセル</Button>
+		<Button disabled={loading} on:click={()=>$dialogVisibility.eventLoad=false} color="alternative">キャンセル</Button>
 		<Button disabled={loading} on:click={asyncLoadEvent} class="text-primary">OK</Button>
   </svelte:fragment>
 </Modal>

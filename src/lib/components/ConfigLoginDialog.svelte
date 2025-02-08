@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Toast } from '$lib/Toast';
-	import { inputPassword, showsConfigLoginDialog } from '$lib/stores';
+	import { inputPassword, dialogVisibility } from '$lib/stores';
 	import { Button, Input, Modal } from "flowbite-svelte";
 	import { goto } from '$app/navigation';
 
@@ -15,7 +15,7 @@
 			//$showsConfigDialog = true;
 			//$showsConfigLoginDialog = false;
 
-			//console.log(`ShowsConfigLoginDialog:${$showsConfigLoginDialog}`);
+			
 		} else {
 			password = '';
 			Toast.Error('パスワードが違います');
@@ -24,7 +24,7 @@
 
 </script>
 
-<Modal title="管理者用パスワード入力" size="xs" placement="center" bind:open={$showsConfigLoginDialog} autoclose outsideclose>
+<Modal title="管理者用パスワード入力" size="xs" placement="center" bind:open={$dialogVisibility.configLogin} autoclose outsideclose>
 
 	<Input type="password" id="password" bind:value={password} />
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button, Modal, Radio } from 'flowbite-svelte';
 	import { isTrial, lastRegistered, selectedEvent, selectedLogId, selectedPoint, unsentCount } from '$lib/stores';
-	import { showsPointSelectDialog } from '$lib/stores';
+	import { dialogVisibility } from '$lib/stores';
 	import type { TimingPoint } from '$lib/api/TimingPoint';
 	import { db } from '$lib/db/db';
 	import { Toast } from '$lib/Toast';
@@ -11,7 +11,7 @@
 	let selectedId = $selectedPoint?.pointId;
 
 	if (!$selectedEvent) {
-		$showsPointSelectDialog = false;
+		$dialogVisibility.pointSelect = false;
 	}
 
 	const asyncSwitchLog:Function = getContext('asyncSwitchLog');
@@ -36,14 +36,14 @@
 
 </style>
 
-<Modal title="地点の選択" size="xs" bind:open={$showsPointSelectDialog}>
+<Modal title="地点の選択" size="xs" bind:open={$dialogVisibility.pointSelect}>
 
 	<ul class="w-100 divide-y divide-gray-200 dark:divide-gray-600">
 	{#each $selectedEvent!.points as point}
 		<li>
 			<Radio class="pt-3 pb-3 pl-5 hover:bg-gray-300"
 				bind:group={ selectedId } value={ point.pointId }
-				on:click={()=>{asyncSelectPoint(point); $showsPointSelectDialog = false;}}>
+				on:click={()=>{asyncSelectPoint(point); $dialogVisibility.pointSelect = false;}}>
 				{ point.pointTitle }
 			</Radio>
 		</li>
@@ -52,7 +52,7 @@
 
 
 	<svelte:fragment slot="footer">
-		<Button on:click={()=>$showsPointSelectDialog=false} color="alternative">キャンセル</Button>
+		<Button on:click={()=>$dialogVisibility.pointSelect=false} color="alternative">キャンセル</Button>
   </svelte:fragment>
 	
 </Modal>

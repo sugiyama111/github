@@ -1,29 +1,32 @@
 <script lang="ts">
   import { Button, Modal } from 'flowbite-svelte';
-	import { showsTrialModeConfirmDialog, isTrial, selectedPoint } from '$lib/stores';
+	import { dialogVisibility, isTrial, selectedPoint } from '$lib/stores';
 	import { getContext } from 'svelte';
 	import { TrialModeToast } from '$lib/TrialModeToast';
 
 	
 	const asyncSwitchLog:Function = getContext('asyncSwitchLog');
 	const startTrialAlertRoutine:Function = getContext('startTrialAlertRoutine');
-	const stopTrialAlertRoutine:Function = getContext('stopTrialAlertRoutine');
+//	const stopTrialAlertRoutine:Function = getContext('stopTrialAlertRoutine');
 
-	const switchTrialMode = async () => {
+	const turnOnTrialMode = async () => {
 		// $isTrialが切り替え前なのか後なのか分かりづらいので、一度変数に入れる
-		const switchesToTrial = !$isTrial;
+		//const switchesToTrial = !$isTrial;
 
-		switchesToTrial ? startTrialAlertRoutine() : stopTrialAlertRoutine();
+		//switchesToTrial ? startTrialAlertRoutine() : stopTrialAlertRoutine();
+		startTrialAlertRoutine();
 
-		await asyncSwitchLog($selectedPoint, switchesToTrial);
+		//await asyncSwitchLog($selectedPoint, switchesToTrial);
+		await asyncSwitchLog($selectedPoint, true);
 
 		// お試しモードのトーストを一度表示
-		if (switchesToTrial) {
+		//if (switchesToTrial) {
 			setTimeout(()=>{TrialModeToast.TrialMode('お試しモード中. 実際には送信されません.');}, 1000);
-		}
+		//}
 
 		// storeの切り替え
-		$isTrial = !$isTrial;
+		//$isTrial = !$isTrial;
+		$isTrial = true;
 	}
 </script>
 
@@ -31,7 +34,7 @@
 	classHeader="bg-trial"
 	classFooter="bg-trial"
 	class="bg-trial text-gray-800 font-bold"
-	bind:open={$showsTrialModeConfirmDialog}>
+	bind:open={$dialogVisibility.trialModeConfirm}>
 
 	<div class="w-100 divide-y divide-gray-200 dark:divide-gray-600 pl-4">
 
@@ -42,8 +45,8 @@
 
 	</div>
 	<svelte:fragment slot="footer">
-		<Button on:click={()=>$showsTrialModeConfirmDialog=false} color="alternative">キャンセル</Button>
-		<Button on:click={()=>{switchTrialMode(); $showsTrialModeConfirmDialog=false;}} class="text-primary bg-light-background dark:bg-dark-background">OK</Button>
+		<Button on:click={()=>$dialogVisibility.trialModeConfirm=false} color="alternative">キャンセル</Button>
+		<Button on:click={()=>{turnOnTrialMode(); $dialogVisibility.trialModeConfirm=false;}} class="text-primary bg-light-background dark:bg-dark-background">OK</Button>
 	</svelte:fragment>
 
 </Modal>

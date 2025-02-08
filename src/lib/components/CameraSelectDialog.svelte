@@ -1,8 +1,7 @@
 <script lang="ts">
   import { Button, Modal, Radio } from 'flowbite-svelte';
-	import { isCameraMirrored, selectedCameraId, selectedEvent } from '$lib/stores';
-	import { showsCameraSelectDialog } from '$lib/stores';
-	
+	import { dialogVisibility, isCameraMirrored, selectedCameraId, selectedEvent } from '$lib/stores';
+		
 	import { onMount } from 'svelte';
 	import { asyncCameraDevices, Camera } from '$lib/type/CameraManager';
 
@@ -13,7 +12,7 @@
 
 	if (!$selectedEvent) {
 		console.log('selectedEvent is NULL!');
-		$showsCameraSelectDialog = false;
+		$dialogVisibility.cameraSelect = false;
 	}
 
 	//let cameraList:Array<CameraDevice> = $state([]);
@@ -28,7 +27,7 @@
 	
 	const handleCameraSelectClick = async (camera:Camera) => {
 		$selectedCameraId = camera.id;
-		$showsCameraSelectDialog = false;
+		$dialogVisibility.cameraSelect = false;
 
 		// 左右反転の自動設定
 		$isCameraMirrored = await camera.asyncIsFacing();
@@ -41,7 +40,7 @@
 
 </style>
 
-<Modal title="カメラの切り替え" size="xs" bind:open={$showsCameraSelectDialog}>
+<Modal title="カメラの切り替え" size="xs" bind:open={$dialogVisibility.cameraSelect}>
 
 {#if cameraList.length == 0}
 	<div>カメラが見つかりません</div>
@@ -61,7 +60,7 @@
 
 
 	<svelte:fragment slot="footer">
-		<Button on:click={()=>$showsCameraSelectDialog=false} color="alternative">キャンセル</Button>
+		<Button onclick={()=>$dialogVisibility.cameraSelect=false} color="alternative">キャンセル</Button>
   </svelte:fragment>
 	
 </Modal>
