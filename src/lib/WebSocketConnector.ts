@@ -1,7 +1,7 @@
 
 /**
  * WebSocketのラップクラス
- * 主な目的は、コールバック処理をPromiseにすること。
+ * コールバック処理をPromiseにするためのクラス
  */
 export class WebSocketConnector {
 	private url:string;

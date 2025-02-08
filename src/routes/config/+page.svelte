@@ -111,7 +111,6 @@
 		try {
 			const apiData = await axios.get(`${serverName}/api/v1/members/${$selectedEvent.eventCode}`);
 			const apiMemberList = await apiData.data.members;
-			console.log(apiMemberList);
 
 			const memberList:Member[] = apiMemberList.map((member:any)=>
 				new Member({
@@ -133,9 +132,6 @@
 				})
 			);
       
-			
-console.log('MEMBERLIST')
-console.log(memberList)
 			
 			// DBのmembersを一度空にする
       await db.members.clear();

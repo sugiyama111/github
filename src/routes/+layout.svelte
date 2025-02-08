@@ -12,10 +12,8 @@ import '../app.css';
 	import { db } from "$lib/db/db";
 
 	import { TimingPoint } from '$lib/api/TimingPoint';
-	import { Toaster } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import PointSelectDialog from '$lib/components/PointSelectDialog.svelte';
-  //import { toast } from '$lib/QRTToast';
 	import { Toast } from '$lib/Toast';
   import { onDestroy, onMount, setContext } from 'svelte';
 	import { RegisterMode } from '$lib/type/RegisterMode';
@@ -23,8 +21,9 @@ import '../app.css';
 	import { TimeoutTicker } from '$lib/type/TimeoutTicker';
 	import { linear } from 'svelte/easing';
     import { Vibrate } from '$lib/Vibrate';
-    import { ToastExtended } from '$lib/ToastExtended';
+    import { TrialModeToast } from '$lib/TrialModeToast';
     import { derived } from 'svelte/store';
+    import TrialModeConfirmDialog from '$lib/components/TrialModeConfirmDialog.svelte';
 
 	let { children } = $props();
 
@@ -127,16 +126,14 @@ $effect(()=>{
 		else $scanner?.asyncTurnOff();
 	}
 
-	const trialAlertTick = new TimeoutTicker(10, {
+	const trialAlertTick = new TimeoutTicker(30, {
 		onTimeout: () => {
 			Vibrate.Play(Vibrate.NOT_FOUND);
-			ToastExtended.TrialMode('お試しモード中. データはサーバーに届きません.');
+			TrialModeToast.TrialMode('お試しモード中. データはサーバーに届きません.');
 
 			// まだお試しモードだったら再度tickを開始する
 			if ($isTrial) {
 				startTrialAlertRoutine();
-			} else {
-				stopTrialAlertRoutine();
 			}
 		},
 		onTick: () => {
@@ -145,18 +142,13 @@ $effect(()=>{
 	})
 
 	const startTrialAlertRoutine = () => {
-		console.log('startTrialAlertRoutine');
-
 		trialAlertTick?.stop();
 		trialAlertTick?.resetLeftTick();
 		trialAlertTick?.start();
-		console.log('alert tick start');
 	}
 	const stopTrialAlertRoutine = () => {
-		console.log('stoptTrialAlertRoutine');
-		
 		trialAlertTick?.stop();
-		ToastExtended.Close();		// お試しモードトーストを閉じる
+		TrialModeToast.Close();		// お試しモードトーストを閉じる
 	}
 
   // ページ遷移を検知して処理を実行
@@ -504,11 +496,11 @@ $effect(()=>{
 
 
 <!-- 通常は非表示の全体で共通のコンポーネント -->
-<Toaster richColors closeButton />
 <SvelteToast {options} />
 <DrawerMenu bind:hidden={drawerHidden}></DrawerMenu>
 <PointSelectDialog />
 <ConfigLoginDialog />
+<TrialModeConfirmDialog />
 
 <div id="trial-frame" class:hidden={!$isTrial}>
 	<div class="top-0 fixed w-full h-2 bg-trial"></div>
@@ -557,11 +549,12 @@ $effect(()=>{
 	
 	<!-- 送信ボタン -->
 {#if $config.allowsSending}
-	<Button class={`${$page.url.pathname=='/' ? 'opacity-100' : 'opacity-20'}
-		fixed rounded-full
+	<Button
+	class={`${$page.url.pathname!='/' ? 'opacity-20' : ''}
+		fixed left-[-28px] bottom-[-28px] 
+		rounded-full w-28 h-28
 		flex justify-center items-center flex-col
-		text-primary-text bg-primary
-		w-28 h-28 left-[-28px] bottom-[-28px]`}
+		text-primary-text bg-primary`}
 		disabled={$isSending || $page.url.pathname!='/'}
 		onclick={asyncSendManually}>
 

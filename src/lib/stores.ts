@@ -22,6 +22,7 @@ export const showsPointSelectDialog = writable(false);		// 地点選択
 export const showsMemberLoadDialog = writable(false);			// 名簿取り込み
 export const showsMemberSelectDialog = writable(false);		// メンバーを複数から選択
 export const showsRegisterConfirmDialog = writable(false);	// 登録確認ダイアログ
+export const showsTrialModeConfirmDialog = writable(false);	// お試しモード確認ダイアログ
 export const showsCameraSelectDialog = writable(false);		// カメラ選択ダイアログ
 export const scanner = writable<ScannerMessenger>();
 

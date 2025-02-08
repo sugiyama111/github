@@ -5,15 +5,15 @@ type ActiveToastKey = {
 	trial_mode:number|null;
 };
 
-export class ToastExtended {
+export class TrialModeToast {
 	
 	static ActiveToasts:ActiveToastKey = {trial_mode:null};
 
 	static TrialMode = (message:string) => {
 		
     // すでに表示中のトーストを消す
-    if (ToastExtended.ActiveToasts.trial_mode) {
-      toast.pop(ToastExtended.ActiveToasts.trial_mode);
+    if (TrialModeToast.ActiveToasts.trial_mode) {
+      toast.pop(TrialModeToast.ActiveToasts.trial_mode);
     }
 
 		const id = toast.push({
@@ -38,10 +38,10 @@ export class ToastExtended {
 			}
 		});
 
-		ToastExtended.ActiveToasts.trial_mode = id;
+		TrialModeToast.ActiveToasts.trial_mode = id;
 	}
 
 	static Close = () => {
-		toast.pop(ToastExtended.ActiveToasts.trial_mode);
+		toast.pop(TrialModeToast.ActiveToasts.trial_mode);
 	}
 }

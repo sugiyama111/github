@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { goto, pushState } from '$app/navigation';
-	import { selectedPoint, showsConfigLoginDialog, showsPointSelectDialog, isTrial } from '$lib/stores';
+	import { showsConfigLoginDialog, showsPointSelectDialog, isTrial, showsTrialModeConfirmDialog } from '$lib/stores';
 	import Icon from '@iconify/svelte';
 	import { Drawer, CloseButton, Sidebar, SidebarWrapper, SidebarGroup, SidebarItem, SidebarBrand, Button, Modal } from 'flowbite-svelte';
     import { getContext } from 'svelte';
@@ -15,21 +14,20 @@
 		easing: sineIn
 	};
 
-	const asyncSwitchLog:Function = getContext('asyncSwitchLog');
-	const startTrialAlertRoutine:Function = getContext('startTrialAlertRoutine');
 	const stopTrialAlertRoutine:Function = getContext('stopTrialAlertRoutine');
-
-	const switchTrialMode = ()=> {
-		const switchesToTrial = !$isTrial;
-
-		switchesToTrial ? startTrialAlertRoutine() : stopTrialAlertRoutine();
-
-		asyncSwitchLog($selectedPoint, switchesToTrial);
-
-		// storeの切り替え
-		$isTrial = !$isTrial;
-	}
 	
+	const handleTrialModeSideMenuClick = () => {
+		hidden = true;
+
+		console.log($isTrial);
+		if (!$isTrial) {
+			$showsTrialModeConfirmDialog = true;
+		} else {
+			stopTrialAlertRoutine();
+			$showsTrialModeConfirmDialog = false;
+			$isTrial = false;
+		}
+	}
 </script>
 
 <style lang="postcss">
@@ -66,7 +64,7 @@
 				</SidebarItem>
 				
 				<SidebarItem label={`お試しモード ${$isTrial ? '終了' : '開始'}`} {spanClass}
-					onclick={()=>{ switchTrialMode(); hidden=true;}}
+					onclick={handleTrialModeSideMenuClick}
 					class={$isTrial ? `font-bold` : ''}>
 					<svelte:fragment slot="icon">
 						<Icon icon="material-symbols:multimodal-hand-eye"
