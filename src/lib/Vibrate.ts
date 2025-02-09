@@ -7,6 +7,7 @@ const vibTypes = {
   READ_OK: [150],
   NOT_FOUND: [250, 80, 250],
 	KEYPAD: [100],
+	TRIAL_MODE: [250, 80, 250],
   // 他の振動パターンを追加する場合はここに追加
 } as const;
 

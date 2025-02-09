@@ -23,11 +23,12 @@
 			return;
 		}
 		
-		// 地点を選択
-		$selectedPoint = point;
-
 		// ログ切り替え
 		await asyncSwitchLog(point, $isTrial);
+		
+		// 地点を選択
+		// ログ切り替え後に値を変更する（ログ参照画面では変更を監視して即ログ取得するため）
+		$selectedPoint = point;
 	}
 
 </script>

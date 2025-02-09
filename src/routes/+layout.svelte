@@ -128,7 +128,7 @@ $effect(()=>{
 
 	const trialAlertTick = new TimeoutTicker(30, {
 		onTimeout: () => {
-			Vibrate.Play(Vibrate.NOT_FOUND);
+			Vibrate.Play(Vibrate.TRIAL_MODE);
 			TrialModeToast.TrialMode('お試しモード中. データはサーバーに届きません.');
 
 			// まだお試しモードだったら再度tickを開始する

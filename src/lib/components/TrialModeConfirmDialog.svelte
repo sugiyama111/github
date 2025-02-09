@@ -1,8 +1,11 @@
 <script lang="ts">
   import { Button, Modal } from 'flowbite-svelte';
+	import { page } from '$app/stores';
 	import { dialogVisibility, isTrial, selectedPoint } from '$lib/stores';
 	import { getContext } from 'svelte';
 	import { TrialModeToast } from '$lib/TrialModeToast';
+    import { Vibrate } from '$lib/Vibrate';
+    import { goto } from '$app/navigation';
 
 	
 	const asyncSwitchLog:Function = getContext('asyncSwitchLog');
@@ -21,12 +24,18 @@
 
 		// お試しモードのトーストを一度表示
 		//if (switchesToTrial) {
-			setTimeout(()=>{TrialModeToast.TrialMode('お試しモード中. 実際には送信されません.');}, 1000);
+			setTimeout(()=>{
+				Vibrate.Play(Vibrate.TRIAL_MODE);
+				TrialModeToast.TrialMode('お試しモード中. 実際には送信されません.');
+			}, 1000);
 		//}
 
 		// storeの切り替え
 		//$isTrial = !$isTrial;
 		$isTrial = true;
+
+		if ($page.url.pathname == '/ref') goto($page.url.pathname, { invalidateAll: true });
+
 	}
 </script>
 

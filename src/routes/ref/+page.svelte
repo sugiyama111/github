@@ -2,12 +2,12 @@
 	import { db } from "$lib/db/db";
 	import type LogEntity from "$lib/db/LogEntity";
 	import { onMount } from "svelte";
-	import { selectedEvent, selectedLogId } from '$lib/stores';
+	import { selectedEvent, selectedLogId, isTrial, selectedPoint } from '$lib/stores';
 	import { goto } from "$app/navigation";
 	import type { TimingPoint } from "$lib/api/TimingPoint";
 	import { dayjs } from '$lib/type/Dayjs';
 	import Icon from "@iconify/svelte";
-    import { Checkbox } from "flowbite-svelte";
+	import { Checkbox } from "flowbite-svelte";
 
 	if (!$selectedEvent) goto('/');
 
@@ -18,16 +18,28 @@
 
 	let showsTrialLog:boolean = $state(false);
 	let logList:Array<LogEntity> = $state([]);
-	
-	onMount(async () => {
+
+	$effect(()=>{
+		// effectでの監視対象とするため、変数を何もせず配置する
+		$isTrial;
+		$selectedPoint;
+		
+		asyncReloadLogList();
+	});
+
+	const asyncReloadLogList = async () => {
 		logList = await db.asyncFetchLogList();
+	}
+
+	onMount(async () => {
+		await asyncReloadLogList();
 	});
 
 </script>
 
 
 <section class="p-2">
-	<Checkbox bind:checked={showsTrialLog}>お試しモードのログを表示</Checkbox>
+	<Checkbox bind:checked={showsTrialLog} class="inline-block cursor-pointer">お試しモードのログを表示</Checkbox>
 </section>
 
 
@@ -49,7 +61,9 @@
 			{#each logList as log}
 			<tr onclick={()=>goto(`/refd/${log.log_id}`)}
 				class:current={$selectedLogId == log.log_id}
-				class:bg-trial={log.is_trial}>
+				class:bg-trial={log.is_trial}
+				class:collapse={log.is_trial && !showsTrialLog}
+				>
 				<td>
 				{#if $selectedLogId == log.log_id}
 					<Icon icon="material-symbols:play-circle-outline-rounded"
