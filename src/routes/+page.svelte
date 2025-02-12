@@ -317,10 +317,11 @@ function sendIntentTurnOff() {
 {#if !$selectedEvent}
 
 <!-- テスト ここから -->
-<button onclick={()=>Vibrate.Play(Vibrate.READ_OK)} class="btn w-20 h-20"
-	style="border:1px solid black;">振動<br>READ_OK</button>
-<button onclick={()=>Vibrate.Play(Vibrate.NOT_FOUND)} class="btn w-20 h-20"
-	style="border:1px solid black;">振動<br>NOT_FOUND</button>
+<button onclick={()=>{
+	// @ts-ignore
+	if (window.AndroidInterface) window.AndroidInterface.callToast();
+	}} class="btn w-20 h-20"
+	style="border:1px solid black;">call<br>JavaScript</button>
 
 	<button onclick={()=>{console.log('on');$scanner?.asyncTurnOn();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナON</button>
