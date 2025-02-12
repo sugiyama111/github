@@ -319,9 +319,9 @@ function sendIntentTurnOff() {
 <!-- テスト ここから -->
 <button onclick={()=>{
 	// @ts-ignore
-	alert(window.AndroidInterface);
+	alert('window.AndroidInterface: ' + window.AndroidInterface);
 	// @ts-ignore
-	alert(AndroidInterface);
+	alert('AndroidInterface: ' + AndroidInterface);
 	// @ts-ignore
 	if (window.AndroidInterface) window.AndroidInterface.callToast();
 	}} class="btn w-20 h-20"
