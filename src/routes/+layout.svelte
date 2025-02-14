@@ -489,7 +489,8 @@ $effect(()=>{
 	
 	let messagePort:MessagePort;
 	self.addEventListener("message", (event) => {
-    console.log("Message received in PWA:", event.data);
+		Toast.Info("Message received in PWA:"+ event.data);
+    //console.log("Message received in PWA:", event.data);
 
 		// メッセージのオリジンを確認
 		if (event.origin !== "https://github-hazel-two.vercel.app/") {
