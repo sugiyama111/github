@@ -265,6 +265,8 @@ $effect(()=>{
 	}
 	
 	const asyncSendManually = async() => {
+		messagePort?.postMessage("New");
+
 		// 定期送信を止める
 		sendingTicker?.stop();
 
@@ -484,6 +486,7 @@ $effect(()=>{
 		console.log('now: '+path+' and goBackUrl set to:'+$goBackUrl);
 	});
 	
+	let messagePort:MessagePort;
 	self.addEventListener("message", (event) => {
     console.log("Message received in PWA:", event.data);
 
@@ -493,12 +496,17 @@ $effect(()=>{
 			return;
 		}
 
-		console.log("Message received in PWA:", event.data);
+		messagePort = event.ports[0];
+		console.log('port is : '+ messagePort);
+		if (typeof messagePort === 'undefined') return;
 
-		// 応答を送信 (第二引数をオブジェクトで指定)
-		event.source?.postMessage("Hello from PWA", {
-			targetOrigin: event.origin, // 信頼できるオリジンを指定
-		});
+		// Post message on this port.
+		messagePort.postMessage("Test")
+
+		// Receive upcoming messages on this port.
+		messagePort.onmessage = function(event) {
+			console.log("[PostMessage1] Got message" + event.data);
+		};
 	});
 
 	// TWAからのメッセージを受信
