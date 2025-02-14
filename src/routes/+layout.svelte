@@ -265,6 +265,7 @@ $effect(()=>{
 	}
 	
 	const asyncSendManually = async() => {
+		Toast.Info("postMessage");
 		messagePort?.postMessage("New");
 
 		// 定期送信を止める
