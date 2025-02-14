@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.example.test_twa",
+      "package_name": "jp.neo_system.qr_timing3_twa",
       "sha256_cert_fingerprints": [
-        "7E:C9:AB:27:27:6B:B8:22:68:19:07:C8:8D:EE:8B:BA:81:D6:66:BF:13:5E:8F:4C:92:4B:B9:F9:5E:40:2E:CE"
+        "6B:F7:0C:2D:F8:B2:72:B8:F0:6F:CF:AF:45:3C:FA:A8:D8:9E:56:24:7E:C2:77:2C:83:78:6A:80:61:AE:11:C9"
       ]
     }
   }
