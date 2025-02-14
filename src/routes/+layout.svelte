@@ -484,6 +484,32 @@ $effect(()=>{
 		console.log('now: '+path+' and goBackUrl set to:'+$goBackUrl);
 	});
 	
+	self.addEventListener("message", (event) => {
+    console.log("Message received in PWA:", event.data);
+
+		// メッセージのオリジンを確認
+		if (event.origin !== "https://github-hazel-two.vercel.app/") {
+			console.warn("Untrusted origin:", event.origin);
+			return;
+		}
+
+		console.log("Message received in PWA:", event.data);
+
+		// 応答を送信 (第二引数をオブジェクトで指定)
+		event.source?.postMessage("Hello from PWA", {
+			targetOrigin: event.origin, // 信頼できるオリジンを指定
+		});
+	});
+
+	// TWAからのメッセージを受信
+	navigator.serviceWorker.ready.then((registration) => {
+		console.log('registration active postMessage');
+		registration?.active?.postMessage("Hello from TWA!");
+
+		navigator.serviceWorker.addEventListener("message", (event) => {
+			console.log("Received in PWA:", event.data);
+		});
+	});
 </script>
 
 <svelte:window on:beforeunload={()=>handleBeforeUnload} />
