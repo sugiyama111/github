@@ -318,12 +318,7 @@ function sendIntentTurnOff() {
 
 <!-- テスト ここから -->
 <button onclick={()=>{
-	// @ts-ignore
-	alert('window.AndroidInterface: ' + window.AndroidInterface);
-	// @ts-ignore
-	alert('AndroidInterface: ' + AndroidInterface ?? '');
-	// @ts-ignore
-	if (window.AndroidInterface) window.AndroidInterface.callToast();
+	window.close();
 	}} class="btn w-20 h-20"
 	style="border:1px solid black;">call<br>JavaScript</button>
 
