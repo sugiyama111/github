@@ -494,7 +494,7 @@ $effect(()=>{
     //console.log("Message received in PWA:", event.data);
 
 		// メッセージのオリジンを確認
-		if (event.origin !== "https://github-hazel-two.vercel.app/") {
+		if (event.origin !== "https://github-hazel-two.vercel.app") {
 			console.warn("Untrusted origin:", event.origin);
 			return;
 		}
