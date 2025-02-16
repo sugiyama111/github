@@ -327,10 +327,13 @@ function sendIntentTurnOff() {
 <button onclick={()=>{
 	//window.close();
 	//asyncSetupScannerConnector();
-		if (window && window.postMessage) {
-			window.postMessage("Hello from PWA", "*");
-			console.log("PWAからTWAへメッセージを送信");
-		}
+		// if (window && window.postMessage) {
+		// 	window.postMessage("Hello from PWA", "*");
+		// 	console.log("PWAからTWAへメッセージを送信");
+		// }
+		Toast.Info('pushed');
+		// @ts-ignore
+		android.hogeMethod('ほげほげ');
 	}} class="btn w-20 h-20"
 	style="border:1px solid black;">call<br>1531</button>
 
