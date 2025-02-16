@@ -326,9 +326,13 @@ function sendIntentTurnOff() {
 <!-- テスト ここから -->
 <button onclick={()=>{
 	//window.close();
-	asyncSetupScannerConnector();
+	//asyncSetupScannerConnector();
+		if (window && window.postMessage) {
+			window.postMessage("Hello from PWA", "*");
+			console.log("PWAからTWAへメッセージを送信");
+		}
 	}} class="btn w-20 h-20"
-	style="border:1px solid black;">call<br>1443</button>
+	style="border:1px solid black;">call<br>1511</button>
 
 	<button onclick={()=>{console.log('on');$scanner?.asyncTurnOn();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナON</button>
