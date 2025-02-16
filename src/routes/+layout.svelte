@@ -490,28 +490,34 @@ $effect(()=>{
 	
 	let messagePort:MessagePort;
 
-	// self.addEventListener("message", (event) => {
-	// 	Toast.Info("Message received in PWA:"+ event.data);
-  //   //console.log("Message received in PWA:", event.data);
+	self.addEventListener("message", (event) => {
 
-	// 	// メッセージのオリジンを確認
-	// 	if (event.origin !== "https://github-hazel-two.vercel.app") {
-	// 		console.warn("Untrusted origin:", event.origin);
-	// 		return;
-	// 	}
+		Toast.Info("Message received in PWA:"+ event.data);
+    //console.log("Message received in PWA:", event.data);
 
-	// 	messagePort = event.ports[0];
-	// 	console.log('port is : '+ messagePort);
-	// 	if (typeof messagePort === 'undefined') return;
+		// メッセージのオリジンを確認
+		if (event.origin !== "https://github-hazel-two.vercel.app") {
+			console.warn("Untrusted origin:", event.origin);
+			return;
+		}
+		if (event.source === window) {
+			Toast.Info('do nothing because message is from PWA')
+			return;
+		}
 
-	// 	// Post message on this port.
-	// 	messagePort.postMessage("Test")
+		messagePort = event.ports[0];
+		console.log('port is : '+ messagePort);
+		if (typeof messagePort === 'undefined') return;
 
-	// 	// Receive upcoming messages on this port.
-	// 	messagePort.onmessage = function(event) {
-	// 		console.log("[PostMessage1] Got message" + event.data);
-	// 	};
-	// });
+		// Post message on this port.
+		//messagePort.postMessage("Test")
+
+		// Receive upcoming messages on this port.
+		messagePort.onmessage = function(event) {
+			Toast.Info("[PostMessage1] Got message" + event.data);
+			console.log("[PostMessage1] Got message" + event.data);
+		};
+	});
 
 
 	
