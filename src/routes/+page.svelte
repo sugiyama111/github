@@ -169,12 +169,13 @@
 	}
 
 	const asyncSetupScannerConnector = async () => {
+		Toast.Success('start setup scanner connector');
 		$scanner = await ScannerMessenger.asyncGetInstance((input:string)=>{
 			console.log('INPUT: ' + input);
 			asyncRegisterByMemberCode(input, RegisterMethod.SCANNER);
 		});
 
-		Toast.Success('setup scanner connector');
+		Toast.Success('end setup scanner connector');
 	}
 
 // @TODO Zebra端末の時のみ起動する
@@ -327,7 +328,7 @@ function sendIntentTurnOff() {
 	//window.close();
 	asyncSetupScannerConnector();
 	}} class="btn w-20 h-20"
-	style="border:1px solid black;">call<br>JavaScript</button>
+	style="border:1px solid black;">call<br>1443</button>
 
 	<button onclick={()=>{console.log('on');$scanner?.asyncTurnOn();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナON</button>
