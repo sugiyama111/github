@@ -265,9 +265,9 @@ $effect(()=>{
 	}
 	
 	const asyncSendManually = async() => {
-		Toast.Info("postMessage:"+messagePort);
-		messagePort?.postMessage("New");
-		window.parent.postMessage("New3");
+		//Toast.Info("postMessage:"+messagePort);
+		//messagePort?.postMessage("New");
+		window.postMessage("New4");
 
 		// 定期送信を止める
 		sendingTicker?.stop();
@@ -489,38 +489,41 @@ $effect(()=>{
 	});
 	
 	let messagePort:MessagePort;
-	self.addEventListener("message", (event) => {
-		Toast.Info("Message received in PWA:"+ event.data);
-    //console.log("Message received in PWA:", event.data);
 
-		// メッセージのオリジンを確認
-		if (event.origin !== "https://github-hazel-two.vercel.app") {
-			console.warn("Untrusted origin:", event.origin);
-			return;
-		}
+	// self.addEventListener("message", (event) => {
+	// 	Toast.Info("Message received in PWA:"+ event.data);
+  //   //console.log("Message received in PWA:", event.data);
 
-		messagePort = event.ports[0];
-		console.log('port is : '+ messagePort);
-		if (typeof messagePort === 'undefined') return;
+	// 	// メッセージのオリジンを確認
+	// 	if (event.origin !== "https://github-hazel-two.vercel.app") {
+	// 		console.warn("Untrusted origin:", event.origin);
+	// 		return;
+	// 	}
 
-		// Post message on this port.
-		messagePort.postMessage("Test")
+	// 	messagePort = event.ports[0];
+	// 	console.log('port is : '+ messagePort);
+	// 	if (typeof messagePort === 'undefined') return;
 
-		// Receive upcoming messages on this port.
-		messagePort.onmessage = function(event) {
-			console.log("[PostMessage1] Got message" + event.data);
-		};
-	});
+	// 	// Post message on this port.
+	// 	messagePort.postMessage("Test")
 
-	// TWAからのメッセージを受信
-	navigator.serviceWorker.ready.then((registration) => {
-		console.log('registration active postMessage');
-		registration?.active?.postMessage("Hello from TWA!");
+	// 	// Receive upcoming messages on this port.
+	// 	messagePort.onmessage = function(event) {
+	// 		console.log("[PostMessage1] Got message" + event.data);
+	// 	};
+	// });
 
-		navigator.serviceWorker.addEventListener("message", (event) => {
-			console.log("Received in PWA:", event.data);
-		});
-	});
+
+	
+	// // TWAからのメッセージを受信
+	// navigator.serviceWorker.ready.then((registration) => {
+	// 	console.log('registration active postMessage');
+	// 	registration?.active?.postMessage("Hello from TWA!");
+
+	// 	navigator.serviceWorker.addEventListener("message", (event) => {
+	// 		console.log("Received in PWA:", event.data);
+	// 	});
+	// });
 </script>
 
 <svelte:window on:beforeunload={()=>handleBeforeUnload} />
