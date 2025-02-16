@@ -173,6 +173,8 @@
 			console.log('INPUT: ' + input);
 			asyncRegisterByMemberCode(input, RegisterMethod.SCANNER);
 		});
+
+		Toast.Success('setup scanner connector');
 	}
 
 // @TODO Zebra端末の時のみ起動する
