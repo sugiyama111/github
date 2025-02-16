@@ -332,7 +332,7 @@ function sendIntentTurnOff() {
 			console.log("PWAからTWAへメッセージを送信");
 		}
 	}} class="btn w-20 h-20"
-	style="border:1px solid black;">call<br>1511</button>
+	style="border:1px solid black;">call<br>1531</button>
 
 	<button onclick={()=>{console.log('on');$scanner?.asyncTurnOn();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナON</button>
