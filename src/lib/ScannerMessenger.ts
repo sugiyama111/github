@@ -1,5 +1,8 @@
 import { WebSocketConnector } from "./WebSocketConnector";
 
+
+import { Toast } from "$lib/Toast";
+
 /**
  * スキャナの操作を行う。
  */
@@ -23,7 +26,7 @@ export class ScannerMessenger {
 	}
 
 	public async asyncTurnOn() {
-		//console.log('ScannerMessenger.asyncTurnOn start');
+		console.log('ScannerMessenger.asyncTurnOn start');
 
 		const json = {
 			"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
@@ -31,9 +34,13 @@ export class ScannerMessenger {
 			"extra_value": "ENABLE_PLUGIN"
 		}
 
-		await ScannerMessenger.connector.asyncSend(json);
+		try {
+			await ScannerMessenger.connector.asyncSend(json);
+		} catch (e:any) {
+			Toast.Error(e);
+		}
 
-		//console.log('ScannerMessenger.asyncTurnOn end');
+		console.log('ScannerMessenger.asyncTurnOn end');
 	}
 
 	public async asyncTurnOff() {
@@ -47,8 +54,8 @@ export class ScannerMessenger {
 
 		try {
 			await ScannerMessenger.connector.asyncSend(json);
-		} catch (e) {
-			console.log(e);
+		} catch (e:any) {
+			Toast.Error(e);
 		}
 
 		console.log('ScannerMessenger.asyncTurnOff end');
