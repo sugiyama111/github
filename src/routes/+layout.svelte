@@ -510,7 +510,7 @@ $effect(()=>{
 		if (typeof messagePort === 'undefined') return;
 
 		// Post message on this port.
-		//messagePort.postMessage("Test")
+		messagePort.postMessage("Test")
 
 		// Receive upcoming messages on this port.
 		messagePort.onmessage = function(event) {
