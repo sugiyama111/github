@@ -388,10 +388,8 @@ function sendIntentTurnOff() {
 
 {#if inputPanel == 'info'}
 	<article id="information" class="">
-		スキャナはありません<br>
-		Scanner Manager アプリが起動していません。<br>
-		端末起動直後の場合は起動するまでお待ちください。<br>
-		それ以外は、アプリを起動してください。		
+		ここにメッセージ
+		
 	</article>
 {:else if inputPanel == 'keypad'}
 	<Keypad onClose={()=>inputPanel = 'info'} onRegister={(num:string)=>{asyncRegisterByNumber(num, RegisterMethod.KEYPAD);}} />

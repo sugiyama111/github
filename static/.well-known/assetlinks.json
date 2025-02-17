@@ -1,6 +1,6 @@
 [
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+	{
+    "relation": ["delegate_permission/common.use_as_origin"],
     "target": {
       "namespace": "android_app",
       "package_name": "jp.neo_system.qr_timing3_twa",
@@ -8,10 +8,9 @@
         "6B:F7:0C:2D:F8:B2:72:B8:F0:6F:CF:AF:45:3C:FA:A8:D8:9E:56:24:7E:C2:77:2C:83:78:6A:80:61:AE:11:C9"
       ]
     }
-  }
-	,
-	{
-    "relation": ["delegate_permission/common.use_as_origin"],
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
       "package_name": "jp.neo_system.qr_timing3_twa",
