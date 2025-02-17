@@ -500,10 +500,10 @@ $effect(()=>{
 			console.warn("Untrusted origin:", event.origin);
 			return;
 		}
-		if (event.source === window) {
-			Toast.Info('do nothing because message is from PWA')
-			return;
-		}
+		// if (event.source === window) {
+		// 	Toast.Info('do nothing because message is from PWA')
+		// 	return;
+		// }
 
 		messagePort = event.ports[0];
 		console.log('port is : '+ messagePort);
