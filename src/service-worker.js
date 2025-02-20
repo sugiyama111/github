@@ -103,6 +103,6 @@ self.addEventListener('message', function (event) {
 self.addEventListener('fetch', function (event) {
 	if (messagePort) {
 		messagePort.postMessage({ type: 'pageTransition', port: messagePort });
-		console.log('push @ sw');
+		console.log('fetch @ sw');
 	}
 });

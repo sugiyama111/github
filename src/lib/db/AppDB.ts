@@ -148,7 +148,7 @@ export default class AppDB extends Dexie {
 
 	// 未送信のレコードの件数を取得
 	async asyncFetchUnsentRecordCount(logId:number): Promise<number> {
-		console.log('fetch unsent count on logid: ' + logId);
+		//console.log('fetch unsent count on logid: ' + logId);
 		const key:[number, number]  = [logId, 0];
 
     return this.records

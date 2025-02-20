@@ -312,8 +312,8 @@ $effect(()=>{
 
 		// 送信済みにする
 		const seqList = records.map(record=>record.seq);
-		console.log('reg seqList');
-		console.log(seqList);
+		// console.log('reg seqList');
+		// console.log(seqList);
 		await db.asyncUpdateRecordToSent($selectedLogId, seqList);
 
 		// 未送信件数を更新
