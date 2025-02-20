@@ -215,12 +215,19 @@ $effect(()=>{
     if (navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({ type: "requestScannerConnection" });
 
-      navigator.serviceWorker.addEventListener("message", (event) => {
+      // navigator.serviceWorker.addEventListener("message", (event) => {
+			// 	console.log('@page received scannerConnection: '+event.data.scannerConnection);
+      //   if (event.data.type === "scannerConnection") {
+      //     scanner.set(event.data.scannerConnection);
+      //   }
+      // });
+
+			self.addEventListener('message', (event)=>{
 				console.log('@page received scannerConnection: '+event.data.scannerConnection);
-        if (event.data.type === "scannerConnection") {
-          scanner.set(event.data.scannerConnection);
-        }
-      });
+				if (event.data.type === 'scannerConnection') {
+					scanner.set(event.data.scannerConnection);
+				}
+			});
     }
 
 
