@@ -222,12 +222,6 @@ $effect(()=>{
       //   }
       // });
 
-			self.addEventListener('message', (event)=>{
-				console.log('@page received scannerConnection: '+event.data.scannerConnection);
-				if (event.data.type === 'scannerConnection') {
-					scanner.set(event.data.scannerConnection);
-				}
-			});
     }
 
 
@@ -490,10 +484,17 @@ $effect(()=>{
 	});
 	
 	
-	self.addEventListener("message", function (event) {
+	self.addEventListener('message', function (event) {
 		console.log('message!');
 		console.log(event.ports);
 		console.log(event.data);
+
+		
+		if (event.data.type === 'scannerConnection') {
+			console.log('@page received scannerConnection: '+event.data.scannerConnection);
+			scanner.set(event.data.scannerConnection);
+		}
+	
 		// We are receiveing messages from any origin, you can check of the origin by
 		// using event.origin
 		// メッセージのオリジンを確認
