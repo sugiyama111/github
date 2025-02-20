@@ -490,7 +490,7 @@ $effect(()=>{
 	});
 	
 	
-	self.addEventListener("message", function (event) {
+	window.addEventListener("message", function (event) {
 		console.log('message!');
 		// We are receiveing messages from any origin, you can check of the origin by
 		// using event.origin
