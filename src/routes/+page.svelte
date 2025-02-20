@@ -184,7 +184,7 @@
 })();
 
 	const handleScannerButton = () => {
-		$scanner?.asyncTurnOn();
+		$scanner?.turnOn();
 		Toast.Info('端末横の黄色いボタンでスキャンして下さい');
 	}
 
@@ -337,9 +337,9 @@ function sendIntentTurnOff() {
 	}} class="btn w-20 h-20"
 	style="border:1px solid black;">call<br>1531</button>
 
-	<button onclick={()=>{console.log('on');$scanner?.asyncTurnOn();}} class="btn w-20 h-20"
+	<button onclick={()=>{console.log('on');$scanner?.turnOn();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナON</button>
-	<button onclick={()=>{console.log('off');$scanner?.asyncTurnOff();}} class="btn w-20 h-20"
+	<button onclick={()=>{console.log('off');$scanner?.turnOff();}} class="btn w-20 h-20"
 		style="border:1px solid black;">スキャナOFF</button>
 
 <button onclick={()=>{console.log('on');sendIntentTurnOn();}} class="btn w-20 h-20"

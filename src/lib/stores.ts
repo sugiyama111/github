@@ -7,7 +7,7 @@ import { TimingPoint } from '$lib/api/TimingPoint';
 import { Config } from '$lib/type/Config';
 import type RecordEntity from '$lib/db/RecordEntity';
 import { dayjs, type Dayjs } from '$lib/type/Dayjs';
-import { ScannerMessenger } from './ScannerMessenger';
+import { TwaPortMessenger } from './TwaPortMessenger';
 import { DialogVisibility } from './type/DialogVisibility';
 
 export const goBackUrl = writable<string|null>(null);
@@ -27,7 +27,7 @@ export const dialogVisibility = persisted('dialogVisibility', <DialogVisibility>
 //export const showsRegisterConfirmDialog = writable(false);	// 登録確認ダイアログ
 //export const showsTrialModeConfirmDialog = writable(false);	// お試しモード確認ダイアログ
 //export const showsCameraSelectDialog = writable(false);		// カメラ選択ダイアログ
-export const scanner = writable<ScannerMessenger>();
+export const scanner = writable<TwaPortMessenger>();
 
 export const isSending = writable<boolean>(false);				// 送信中であるか
 

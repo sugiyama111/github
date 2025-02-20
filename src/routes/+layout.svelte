@@ -24,6 +24,7 @@ import '../app.css';
     import { TrialModeToast } from '$lib/TrialModeToast';
     import { derived } from 'svelte/store';
     import TrialModeConfirmDialog from '$lib/components/TrialModeConfirmDialog.svelte';
+    import { MessagePortMessenger, TwaPortMessenger } from '$lib/TwaPortMessenger';
 
 	let { children } = $props();
 
@@ -122,8 +123,8 @@ $effect(()=>{
 */
 
 	const resetScannerByUrl = (path:string) => {
-		if (path === '/' && $selectedEvent && $selectedPoint) $scanner?.asyncTurnOn();
-		else $scanner?.asyncTurnOff();
+		if (path === '/' && $selectedEvent && $selectedPoint) $scanner?.turnOn();
+		else $scanner?.turnOff();
 	}
 
 	const trialAlertTick = new TimeoutTicker(30, {
@@ -190,11 +191,11 @@ $effect(()=>{
     // 必要な処理をここに記述
 
 		if (to == '/') {
-			$scanner?.asyncTurnOn();
+			$scanner?.turnOn();
 			console.log('route change /');
 			Toast.Success('route change /');
 		} else if (to == '/config') {
-			$scanner?.asyncTurnOff();
+			$scanner?.turnOff();
 			console.log('route change /config');
 			Toast.Success('route change /config TurnOFF');
 		}
@@ -402,15 +403,15 @@ $effect(()=>{
 		//toast.success(`visibility: ${document.visibilityState} path:${$page.url.pathname}`);
 		
 		if (document.visibilityState === 'visible' && $page.url.pathname == '/') {
-			$scanner?.asyncTurnOn();
+			$scanner?.turnOn();
 		} else {
-			$scanner?.asyncTurnOff();
+			$scanner?.turnOff();
 		}
 	}
 
 	// PWAをkillした時に実行される
 	function handleBeforeUnload(e:Event) {
-		$scanner?.asyncTurnOff();
+		$scanner?.turnOff();
 		// console.log('beforeunload');
 		// toast.success('beforeunload');
 //		goto('/');
@@ -488,36 +489,24 @@ $effect(()=>{
 		console.log('now: '+path+' and goBackUrl set to:'+$goBackUrl);
 	});
 	
-	let messagePort:MessagePort;
+	
+	let messenger:TwaPortMessenger;
 
-	self.addEventListener("message", (event) => {
-
-		Toast.Info("Message received in PWA:"+ event.data);
-    //console.log("Message received in PWA:", event.data);
-
+	self.addEventListener("message", function (event) {
+		// We are receiveing messages from any origin, you can check of the origin by
+		// using event.origin
 		// メッセージのオリジンを確認
-		if (event.origin !== "https://github-hazel-two.vercel.app") {
-			console.warn("Untrusted origin:", event.origin);
-			return;
-		}
-		// if (event.source === window) {
-		// 	Toast.Info('do nothing because message is from PWA')
+		// if (event.origin !== "https://github-hazel-two.vercel.app") {
+		// 	console.warn("Untrusted origin:", event.origin);
 		// 	return;
 		// }
 
-		messagePort = event.ports[0];
-		console.log('port is : '+ messagePort);
-		if (typeof messagePort === 'undefined') return;
-
-		// Post message on this port.
-		messagePort.postMessage("Test")
-
-		// Receive upcoming messages on this port.
-		messagePort.onmessage = function(event) {
-			Toast.Info("[PostMessage1] Got message" + event.data);
+		// get the port then use it for communication.
+		messenger = MessagePortMessenger.getInstance(event, function(event:MessageEvent) {
 			console.log("[PostMessage1] Got message" + event.data);
-		};
-	}, true);
+		});
+	});
+
 
 
 	
