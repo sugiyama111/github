@@ -101,8 +101,9 @@ self.addEventListener('message', function (event) {
 });
 // 画面遷移（ページのリクエスト）時にメッセージポートをページに渡す
 self.addEventListener('fetch', function (event) {
+	console.log('fetch @ sw: '+messagePort);
 	if (messagePort) {
 		messagePort.postMessage({ type: 'pageTransition', port: messagePort });
-		console.log('fetch @ sw');
+		
 	}
 });
