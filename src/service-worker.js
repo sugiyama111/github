@@ -92,7 +92,7 @@ self.addEventListener('message', (event) => {
   } else if (event.data.type === 'requestScannerConnection') {
 		console.log('@sw received requestScannerConnection');
     // ページ側から scannerConnection のリクエストが来たら返す
-		console.log('@sw send scannerConnection:'+event.source);
+		console.log('@sw send scannerConnection:'+scannerConnection);
     if (scannerConnection && event.source) {
       event.source.postMessage({ type: 'scannerConnection', scannerConnection }, [scannerConnection]);
     }
