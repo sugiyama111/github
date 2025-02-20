@@ -154,6 +154,7 @@ $effect(()=>{
 
   // ページ遷移を検知して処理を実行
   $effect(() => {
+		console.log('$effect called @ layout: ' + $page.url.pathname);
 		// URL入力しての画面表示時に発行(undefined -> /)。
 		// スキャナついてなくてリロード時にONにする
 		resetScannerByUrl($page.url.pathname);
