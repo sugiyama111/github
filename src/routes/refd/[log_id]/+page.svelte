@@ -143,9 +143,7 @@
 
 
 <style lang="postcss">
-	body {
-		@apply p-1;
-	}
+	
 	section.head {
 		@apply bg-cyan-200;
 		@apply flex justify-center;

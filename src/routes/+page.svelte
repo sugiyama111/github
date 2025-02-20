@@ -20,7 +20,6 @@
   import { ScanInput } from "$lib/type/ScanInput";
 	import { ScanInputValidator } from "$lib/ScanInputValidator";
 	import type { ValidationResultState } from "$lib/type/ValidationResult";
-	import { ScannerMessenger } from "$lib/ScannerMessenger";
 	import RegisterModeTab from "$lib/components/RegisterModeTab.svelte";
 
 	let inputPanel:'info' | 'camera' | 'keypad' = $state<'info' | 'camera' | 'keypad'>('info');
@@ -168,20 +167,20 @@
 
 	}
 
-	const asyncSetupScannerConnector = async () => {
-		Toast.Success('start setup scanner connector');
-		$scanner = await ScannerMessenger.asyncGetInstance((input:string)=>{
-			console.log('INPUT: ' + input);
-			asyncRegisterByMemberCode(input, RegisterMethod.SCANNER);
-		});
+// 	const asyncSetupScannerConnector = async () => {
+// 		Toast.Success('start setup scanner connector');
+// 		$scanner = await ScannerMessenger.asyncGetInstance((input:string)=>{
+// 			console.log('INPUT: ' + input);
+// 			asyncRegisterByMemberCode(input, RegisterMethod.SCANNER);
+// 		});
 
-		Toast.Success('end setup scanner connector');
-	}
+// 		Toast.Success('end setup scanner connector');
+// 	}
 
-// @TODO Zebra端末の時のみ起動する
-(async () => {
-	await asyncSetupScannerConnector();
-})();
+// // @TODO Zebra端末の時のみ起動する
+// (async () => {
+// 	await asyncSetupScannerConnector();
+// })();
 
 	const handleScannerButton = () => {
 		$scanner?.turnOn();

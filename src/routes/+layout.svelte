@@ -24,7 +24,7 @@ import '../app.css';
     import { TrialModeToast } from '$lib/TrialModeToast';
     import { derived } from 'svelte/store';
     import TrialModeConfirmDialog from '$lib/components/TrialModeConfirmDialog.svelte';
-    import { MessagePortMessenger, TwaPortMessenger } from '$lib/TwaPortMessenger';
+    import { TwaPortMessenger } from '$lib/TwaPortMessenger';
 
 	let { children } = $props();
 
@@ -490,8 +490,6 @@ $effect(()=>{
 	});
 	
 	
-	let messenger:TwaPortMessenger;
-
 	self.addEventListener("message", function (event) {
 		// We are receiveing messages from any origin, you can check of the origin by
 		// using event.origin
@@ -502,7 +500,7 @@ $effect(()=>{
 		// }
 
 		// get the port then use it for communication.
-		messenger = MessagePortMessenger.getInstance(event, function(event:MessageEvent) {
+		$scanner = TwaPortMessenger.getInstance(event, function(event:MessageEvent) {
 			console.log("[PostMessage1] Got message" + event.data);
 		});
 	});

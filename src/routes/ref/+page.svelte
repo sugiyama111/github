@@ -109,13 +109,7 @@
 
 
 <style lang="postcss">
-	.menu:hover {
-		border: 1px solid blue;
-	}
 
-	body {
-		@apply p-1;
-	}
 	table {
 		border: 1px solid lightgray;
 		width: 100%;
