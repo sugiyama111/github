@@ -211,10 +211,12 @@ $effect(()=>{
 		}
 
 		// Service Worker から scannerConnection を取得
+		console.log('@page send requestScannerConnection');
     if (navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({ type: "requestScannerConnection" });
 
       navigator.serviceWorker.addEventListener("message", (event) => {
+				console.log('@page received scannerConnection: '+event.data.scannerConnection);
         if (event.data.type === "scannerConnection") {
           scanner.set(event.data.scannerConnection);
         }
@@ -371,9 +373,10 @@ $effect(()=>{
 		sendingTicker?.stop();
 
 		// service-workerに、scanner接続を退避
+		console.log('@page send twaMessenger');
 		if (navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage(
-        { type: "twaMessanger", scannerConnection: $scanner },
+        { type: "twaMessenger", scannerConnection: $scanner },
         [$scanner] // transferable objects として渡す
       );
     }

@@ -85,11 +85,14 @@ self.addEventListener('fetch', (event) => {
 let scannerConnection = null;
 
 self.addEventListener('message', (event) => {
-  if (event.data.type === 'twaMessanger') {
+  if (event.data.type === 'twaMessenger') {
+		console.log('@sw receive twaMessenger');
     // ページ側から scannerConnection を受け取る
     scannerConnection = event.data.scannerConnection;
   } else if (event.data.type === 'requestScannerConnection') {
+		console.log('@sw received requestScannerConnection');
     // ページ側から scannerConnection のリクエストが来たら返す
+		console.log('@sw send scannerConnection:'+event.source);
     if (scannerConnection && event.source) {
       event.source.postMessage({ type: 'scannerConnection', scannerConnection }, [scannerConnection]);
     }
