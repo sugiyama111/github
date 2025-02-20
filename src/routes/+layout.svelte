@@ -209,36 +209,18 @@ $effect(()=>{
 		if ($isTrial) {
 			startTrialAlertRoutine();
 		}
-		// 2025/2/5 コメントアウト　svelte.config.js で登録するよう
-		// // service workerの登録
-		// if ('serviceWorker' in navigator) {
-    //   navigator.serviceWorker
-    //     .register('/service-worker.js'
-		// 			,{ type: dev ? 'module' : 'classic' })  // サービスワーカーを登録するパス
-    //     .then((registration:ServiceWorkerRegistration) => {
-    //       console.log('ServiceWorker registration successful with scope: ', registration.scope);
 
-		// 			registration.onupdatefound = () => {
-		// 				const installingWorker = registration.installing;
-		// 				if (installingWorker) {
-		// 					installingWorker.onstatechange = () => {
-		// 						if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-		// 							isUpdateAvailable = true;
-		// 							if (confirm('更新があります。更新しますか？')) {
-		// 								registration.update();
-		// 							}
-		// 						}
-		// 					};
-		// 				}
-		// 			}
-	
-    //     })
-    //     .catch((error) => {
-    //       console.log('ServiceWorker registration failed: ', error);
-    //     });
-    // } else {
-    //   console.log('Service Worker not supported');
-    // }
+		// Service Worker から scannerConnection を取得
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: "requestScannerConnection" });
+
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data.type === "scannerConnection") {
+          scanner.set(event.data.scannerConnection);
+        }
+      });
+    }
+
 
 		// 送信ルーティンの開始
 		if ($config.allowsSending) {
@@ -388,6 +370,13 @@ $effect(()=>{
 		// 送信があれば一旦停止
 		sendingTicker?.stop();
 
+		// service-workerに、scanner接続を退避
+		if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage(
+        { type: "twaMessanger", scannerConnection: $scanner },
+        [$scanner] // transferable objects として渡す
+      );
+    }
 	});
 	// // 他画面に遷移時に発行
 	// onDestroy(()=>{

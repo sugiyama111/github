@@ -183,7 +183,12 @@
 // })();
 
 	const handleScannerButton = () => {
-		$scanner?.turnOn();
+		if (!$scanner) {
+			Toast.Error('スキャナと接続されていません');
+			return;
+		}
+
+		$scanner.turnOn();
 		Toast.Info('端末横の黄色いボタンでスキャンして下さい');
 	}
 

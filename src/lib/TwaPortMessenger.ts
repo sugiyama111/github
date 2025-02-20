@@ -10,7 +10,6 @@ export class TwaPortMessenger {
 	
 		if (!TwaPortMessenger.instance) {
 			TwaPortMessenger.port = event.ports[0];
-			navigator.serviceWorker.controller?.postMessage({ type: 'twaMessagePort', port: TwaPortMessenger.port }, [TwaPortMessenger.port]);
 
 			// TWAから受け取った場合の処理
 			TwaPortMessenger.port.onmessage = function (event) {

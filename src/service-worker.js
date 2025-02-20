@@ -82,28 +82,16 @@ self.addEventListener('fetch', (event) => {
 });
 
 
+let scannerConnection = null;
 
-let messagePort = null;
-
-self.addEventListener('message', function (event) {
-	if (event.data.type === 'twaMessagePort') {
-		messagePort = event.data.port;
-
-		// MessagePort からのメッセージを処理
-		messagePort.onmessage = function (event) {
-			console.log('Received message from Page:', event.data);
-			// 必要に応じて処理を追加
-		};
-		
-		// ポートを接続
-		messagePort.start();
-	}
-});
-// 画面遷移（ページのリクエスト）時にメッセージポートをページに渡す
-self.addEventListener('fetch', function (event) {
-	console.log('fetch @ sw: '+messagePort);
-	if (messagePort) {
-		messagePort.postMessage({ type: 'pageTransition', port: messagePort });
-		
-	}
+self.addEventListener('message', (event) => {
+  if (event.data.type === 'twaMessanger') {
+    // ページ側から scannerConnection を受け取る
+    scannerConnection = event.data.scannerConnection;
+  } else if (event.data.type === 'requestScannerConnection') {
+    // ページ側から scannerConnection のリクエストが来たら返す
+    if (scannerConnection && event.source) {
+      event.source.postMessage({ type: 'scannerConnection', scannerConnection }, [scannerConnection]);
+    }
+  }
 });
