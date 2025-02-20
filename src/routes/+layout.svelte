@@ -490,7 +490,7 @@ $effect(()=>{
 	});
 	
 	
-	window.addEventListener("message", function (event) {
+	self.addEventListener("message", function (event) {
 		console.log('message!');
 		// We are receiveing messages from any origin, you can check of the origin by
 		// using event.origin
@@ -501,9 +501,7 @@ $effect(()=>{
 		// }
 
 		// get the port then use it for communication.
-		$scanner = TwaPortMessenger.getInstance(event, function(event:MessageEvent) {
-			console.log("[PostMessage1] Got message" + event.data);
-		});
+		$scanner = TwaPortMessenger.getInstance(event);
 	});
 
 

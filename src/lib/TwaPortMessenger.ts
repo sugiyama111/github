@@ -5,13 +5,21 @@ export class TwaPortMessenger {
 	private static port:MessagePort;
 
 		public static getInstance(
-				event:MessageEvent,
-				onMessageCallback:((this: MessagePort, ev: MessageEvent<any>)=>any)): TwaPortMessenger {
+				event:MessageEvent) {
+				//onMessageCallback:((this: MessagePort, ev: MessageEvent<any>)=>any)): TwaPortMessenger {
 	
 		if (!TwaPortMessenger.instance) {
 			TwaPortMessenger.port = event.ports[0];
+			navigator.serviceWorker.controller?.postMessage({ type: 'twaMessagePort', port: TwaPortMessenger.port });
 
-			TwaPortMessenger.port.onmessage = onMessageCallback;		// メッセージ受信時のコールバック関数を登録
+			// TWAから受け取った場合の処理
+			TwaPortMessenger.port.onmessage = function (event) {
+				if (event.data.type === 'pageTransition') {
+					console.log('Received message from Service Worker:', event.data.message);
+					// swに保持しておいたMessagePortを取得
+					TwaPortMessenger.port = event.data.port;
+				}
+			};
 
 			TwaPortMessenger.instance = new TwaPortMessenger();
 		}
@@ -20,21 +28,21 @@ export class TwaPortMessenger {
 	}
 
 	public turnOn() {
-			console.log('ScannerMessenger.turnOn start');
-	
-			const json = {
-				"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
-				"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
-				"extra_value": "ENABLE_PLUGIN"
-			}
-	
-			try {
-				TwaPortMessenger.port.postMessage(JSON.stringify(json));
-			} catch (e:any) {
-				Toast.Error(e);
-			}
-	
-			console.log('ScannerMessenger.turnOn end');
+		console.log('ScannerMessenger.turnOn start');
+
+		const json = {
+			"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
+			"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
+			"extra_value": "ENABLE_PLUGIN"
+		}
+
+		try {
+			TwaPortMessenger.port.postMessage(JSON.stringify(json));
+		} catch (e:any) {
+			Toast.Error(e);
+		}
+
+		console.log('ScannerMessenger.turnOn end');
 	}
 
 	public turnOff() {

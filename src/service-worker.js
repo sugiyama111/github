@@ -80,3 +80,27 @@ self.addEventListener('fetch', (event) => {
 
 	event.respondWith(respond());
 });
+
+
+
+let messagePort = null;
+
+self.addEventListener('message', function (event) {
+	if (event.data.type === 'twaMessagePort') {
+		messagePort = event.data.port;
+
+		// MessagePort からのメッセージを処理
+		messagePort.onmessage = function (event) {
+			console.log('Received message from Page:', event.data);
+			// 必要に応じて処理を追加
+		};
+		
+		// ポートを接続
+		messagePort.start();
+	}
+});
+self.addEventListener('push', function (event) {
+	if (messagePort) {
+		messagePort.postMessage({ type: 'pageTransition', port: messagePort });
+	}
+});
