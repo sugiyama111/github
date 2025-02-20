@@ -102,5 +102,6 @@ self.addEventListener('message', function (event) {
 self.addEventListener('push', function (event) {
 	if (messagePort) {
 		messagePort.postMessage({ type: 'pageTransition', port: messagePort });
+		console.log('push @ sw');
 	}
 });

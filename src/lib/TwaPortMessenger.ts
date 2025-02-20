@@ -15,7 +15,8 @@ export class TwaPortMessenger {
 			// TWAから受け取った場合の処理
 			TwaPortMessenger.port.onmessage = function (event) {
 				if (event.data.type === 'pageTransition') {
-					console.log('Received message from Service Worker:', event.data.message);
+					console.log('Received port from Service Worker');
+					console.log(event.data.port);
 					// swに保持しておいたMessagePortを取得
 					TwaPortMessenger.port = event.data.port;
 				}
