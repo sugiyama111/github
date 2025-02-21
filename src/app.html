@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
 		<script>
+			let port;
 			window.addEventListener('message', function (event) {
 		console.log('message!');
 		console.log(event.ports);
@@ -21,7 +22,7 @@
 		// }
 
 
-		console.log("type: "+event.data.type);
+		console.log("event.data.type: ", event.data.type);
 		console.log(event);
 
 		// get the port then use it for communication.
