@@ -419,7 +419,7 @@ function turnOff() {
 }
 
 	const sendToSw = () => {
-		console.log('azukeru');
+		console.log('SWへ預けます');
 		if (port && navigator.serviceWorker.controller) {
 				navigator.serviceWorker.controller.postMessage(
 					{ type: "azukeru", port: port },
@@ -430,7 +430,7 @@ function turnOff() {
 	}
 
 	const requestToGiveBackSw = () => {
-		console.log('toridasu');
+		console.log('SWへ取り出し命令');
 		if (navigator.serviceWorker.controller) {
 				navigator.serviceWorker.controller.postMessage(
 					{ type: "toridasu" },
@@ -441,7 +441,7 @@ function turnOff() {
 	// service-workerからのメッセージ受信
 	navigator.serviceWorker.addEventListener('message', (event) => {
 		if (event.data.type === 'kaesu') {
-			console.log('Received message from SW:', event.data);
+			console.log('SWから返却されました', event.data);
 			port = event.data.port;
 		}
 	});

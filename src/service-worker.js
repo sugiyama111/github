@@ -89,16 +89,13 @@ let port = null;
 self.addEventListener('message', (event) => {
 
 	if (event.data.type === 'azukeru') {
-		console.log('@sw receive azukeru');
+		console.log('@sw 預け命令を受け取りました．持っておきます');
 		
 		// ページ側から port を受け取る
 		port = event.data.port;
 	}
 	else if (event.data.type === 'toridasu') {
-		console.log('@sw received toridasu');
-		
-		// ページ側から scannerConnection のリクエストが来たら返す
-		console.log('@sw send port:'+port);
+		console.log('@sw 取り出し命令を受け取りました，命令元に返します', port);
 		
 		if (port && event.source) {
 			console.log("now sending");
