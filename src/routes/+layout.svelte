@@ -406,11 +406,11 @@ const turnOnJsonStr = JSON.stringify(turnOnJson);
 const turnOffJsonStr = JSON.stringify(turnOffJson);
 function turnOn() {
 	port?.postMessage(turnOnJsonStr)
-	console.log('sent TurnOn');
+	console.log('sent TurnOn', port);
 }
 function turnOff() {
 	port?.postMessage(turnOffJsonStr)
-	console.log('sent TurnOff');
+	console.log('sent TurnOff', port);
 }
 
 	const sendToSw = () => {
