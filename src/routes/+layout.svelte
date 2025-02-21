@@ -164,6 +164,7 @@ $effect(()=>{
 		console.log('$effect called @ layout: ' + $page.url.pathname);
 		// URL入力しての画面表示時に発行(undefined -> /)。
 		// スキャナついてなくてリロード時にONにする
+		console.log('reset scanner(url) by 2 $effect')
 		resetScannerByUrl($page.url.pathname);
     // const newPath = $page.url.pathname;
 
@@ -219,19 +220,19 @@ $effect(()=>{
 			startTrialAlertRoutine();
 		}
 
-		// Service Worker から scannerConnection を取得
-		console.log('@page send requestScannerConnection');
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({ type: "requestScannerConnection" });
+		// // Service Worker から scannerConnection を取得
+		// console.log('@page send requestScannerConnection');
+    // if (navigator.serviceWorker.controller) {
+    //   navigator.serviceWorker.controller.postMessage({ type: "requestScannerConnection" });
 
-      // navigator.serviceWorker.addEventListener("message", (event) => {
-			// 	console.log('@page received scannerConnection: '+event.data.scannerConnection);
-      //   if (event.data.type === "scannerConnection") {
-      //     scanner.set(event.data.scannerConnection);
-      //   }
-      // });
+    //   // navigator.serviceWorker.addEventListener("message", (event) => {
+		// 	// 	console.log('@page received scannerConnection: '+event.data.scannerConnection);
+    //   //   if (event.data.type === "scannerConnection") {
+    //   //     scanner.set(event.data.scannerConnection);
+    //   //   }
+    //   // });
 
-    }
+    // }
 
 
 		// 送信ルーティンの開始
@@ -573,6 +574,9 @@ function turnOff() {
 		port = event.ports[0];
 		console.log("port: "+port);
 		
+		console.log('reset scanner(url) by 1')
+		resetScannerByUrl($page.url.pathname);
+
 		if (typeof port === 'undefined') return;
 
 		// Receive upcoming messages on this port.
