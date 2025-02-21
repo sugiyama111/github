@@ -82,19 +82,29 @@ self.addEventListener('fetch', (event) => {
 });
 
 
-let scannerConnection = null;
+
+
+let port = null;
 
 self.addEventListener('message', (event) => {
-  if (event.data.type === 'twaMessenger') {
-		console.log('@sw receive twaMessenger');
-    // ページ側から scannerConnection を受け取る
-    scannerConnection = event.data.scannerConnection;
-  } else if (event.data.type === 'requestScannerConnection') {
-		console.log('@sw received requestScannerConnection');
-    // ページ側から scannerConnection のリクエストが来たら返す
-		console.log('@sw send scannerConnection:'+scannerConnection);
-    if (scannerConnection && event.source) {
-      event.source.postMessage({ type: 'scannerConnection', scannerConnection }, [scannerConnection]);
-    }
-  }
+
+	if (event.data.type === 'azukeru') {
+		console.log('@sw receive azukeru');
+		
+		// ページ側から port を受け取る
+		port = event.data.port;
+	}
+	else if (event.data.type === 'toridasu') {
+		console.log('@sw received toridasu');
+		
+		// ページ側から scannerConnection のリクエストが来たら返す
+		console.log('@sw send port:'+port);
+		
+		if (port && event.source) {
+			console.log("now sending");
+			event.source.postMessage({ type: 'kaesu', port }, [port]);
+			//self.postMessage({ type: 'kaesu', port }, [port]);
+		}
+	}
 });
+

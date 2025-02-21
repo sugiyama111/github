@@ -5,19 +5,17 @@ export class TwaPortMessenger {
 	private static port:MessagePort;
 
 		public static getInstance(
-				event:MessageEvent) {
+				port:MessagePort) {
 				//onMessageCallback:((this: MessagePort, ev: MessageEvent<any>)=>any)): TwaPortMessenger {
 	
 		if (!TwaPortMessenger.instance) {
-			TwaPortMessenger.port = event.ports[0];
+			TwaPortMessenger.port = port;
 
 			// TWAから受け取った場合の処理
 			TwaPortMessenger.port.onmessage = function (event) {
 				
-				//if (event.data.type === 'pageTransition') {
-					console.log('Received data from Service Worker');
-					console.log(event.data);
-				//}
+				console.log("[PostMessage1] Got message" + event.data);
+				
 			};
 
 			TwaPortMessenger.instance = new TwaPortMessenger();

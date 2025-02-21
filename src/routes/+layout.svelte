@@ -123,8 +123,14 @@ $effect(()=>{
 */
 
 	const resetScannerByUrl = (path:string) => {
-		if (path === '/' && $selectedEvent && $selectedPoint) $scanner?.turnOn();
-		else $scanner?.turnOff();
+		if (path === '/' && $selectedEvent && $selectedPoint) {
+			$scanner?.turnOn();
+			turnOn();
+		}
+		else {
+			$scanner?.turnOff();
+			turnOff();
+		}
 	}
 
 	const trialAlertTick = new TimeoutTicker(30, {
@@ -204,6 +210,8 @@ $effect(()=>{
 
 	// 初期表示時・画面遷移時に発行
 	onMount(()=>{
+		requestToGiveBackSw();
+
 		console.log('◆pushState');
 
 		if ($isTrial) {
@@ -375,13 +383,63 @@ $effect(()=>{
 
 		// service-workerに、scanner接続を退避
 		console.log('@page send twaMessenger');
-		if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage(
-        { type: "twaMessenger", scannerConnection: $scanner },
-        [$scanner] // transferable objects として渡す
-      );
-    }
+		sendToSw();
 	});
+
+
+ //////////////////
+ 
+ let port:MessagePort|null = null;
+ const turnOnJson = {
+	"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
+	"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
+	"extra_value": "ENABLE_PLUGIN"
+}
+
+const turnOffJson = {
+	"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
+	"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
+	"extra_value": "DISABLE_PLUGIN"
+}
+const turnOnJsonStr = JSON.stringify(turnOnJson);
+const turnOffJsonStr = JSON.stringify(turnOffJson);
+function turnOn() {
+	port?.postMessage(turnOnJsonStr)
+	console.log('sent TurnOn');
+}
+function turnOff() {
+	port?.postMessage(turnOffJsonStr)
+	console.log('sent TurnOff');
+}
+
+	const sendToSw = () => {
+		console.log('azukeru');
+		if (port && navigator.serviceWorker.controller) {
+				navigator.serviceWorker.controller.postMessage(
+					{ type: "azukeru", port: port },
+					[port] // transferable objects として渡す
+				);
+				port = null;
+		}
+	}
+
+	const requestToGiveBackSw = () => {
+		console.log('toridasu');
+		if (navigator.serviceWorker.controller) {
+				navigator.serviceWorker.controller.postMessage(
+					{ type: "toridasu" },
+				);
+		}
+	}
+
+	// service-workerからのメッセージ受信
+	navigator.serviceWorker.addEventListener('message', (event) => {
+		if (event.data.type === 'kaesu') {
+			console.log('Received message from SW:', event.data);
+			port = event.data.port;
+		}
+	});
+
 	// // 他画面に遷移時に発行
 	// onDestroy(()=>{
 	// 	$scanner?.asyncTurnOff();
@@ -398,8 +456,10 @@ $effect(()=>{
 		
 		if (document.visibilityState === 'visible' && $page.url.pathname == '/') {
 			$scanner?.turnOn();
+			turnOn();
 		} else {
 			$scanner?.turnOff();
+			turnOff();
 		}
 	}
 
@@ -504,7 +564,7 @@ $effect(()=>{
 		// }
 
 		// get the port then use it for communication.
-		$scanner = TwaPortMessenger.getInstance(event);
+		$scanner = TwaPortMessenger.getInstance(event.ports[0]);
 	});
 
 

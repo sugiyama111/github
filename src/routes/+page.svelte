@@ -189,6 +189,7 @@
 		}
 
 		$scanner.turnOn();
+		sendIntentTurnOn();
 		Toast.Info('端末横の黄色いボタンでスキャンして下さい');
 	}
 
