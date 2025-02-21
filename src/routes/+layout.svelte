@@ -441,6 +441,8 @@ function turnOff() {
 			port = event.data.port;
 		}
 	});
+////////////////////////↑
+
 
 	// // 他画面に遷移時に発行
 	// onDestroy(()=>{
@@ -546,17 +548,12 @@ function turnOff() {
 	});
 	
 	
-	self.addEventListener('message', function (event) {
+	window.addEventListener('message', function (event) {
 		console.log('message!');
 		console.log(event.ports);
 		console.log(event.data);
 
 		
-		if (event.data.type === 'scannerConnection') {
-			console.log('@page received scannerConnection: '+event.data.scannerConnection);
-			scanner.set(event.data.scannerConnection);
-		}
-	
 		// We are receiveing messages from any origin, you can check of the origin by
 		// using event.origin
 		// メッセージのオリジンを確認
