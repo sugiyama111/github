@@ -364,6 +364,7 @@ $effect(()=>{
  //let port:MessagePort|null = null;
  // @ts-ignore
  let port:MessagePort|null = window.port;		// 起動時の受け取りはここから。
+ // @ts-ignore
 	console.log('window.port', window.port)
 
  const turnOnJson = {

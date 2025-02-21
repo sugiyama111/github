@@ -27,7 +27,9 @@
 		console.log(event);
 
 		// get the port then use it for communication.
-		port = event.ports[0];
+		//port = event.ports[0];
+		window.port = event.ports[0];
+		port = window.port;
 		console.log("port: ", port);
 		
 		//console.log('reset scanner(url) by 1')
