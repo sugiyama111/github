@@ -184,6 +184,15 @@ $effect(()=>{
 
 	// 初期表示時・画面遷移時に発行
 	onMount(()=>{
+		
+		// service-workerからのメッセージ受信 タイミング的には、service-workerが登録されてから
+		navigator.serviceWorker.addEventListener('message', (event) => {
+			if (event.data.type === 'kaesu') {
+				console.log('SWから返却されました', event.data);
+				port = event.data.port;
+			}
+		});
+		
 		requestToGiveBackSw();
 
 		if ($isTrial) {
@@ -411,13 +420,6 @@ function turnOff() {
 		}
 	}
 
-	// service-workerからのメッセージ受信
-	navigator.serviceWorker.addEventListener('message', (event) => {
-		if (event.data.type === 'kaesu') {
-			console.log('SWから返却されました', event.data);
-			port = event.data.port;
-		}
-	});
 ////////////////////////↑
 
 
