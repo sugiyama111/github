@@ -66,41 +66,47 @@ import '../app.css';
 
 	let isUpdateAvailable = false;
 
-	// PWAのためのservice-worker登録
-	// console.log('service workerがregisterできているか');
-	// console.log(window);
-	// if ('serviceWorker' in navigator) {
-	// 	//window.addEventListener('load', function() {
-	// 	window.addEventListener('load', () => {
-	// 		console.log('load');
-	// 		window.navigator.serviceWorker.register('/service-worker.js')	//, { scope: './' })
-	// 		.then((registration:ServiceWorkerRegistration) => {
-	// 			console.log('ServiceWorker registration successfull with scope: ', registration.scope);
-
-	// 			registration.onupdatefound = () => {
-	// 				const installingWorker = registration.installing;
-	// 				if (installingWorker) {
-	// 					installingWorker.onstatechange = () => {
-	// 						if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-	// 							isUpdateAvailable = true;
-	// 							if (confirm('更新があります。更新しますか？')) {
-	// 								registration.update();
-	// 							}
-	// 						}
-	// 					};
-	// 				}
-	// 			}
-
-	// 		}, function (err:Error) {
-	// 			console.log('ServiceWorker registration failed: ', err);
-	// 		});
-	// 	});
-	// }
-
-
 	// drawerの設定
 	let drawerHidden = $state(true);
 
+
+	//////////////////////// ↓
+	window.addEventListener('message', function (event) {
+		console.log('message!');
+		console.log(event.ports);
+		console.log(event.data);
+
+		
+		// We are receiveing messages from any origin, you can check of the origin by
+		// using event.origin
+		// メッセージのオリジンを確認
+		// if (event.origin !== "https://github-hazel-two.vercel.app") {
+		// 	console.warn("Untrusted origin:", event.origin);
+		// 	return;
+		// }
+
+
+		console.log("type: "+event.data.type);
+		console.log(event);
+
+		// get the port then use it for communication.
+		port = event.ports[0];
+		console.log("port: "+port);
+		
+		console.log('reset scanner(url) by 1')
+		resetScannerByUrl($page.url.pathname);
+
+		if (typeof port === 'undefined') return;
+
+		// Receive upcoming messages on this port.
+		port.onmessage = function(event) {
+			console.log("[PostMessage1] Got message" + event.data);
+		};
+
+		// get the port then use it for communication.
+		//$scanner = TwaPortMessenger.getInstance(event.ports[0]);
+	});
+	//////////////////////// ↑
 
 /*
 // ダイアログ表示時にturnoffするテスト
@@ -548,43 +554,6 @@ function turnOff() {
 	});
 	
 	
-	window.addEventListener('message', function (event) {
-		console.log('message!');
-		console.log(event.ports);
-		console.log(event.data);
-
-		
-		// We are receiveing messages from any origin, you can check of the origin by
-		// using event.origin
-		// メッセージのオリジンを確認
-		// if (event.origin !== "https://github-hazel-two.vercel.app") {
-		// 	console.warn("Untrusted origin:", event.origin);
-		// 	return;
-		// }
-
-
-		////////////////////////
-		console.log("type: "+event.data.type);
-		console.log(event);
-
-		// get the port then use it for communication.
-		port = event.ports[0];
-		console.log("port: "+port);
-		
-		console.log('reset scanner(url) by 1')
-		resetScannerByUrl($page.url.pathname);
-
-		if (typeof port === 'undefined') return;
-
-		// Receive upcoming messages on this port.
-		port.onmessage = function(event) {
-			console.log("[PostMessage1] Got message" + event.data);
-		};
-
-		// get the port then use it for communication.
-		//$scanner = TwaPortMessenger.getInstance(event.ports[0]);
-	});
-
 
 
 	
