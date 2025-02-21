@@ -123,6 +123,7 @@ $effect(()=>{
 */
 
 	const resetScannerByUrl = (path:string) => {
+		console.log(`resetByUrl: ${path}`);
 		if (path === '/' && $selectedEvent && $selectedPoint) {
 			$scanner?.turnOn();
 			turnOn();
