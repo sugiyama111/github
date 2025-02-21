@@ -71,8 +71,6 @@ import '../app.css';
 
 
 	//////////////////////// ↓
-	export const load = () => {
-		
 	window.addEventListener('message', function (event) {
 		console.log('message!');
 		console.log(event.ports);
@@ -108,7 +106,6 @@ import '../app.css';
 		// get the port then use it for communication.
 		//$scanner = TwaPortMessenger.getInstance(event.ports[0]);
 	});
-}
 	//////////////////////// ↑
 
 /*
@@ -538,7 +535,7 @@ function turnOff() {
 	// onpopstateは afterNavigate(beforeNavigate) との実行順序は保証できない？
 	// afterNavigateではgotoせず、戻るべき先のみを指示する
 	afterNavigate((event)=>{
-		console.log('afterNavigate');
+		//console.log('afterNavigate');
 
 		const path = event.to?.url.pathname ?? '';
 
@@ -552,7 +549,7 @@ function turnOff() {
 			$goBackUrl = '/ref';
 		}
 
-		console.log('now: '+path+' and goBackUrl set to:'+$goBackUrl);
+		//console.log('now: '+path+' and goBackUrl set to:'+$goBackUrl);
 	});
 	
 	
