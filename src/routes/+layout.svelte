@@ -234,7 +234,7 @@ $effect(()=>{
 	const asyncSendManually = async() => {
 		//Toast.Info("postMessage:"+messagePort);
 		//messagePort?.postMessage("New");
-		window.postMessage("New4");
+		sendToSw();
 
 		// 定期送信を止める
 		sendingTicker?.stop();

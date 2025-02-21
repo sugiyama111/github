@@ -95,9 +95,14 @@ self.addEventListener('message', (event) => {
 		port = event.data.port;
 	}
 	else if (event.data.type === 'toridasu') {
-		console.log('@sw 取り出し命令を受け取りました，命令元に返します', port);
+		if (port) {
+			console.log('@sw 取り出し命令を受け取りました，命令元に返します', port);
+		} else {
+			console.log('@sw 取り出し命令を受け取りましたがnullなので中止します');
+			return;
+		}
 		
-		if (port && event.source) {
+		if (event.source) {
 			console.log("now sending");
 			event.source.postMessage({ type: 'kaesu', port }, [port]);
 			//self.postMessage({ type: 'kaesu', port }, [port]);
