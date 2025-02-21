@@ -5,6 +5,43 @@
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
+		<script>
+			window.addEventListener('message', function (event) {
+		console.log('message!');
+		console.log(event.ports);
+		console.log(event.data);
+
+		
+		// We are receiveing messages from any origin, you can check of the origin by
+		// using event.origin
+		// メッセージのオリジンを確認
+		// if (event.origin !== "https://github-hazel-two.vercel.app") {
+		// 	console.warn("Untrusted origin:", event.origin);
+		// 	return;
+		// }
+
+
+		console.log("type: "+event.data.type);
+		console.log(event);
+
+		// get the port then use it for communication.
+		port = event.ports[0];
+		console.log("port: ", port);
+		
+		console.log('reset scanner(url) by 1')
+		//resetScannerByUrl($page.url.pathname);
+
+		if (typeof port === 'undefined') return;
+
+		// Receive upcoming messages on this port.
+		port.onmessage = function(event) {
+			console.log("[PostMessage1] Got message" + event.data);
+		};
+
+		// get the port then use it for communication.
+		//$scanner = TwaPortMessenger.getInstance(event.ports[0]);
+	});
+		</script>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
