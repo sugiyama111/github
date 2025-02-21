@@ -71,6 +71,8 @@ import '../app.css';
 
 
 	//////////////////////// ↓
+	export const load = () => {
+		
 	window.addEventListener('message', function (event) {
 		console.log('message!');
 		console.log(event.ports);
@@ -96,17 +98,17 @@ import '../app.css';
 		console.log('reset scanner(url) by 1')
 		//resetScannerByUrl($page.url.pathname);
 
-		//if (typeof port === 'undefined') return;
+		if (typeof port === 'undefined') return;
 
 		// Receive upcoming messages on this port.
 		port.onmessage = function(event) {
 			console.log("[PostMessage1] Got message" + event.data);
-			
 		};
 
 		// get the port then use it for communication.
 		//$scanner = TwaPortMessenger.getInstance(event.ports[0]);
 	});
+}
 	//////////////////////// ↑
 
 /*
