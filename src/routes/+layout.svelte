@@ -91,16 +91,17 @@ import '../app.css';
 
 		// get the port then use it for communication.
 		port = event.ports[0];
-		console.log("port: "+port);
+		console.log("port: ", port);
 		
 		console.log('reset scanner(url) by 1')
-		resetScannerByUrl($page.url.pathname);
+		//resetScannerByUrl($page.url.pathname);
 
-		if (typeof port === 'undefined') return;
+		//if (typeof port === 'undefined') return;
 
 		// Receive upcoming messages on this port.
 		port.onmessage = function(event) {
 			console.log("[PostMessage1] Got message" + event.data);
+			
 		};
 
 		// get the port then use it for communication.
@@ -245,7 +246,7 @@ $effect(()=>{
 		}
 
 		//toast.info(`mount url:${$page.url.pathname}`);
-		resetScannerByUrl($page.url.pathname);
+		//resetScannerByUrl($page.url.pathname);
 
 
 
@@ -435,6 +436,8 @@ function turnOff() {
 				navigator.serviceWorker.controller.postMessage(
 					{ type: "toridasu" },
 				);
+
+				resetScannerByUrl($page.url.pathname);
 		}
 	}
 
