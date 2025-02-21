@@ -363,8 +363,7 @@ $effect(()=>{
 		sendingTicker?.stop();
 
 		// service-workerに、scanner接続を退避
-		console.log('@page send twaMessenger');
-		sendToSw();
+		//console.log('@page send twaMessenger');
 	});
 
 
@@ -449,6 +448,8 @@ function turnOff() {
 	// PWAをkillした時に実行される
 	function handleBeforeUnload(e:Event) {
 		$scanner?.turnOff();
+		sendToSw();
+
 		// console.log('beforeunload');
 		// toast.success('beforeunload');
 //		goto('/');
