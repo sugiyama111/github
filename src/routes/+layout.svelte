@@ -220,8 +220,6 @@ $effect(()=>{
 	onMount(()=>{
 		requestToGiveBackSw();
 
-		console.log('◆pushState');
-
 		if ($isTrial) {
 			startTrialAlertRoutine();
 		}
@@ -501,7 +499,6 @@ function turnOff() {
 	// });
 	
 	const handleGetBack = (e:Event) => {
-		console.log('◆handleGotBack');
 		console.log('goBackUrl=: ' + $goBackUrl);
 
 		const to = $goBackUrl;
@@ -536,7 +533,7 @@ function turnOff() {
 	// onpopstateは afterNavigate(beforeNavigate) との実行順序は保証できない？
 	// afterNavigateではgotoせず、戻るべき先のみを指示する
 	afterNavigate((event)=>{
-		console.log('◆afterNavigate');
+		console.log('afterNavigate');
 
 		const path = event.to?.url.pathname ?? '';
 
