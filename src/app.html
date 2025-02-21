@@ -6,7 +6,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
 		<script>
-			let port;
+			window.port = null;				// layout.svelteと共有できる変数を作成
+			let port = window.port;		// 参照を取得
 			window.addEventListener('message', function (event) {
 		console.log('message!');
 		console.log(event.ports);
@@ -29,7 +30,7 @@
 		port = event.ports[0];
 		console.log("port: ", port);
 		
-		console.log('reset scanner(url) by 1')
+		//console.log('reset scanner(url) by 1')
 		//resetScannerByUrl($page.url.pathname);
 
 		if (typeof port === 'undefined') return;

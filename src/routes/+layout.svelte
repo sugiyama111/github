@@ -361,7 +361,11 @@ $effect(()=>{
 
  //////////////////
  
- let port:MessagePort|null = null;
+ //let port:MessagePort|null = null;
+ // @ts-ignore
+ let port:MessagePort|null = window.port;		// 起動時の受け取りはここから。
+	console.log('window.port', window.port)
+
  const turnOnJson = {
 	"action": "com.symbol.datawedge.api.ACTION_SCANNERINPUTPLUGIN",
 	"extra_key": "com.symbol.datawedge.api.EXTRA_PARAMETER",
