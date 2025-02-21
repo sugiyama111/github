@@ -564,8 +564,24 @@ function turnOff() {
 		// 	return;
 		// }
 
+
+		////////////////////////
+		console.log("type: "+event.data.type);
+		console.log(event);
+
 		// get the port then use it for communication.
-		$scanner = TwaPortMessenger.getInstance(event.ports[0]);
+		port = event.ports[0];
+		console.log("port: "+port);
+		
+		if (typeof port === 'undefined') return;
+
+		// Receive upcoming messages on this port.
+		port.onmessage = function(event) {
+			console.log("[PostMessage1] Got message" + event.data);
+		};
+
+		// get the port then use it for communication.
+		//$scanner = TwaPortMessenger.getInstance(event.ports[0]);
 	});
 
 
